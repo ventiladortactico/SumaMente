@@ -1,5 +1,6 @@
-const CACHE_NAME = 'sumamente-v2';
+const CACHE_NAME = 'sumamente-v3-final';
 const ASSETS = [
+  './',
   './index.html',
   './manifest.json',
   './logo.png',
@@ -7,12 +8,32 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting(); // Forzar activación inmediata
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
 });
 
+self.addEventListener('activate', event => {
+  // Limpiar caches viejos
+  event.waitUntil(
+    caches.keys().then(keys => Promise.all(
+      keys.map(key => {
+        if (key !== CACHE_NAME) return caches.delete(key);
+      })
+    ))
+  );
+  return self.clients.claim();
+});
+
 self.addEventListener('fetch', event => {
+  // Evitar que las navegaciones abran el navegador externo
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
   event.respondWith(
     caches.match(event.request).then(response => response || fetch(event.request))
   );

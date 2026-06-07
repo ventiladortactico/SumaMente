@@ -4,8 +4,11 @@
   "description": "Calculadora científica inteligente: Medicina, Finanzas, Electrónica y más.",
   "start_url": "./index.html",
   "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay"],
+  "orientation": "portrait",
   "background_color": "#0a0b0e",
-  "theme_color": "#4f9cf9",
+  "theme_color": "#0a0b0e",
+  "scope": "./",
   "icons": [
     {
       "src": "logo.png",

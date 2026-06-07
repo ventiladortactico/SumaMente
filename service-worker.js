@@ -1,7 +1,8 @@
-const CACHE_NAME = 'calcpro-v1';
+const CACHE_NAME = 'sumamente-v2';
 const ASSETS = [
-  './calculadora_cientifica_pro.html',
+  './index.html',
   './manifest.json',
+  './logo.png',
   'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800&display=swap'
 ];
 

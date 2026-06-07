@@ -317,13 +317,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
         <div class="panel-header"><span class="panel-title">Electrónica</span></div>
         <div class="panel-body">
           <div class="formula-chips" id="chips-electro">
-            <button class="chip active" onclick="setFormula('electro','led')">LED Resistor</button>
-            <button class="chip" onclick="setFormula('electro','ohm')">Ley de Ohm</button>
-            <button class="chip" onclick="setFormula('electro','rc')">Filtro RC</button>
-            <button class="chip" onclick="setFormula('electro','div')">Divisor V</button>
-            <button class="chip" onclick="setFormula('electro','par')">Paralelo R</button>
-            <button class="chip" onclick="setFormula('electro','db')">dB Ganancia</button>
-            <button class="chip" onclick="setFormula('electro','555')">555 Astable</button>
+            <button class="chip active" onclick="setFormula('electro','led',event)">LED Resistor</button>
+            <button class="chip" onclick="setFormula('electro','ohm',event)">Ley de Ohm</button>
+            <button class="chip" onclick="setFormula('electro','rc',event)">Filtro RC</button>
+            <button class="chip" onclick="setFormula('electro','div',event)">Divisor V</button>
+            <button class="chip" onclick="setFormula('electro','par',event)">Paralelo R</button>
+            <button class="chip" onclick="setFormula('electro','db',event)">dB Ganancia</button>
+            <button class="chip" onclick="setFormula('electro','555',event)">555 Astable</button>
           </div>
           <div id="form-electro"></div>
           <div class="result" id="result-electro"></div>
@@ -338,20 +338,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
         <div class="panel-header"><span class="panel-title">Medicina</span></div>
         <div class="panel-body">
           <div class="formula-chips">
-            <button class="chip active" onclick="setFormula('med','goteo')">Goteo IV</button>
-            <button class="chip" onclick="setFormula('med','dosis')">Dosis mg/kg</button>
-            <button class="chip" onclick="setFormula('med','imc')">IMC</button>
-            <button class="chip" onclick="setFormula('med','tmb')">TMB Harris</button>
-            <button class="chip" onclick="setFormula('med','crcl')">Clearance Cr.</button>
-            <button class="chip" onclick="setFormula('med','peso_ideal')">Peso Ideal</button>
-            <button class="chip" onclick="setFormula('med','asc')">ASC (Mosteller)</button>
-            <button class="chip" onclick="setFormula('med','ascvd')">ASCVD Risk</button>
-            <button class="chip" onclick="setFormula('med','sofa')">SOFA</button>
-            <button class="chip" onclick="setFormula('med','curb65')">CURB-65</button>
-            <button class="chip" onclick="setFormula('med','geneva')">Ginebra TEP</button>
-            <button class="chip" onclick="setFormula('med','gina')">Asma GINA</button>
-            <button class="chip" onclick="setFormula('med','anc')">ANC</button>
-            <button class="chip" onclick="setFormula('med','ganzoni')">Ganzoni (Hierro)</button>
+            <button class="chip active" onclick="setFormula('med','goteo',event)">Goteo IV</button>
+            <button class="chip" onclick="setFormula('med','dosis',event)">Dosis mg/kg</button>
+            <button class="chip" onclick="setFormula('med','imc',event)">IMC</button>
+            <button class="chip" onclick="setFormula('med','tmb',event)">TMB Harris</button>
+            <button class="chip" onclick="setFormula('med','crcl',event)">Clearance Cr.</button>
+            <button class="chip" onclick="setFormula('med','peso_ideal',event)">Peso Ideal</button>
+            <button class="chip" onclick="setFormula('med','asc',event)">ASC (Mosteller)</button>
+            <button class="chip" onclick="setFormula('med','ascvd',event)">ASCVD Risk</button>
+            <button class="chip" onclick="setFormula('med','sofa',event)">SOFA</button>
+            <button class="chip" onclick="setFormula('med','curb65',event)">CURB-65</button>
+            <button class="chip" onclick="setFormula('med','geneva',event)">Ginebra TEP</button>
+            <button class="chip" onclick="setFormula('med','gina',event)">Asma GINA</button>
+            <button class="chip" onclick="setFormula('med','anc',event)">ANC</button>
+            <button class="chip" onclick="setFormula('med','ganzoni',event)">Ganzoni (Hierro)</button>
           </div>
           <div id="form-med"></div>
           <div class="result" id="result-med"></div>
@@ -374,13 +374,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
         </div>
         <div class="panel-body">
           <div class="formula-chips">
-            <button class="chip active" onclick="setFormula('fin','prestamo')">Préstamo francés</button>
-            <button class="chip" onclick="setFormula('fin','uva')">Préstamo UVA</button>
-            <button class="chip" onclick="setFormula('fin','intcomp')">Interés compuesto</button>
-            <button class="chip" onclick="setFormula('fin','margen')">Margen %</button>
-            <button class="chip" onclick="setFormula('fin','vpn_tir')">VPN / TIR</button>
-            <button class="chip" onclick="setFormula('fin','aleman_amer')">Alemán / Americano</button>
-            <button class="chip" onclick="setFormula('fin','tasas')">Conversor Tasas</button>
+            <button class="chip active" onclick="setFormula('fin','prestamo',event)">Préstamo francés</button>
+            <button class="chip" onclick="setFormula('fin','uva',event)">Préstamo UVA</button>
+            <button class="chip" onclick="setFormula('fin','intcomp',event)">Interés compuesto</button>
+            <button class="chip" onclick="setFormula('fin','margen',event)">Margen %</button>
+            <button class="chip" onclick="setFormula('fin','vpn_tir',event)">VPN / TIR</button>
+            <button class="chip" onclick="setFormula('fin','aleman_amer',event)">Alemán / Americano</button>
+            <button class="chip" onclick="setFormula('fin','tasas',event)">Conversor Tasas</button>
           </div>
           <div id="form-fin"></div>
           <div class="result" id="result-fin"></div>
@@ -395,10 +395,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
         <div class="panel-header"><span class="panel-title">Química</span></div>
         <div class="panel-body">
           <div class="formula-chips">
-            <button class="chip active" onclick="setFormula('quim','molar')">Molaridad</button>
-            <button class="chip" onclick="setFormula('quim','dilucion')">Dilución</button>
-            <button class="chip" onclick="setFormula('quim','ph')">pH</button>
-            <button class="chip" onclick="setFormula('quim','gas')">Gas ideal PV=nRT</button>
+            <button class="chip active" onclick="setFormula('quim','molar',event)">Molaridad</button>
+            <button class="chip" onclick="setFormula('quim','dilucion',event)">Dilución</button>
+            <button class="chip" onclick="setFormula('quim','ph',event)">pH</button>
+            <button class="chip" onclick="setFormula('quim','gas',event)">Gas ideal PV=nRT</button>
           </div>
           <div id="form-quim"></div>
           <div class="result" id="result-quim"></div>
@@ -413,9 +413,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
         <div class="panel-header"><span class="panel-title">Construcción</span></div>
         <div class="panel-body">
           <div class="formula-chips">
-            <button class="chip active" onclick="setFormula('civil','hormigon')">Hormigón</button>
-            <button class="chip" onclick="setFormula('civil','ladrillos')">Ladrillos</button>
-            <button class="chip" onclick="setFormula('civil','caida')">Caída de tensión</button>
+            <button class="chip active" onclick="setFormula('civil','hormigon',event)">Hormigón</button>
+            <button class="chip" onclick="setFormula('civil','ladrillos',event)">Ladrillos</button>
+            <button class="chip" onclick="setFormula('civil','caida',event)">Caída de tensión</button>
           </div>
           <div id="form-civil"></div>
           <div class="result" id="result-civil"></div>
@@ -430,9 +430,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
         <div class="panel-header"><span class="panel-title">Mecánica</span></div>
         <div class="panel-body">
           <div class="formula-chips">
-            <button class="chip active" onclick="setFormula('mec','cilindrada')">Cilindrada</button>
-            <button class="chip" onclick="setFormula('mec','potencia')">HP / Torque</button>
-            <button class="chip" onclick="setFormula('mec','consumo')">Consumo km/L</button>
+            <button class="chip active" onclick="setFormula('mec','cilindrada',event)">Cilindrada</button>
+            <button class="chip" onclick="setFormula('mec','potencia',event)">HP / Torque</button>
+            <button class="chip" onclick="setFormula('mec','consumo',event)">Consumo km/L</button>
           </div>
           <div id="form-mec"></div>
           <div class="result" id="result-mec"></div>
@@ -447,10 +447,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
         <div class="panel-header"><span class="panel-title">Geometría</span></div>
         <div class="panel-body">
           <div class="formula-chips">
-            <button class="chip active" onclick="setFormula('geom','circulo')">Círculo</button>
-            <button class="chip" onclick="setFormula('geom','triangulo')">Triángulo</button>
-            <button class="chip" onclick="setFormula('geom','esfera')">Esfera</button>
-            <button class="chip" onclick="setFormula('geom','cilindro')">Cilindro</button>
+            <button class="chip active" onclick="setFormula('geom','circulo',event)">Círculo</button>
+            <button class="chip" onclick="setFormula('geom','triangulo',event)">Triángulo</button>
+            <button class="chip" onclick="setFormula('geom','esfera',event)">Esfera</button>
+            <button class="chip" onclick="setFormula('geom','cilindro',event)">Cilindro</button>
           </div>
           <div id="form-geom"></div>
           <div class="result" id="result-geom"></div>
@@ -465,10 +465,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
         <div class="panel-header"><span class="panel-title">Conversor de Unidades</span></div>
         <div class="panel-body">
           <div class="formula-chips">
-            <button class="chip active" onclick="setFormula('unit','longitud')">Longitud</button>
-            <button class="chip" onclick="setFormula('unit','masa')">Masa</button>
-            <button class="chip" onclick="setFormula('unit','temp')">Temperatura</button>
-            <button class="chip" onclick="setFormula('unit','presion')">Presión</button>
+            <button class="chip active" onclick="setFormula('unit','longitud',event)">Longitud</button>
+            <button class="chip" onclick="setFormula('unit','masa',event)">Masa</button>
+            <button class="chip" onclick="setFormula('unit','temp',event)">Temperatura</button>
+            <button class="chip" onclick="setFormula('unit','presion',event)">Presión</button>
           </div>
           <div id="form-unit"></div>
           <div class="result" id="result-unit"></div>
@@ -483,9 +483,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
         <div class="panel-header"><span class="panel-title">Física</span></div>
         <div class="panel-body">
           <div class="formula-chips">
-            <button class="chip active" onclick="setFormula('fis','velocidad')">Velocidad/Acel.</button>
-            <button class="chip" onclick="setFormula('fis','fuerza')">Fuerza (F=m·a)</button>
-            <button class="chip" onclick="setFormula('fis','energia')">Energía</button>
+            <button class="chip active" onclick="setFormula('fis','velocidad',event)">Velocidad/Acel.</button>
+            <button class="chip" onclick="setFormula('fis','fuerza',event)">Fuerza (F=m·a)</button>
+            <button class="chip" onclick="setFormula('fis','energia',event)">Energía</button>
           </div>
           <div id="form-fis"></div>
           <div class="result" id="result-fis"></div>
@@ -1713,9 +1713,11 @@ function selectModule(mode){
   toggleModal(false);
 }
 
-function setFormula(module,key){
-  document.querySelectorAll('#mode-'+module+' .chip').forEach(c=>c.classList.remove('active'));
-  event.target.classList.add('active');
+function setFormula(module,key,event){
+  if(event && event.target){
+    document.querySelectorAll('#mode-'+module+' .chip').forEach(c=>c.classList.remove('active'));
+    event.target.classList.add('active');
+  }
   activeFormula[module]=key;
   renderForm(module,key);
   document.getElementById('result-'+module).classList.remove('show');

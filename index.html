@@ -1841,7 +1841,7 @@ setFormula('fis','velocidad');
 // PWA Service Worker Registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js', { scope: './' })
+    navigator.serviceWorker.register('/SumaMente/service-worker.js', { scope: '/SumaMente/' })
       .then(reg => {
         console.log('SumaMente PWA: Registrado con éxito');
         reg.onupdatefound = () => {

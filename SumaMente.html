@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0b0e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#0a0b0e;
+--surface:#111318;
+--surface2:#181c24;
+--surface3:#1e232f;
+--border:#2a3040;
+--border2:#3a4558;
+--accent:#4f9cf9;
+--accent2:#38e8c8;
+--accent3:#f97b4f;
+--accent4:#a78bfa;
+--warn:#f9c74f;
+--danger:#f94f4f;
+--success:#4ff97b;
+--text:#e8edf5;
+--text2:#8a97b0;
+--text3:#4a5570;
+--mono:'JetBrains Mono',monospace;
+--sans:'Syne',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;overflow-x:hidden}
+.app{max-width:820px;margin:0 auto;padding:16px}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 0 16px;border-bottom:1px solid var(--border)}
+.logo{font-family:var(--sans);font-size:18px;font-weight:800;letter-spacing:-0.5px}
+.logo span{color:var(--accent)}
+.version{font-size:10px;color:var(--text3);letter-spacing:2px;text-transform:uppercase}
+
+/* TABS & NAVIGATION */
+.nav-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:8px}
+.current-mode-display{display:flex;align-items:center;gap:10px}
+.current-mode-display .dot{width:8px;height:8px;border-radius:50%}
+.current-mode-name{font-family:var(--sans);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text)}
+
+.btn-menu{background:var(--surface3);border:1px solid var(--accent);color:var(--accent);padding:10px 18px;border-radius:8px;cursor:pointer;font-family:var(--mono);font-size:12px;font-weight:700;white-space:nowrap;transition:all 0.15s;display:flex;align-items:center;gap:8px}
+.btn-menu:hover{background:var(--accent);color:var(--bg)}
+.btn-menu svg{width:16px;height:16px}
+
+/* MODULE SELECTOR MODAL */
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,11,14,0.95);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)}
+.modal.show{display:flex}
+.modal-content{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:600px;padding:24px;position:relative}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer}
+.modal-close:hover{color:var(--text)}
+.modal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:20px}
+.module-card{background:var(--surface2);border:1px solid var(--border);padding:16px;border-radius:12px;text-align:center;cursor:pointer;transition:all 0.2s}
+.module-card:hover{border-color:var(--accent);transform:translateY(-3px);background:var(--surface3)}
+.module-card .dot{width:10px;height:10px;border-radius:50%;margin:0 auto 10px;display:block}
+.module-card .name{font-size:12px;font-weight:700;color:var(--text)}
+.module-card .desc{font-size:9px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:1fr 280px;gap:12px;margin-top:12px}
+@media(max-width:640px){.layout{grid-template-columns:1fr}}
+
+/* PANEL */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.panel-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.panel-title{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)}
+.panel-body{padding:14px}
+
+/* DISPLAY */
+.display{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:12px;min-height:90px;position:relative}
+.display-formula{font-size:11px;color:var(--text3);margin-bottom:4px;min-height:16px}
+.display-value{font-size:28px;font-weight:300;color:var(--text);text-align:right;word-break:break-all;line-height:1.2}
+.display-unit{font-size:13px;color:var(--accent2);margin-top:2px;text-align:right}
+.display-mode{position:absolute;top:10px;left:12px;font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase}
+
+/* FIELDS */
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.field-full{margin-bottom:8px}
+.field label{font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px}
+.field input,.field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:border-color 0.15s}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.field select option{background:var(--surface2)}
+
+/* BUTTONS */
+.btn-calc{width:100%;padding:11px;background:var(--accent);border:none;border-radius:7px;color:#0a0b0e;font-family:var(--mono);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:opacity 0.15s;margin-top:4px}
+.btn-calc:hover{opacity:0.85}
+.btn-secondary{padding:7px 12px;background:transparent;border:1px solid var(--border2);border-radius:6px;color:var(--text2);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all 0.15s}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+
+/* RESULT CARD */
+.result{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:10px;display:none}
+.result.show{display:block}
+.result-main{font-size:22px;font-weight:500;color:var(--accent2);margin-bottom:4px}
+.result-label{font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
+.result-extras{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.result-extra{font-size:12px;color:var(--text2);padding:6px 10px;background:var(--surface3);border-radius:5px;border-left:2px solid var(--border2)}
+.result-extra.warn{border-left-color:var(--warn);color:var(--warn)}
+.result-extra.danger{border-left-color:var(--danger);color:var(--danger)}
+.result-extra.ok{border-left-color:var(--success);color:var(--success)}
+.result-extra.info{border-left-color:var(--accent);color:var(--accent)}
+
+/* KEYPAD */
+.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.key{padding:9px 4px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-family:var(--mono);font-size:12px;cursor:pointer;text-align:center;transition:all 0.12s;user-select:none}
+.key:hover{background:var(--surface3);color:var(--text);border-color:var(--border2)}
+.key:active{transform:scale(0.94)}
+.key.op{color:var(--accent)}
+.key.fn{color:var(--accent4);font-size:10px}
+.key.eq{background:var(--accent);color:#0a0b0e;font-weight:700;border-color:var(--accent)}
+.key.eq:hover{opacity:0.85}
+.key.spec{color:var(--accent2);font-size:10px}
+.key.wide{grid-column:span 2}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:12px}
+
+/* HISTORY */
+.history-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto}
+.history-item{padding:8px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);cursor:pointer;transition:border-color 0.15s}
+.history-item:hover{border-color:var(--border2)}
+.history-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.history-val{font-size:13px;color:var(--text);margin-top:2px}
+
+/* DB QUICK */
+.db-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.db-item{padding:7px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all 0.15s}
+.db-item:hover{border-color:var(--accent2);background:var(--surface3)}
+.db-name{font-size:10px;color:var(--text3)}
+.db-val{font-size:12px;color:var(--accent2);font-weight:500}
+
+/* FORMULA SEARCH */
+.search-box{position:relative;margin-bottom:8px}
+.search-box input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 10px 7px 30px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none}
+.search-box input:focus{border-color:var(--accent)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px}
+
+/* STEPS */
+.steps{margin-top:10px;display:none}
+.steps.show{display:block}
+.step{padding:6px 10px;margin-bottom:4px;font-size:11px;color:var(--text2);border-left:2px solid var(--border2)}
+.step strong{color:var(--accent);font-weight:500}
+
+/* STATUS BAR */
+.statusbar{display:flex;justify-content:space-between;align-items:center;padding:8px 0 0;border-top:1px solid var(--border);margin-top:12px}
+.status-item{font-size:10px;color:var(--text3);letter-spacing:0.5px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block;margin-right:5px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* FORMULA CHIPS */
+.formula-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.chip{padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:10px;color:var(--text2);cursor:pointer;transition:all 0.15s}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.active{background:var(--surface3);border-color:var(--accent);color:var(--accent)}
+
+/* HIDDEN MODES */
+.mode-section{display:none}
+.mode-section.active{display:block}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* GENERAL CALC DISPLAY */
+.gen-display{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:10px}
+.gen-expr{font-size:13px;color:var(--text3);text-align:right;min-height:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gen-result{font-size:34px;font-weight:300;text-align:right;color:var(--text);min-height:46px}
+
+.separator{height:1px;background:var(--border);margin:10px 0}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="header">
+  <div>
+    <div class="logo">SUMA<span>MENTE</span></div>
+    <div class="version">v1.1 · Pro</div>
+  </div>
+  <div style="display:flex;gap:6px">
+    <button class="btn-secondary" onclick="toggleSteps()">± pasos</button>
+    <button class="btn-secondary" onclick="clearHistory()">limpiar</button>
+  </div>
+</div>
+
+<div class="nav-bar">
+  <div class="current-mode-display">
+    <span class="dot" id="current-dot" style="background:#4f9cf9"></span>
+    <span class="current-mode-name" id="current-name">General</span>
+  </div>
+  <button class="btn-menu" onclick="toggleModal(true)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    MÓDULOS
+  </button>
+</div>
+
+<!-- Modal Selector de Módulos -->
+<div class="modal" id="modal-modules" onclick="toggleModal(false)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="toggleModal(false)">×</button>
+    <div class="panel-title" style="margin-bottom:10px">Seleccionar Módulo</div>
+    <div class="modal-grid">
+      <div class="module-card" onclick="selectModule('general')">
+        <span class="dot" style="background:#4f9cf9"></span>
+        <div class="name">General</div>
+        <div class="desc">Científica</div>
+      </div>
+      <div class="module-card" onclick="selectModule('electro')">
+        <span class="dot" style="background:#38e8c8"></span>
+        <div class="name">Electrónica</div>
+        <div class="desc">Circuitos</div>
+      </div>
+      <div class="module-card" onclick="selectModule('med')">
+        <span class="dot" style="background:#f97b4f"></span>
+        <div class="name">Medicina</div>
+        <div class="desc">Hospitalario</div>
+      </div>
+      <div class="module-card" onclick="selectModule('fin')">
+        <span class="dot" style="background:#a78bfa"></span>
+        <div class="name">Finanzas</div>
+        <div class="desc">Económico</div>
+      </div>
+      <div class="module-card" onclick="selectModule('quim')">
+        <span class="dot" style="background:#f9c74f"></span>
+        <div class="name">Química</div>
+        <div class="desc">Laboratorio</div>
+      </div>
+      <div class="module-card" onclick="selectModule('civil')">
+        <span class="dot" style="background:#4ff97b"></span>
+        <div class="name">Construcción</div>
+        <div class="desc">Ingeniería</div>
+      </div>
+      <div class="module-card" onclick="selectModule('mec')">
+        <span class="dot" style="background:#f94f4f"></span>
+        <div class="name">Mecánica</div>
+        <div class="desc">Motores</div>
+      </div>
+      <div class="module-card" onclick="selectModule('geom')">
+        <span class="dot" style="background:#f94fa7"></span>
+        <div class="name">Geometría</div>
+        <div class="desc">Formas</div>
+      </div>
+      <div class="module-card" onclick="selectModule('unit')">
+        <span class="dot" style="background:#4fdbf9"></span>
+        <div class="name">Unidades</div>
+        <div class="desc">Conversor</div>
+      </div>
+      <div class="module-card" onclick="selectModule('fis')">
+        <span class="dot" style="background:#f9f54f"></span>
+        <div class="name">Física</div>
+        <div class="desc">Cinemática</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <div>
+
+    <!-- ===== GENERAL ===== -->
+    <div class="mode-section active" id="mode-general">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Calculadora científica</span></div>
+        <div class="panel-body">
+          <div class="gen-display">
+            <div class="gen-expr" id="gen-expr"></div>
+            <div class="gen-result" id="gen-result">0</div>
+          </div>
+          <div class="keypad">
+            <button class="key fn" onclick="genKey('sin(')">sin</button>
+            <button class="key fn" onclick="genKey('cos(')">cos</button>
+            <button class="key fn" onclick="genKey('tan(')">tan</button>
+            <button class="key fn" onclick="genKey('Math.sqrt(')">√</button>
+            <button class="key fn" onclick="genKey('Math.log10(')">log</button>
+            <button class="key fn" onclick="genKey('Math.log(')">ln</button>
+            <button class="key fn" onclick="genKey('Math.PI')">π</button>
+            <button class="key fn" onclick="genKey('**')">xʸ</button>
+            <button class="key op" onclick="genClear()">C</button>
+            <button class="key op" onclick="genBack()">⌫</button>
+            <button class="key op" onclick="genKey('(')">(</button>
+            <button class="key op" onclick="genKey('/')">÷</button>
+            <button class="key" onclick="genKey('7')">7</button>
+            <button class="key" onclick="genKey('8')">8</button>
+            <button class="key" onclick="genKey('9')">9</button>
+            <button class="key op" onclick="genKey('*')">×</button>
+            <button class="key" onclick="genKey('4')">4</button>
+            <button class="key" onclick="genKey('5')">5</button>
+            <button class="key" onclick="genKey('6')">6</button>
+            <button class="key op" onclick="genKey('-')">−</button>
+            <button class="key" onclick="genKey('1')">1</button>
+            <button class="key" onclick="genKey('2')">2</button>
+            <button class="key" onclick="genKey('3')">3</button>
+            <button class="key op" onclick="genKey('+')">+</button>
+            <button class="key" onclick="genKey('0')">0</button>
+            <button class="key" onclick="genKey('.')">.</button>
+            <button class="key fn" onclick="genKey(')')">)</button>
+            <button class="key eq" onclick="genEval()">=</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ELECTRÓNICA ===== -->
+    <div class="mode-section" id="mode-electro">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Electrónica</span></div>
+        <div class="panel-body">
+          <div class="formula-chips" id="chips-electro">
+            <button class="chip active" onclick="setFormula('electro','led')">LED Resistor</button>
+            <button class="chip" onclick="setFormula('electro','ohm')">Ley de Ohm</button>
+            <button class="chip" onclick="setFormula('electro','rc')">Filtro RC</button>
+            <button class="chip" onclick="setFormula('electro','div')">Divisor V</button>
+            <button class="chip" onclick="setFormula('electro','par')">Paralelo R</button>
+            <button class="chip" onclick="setFormula('electro','db')">dB Ganancia</button>
+            <button class="chip" onclick="setFormula('electro','555')">555 Astable</button>
+          </div>
+          <div id="form-electro"></div>
+          <div class="result" id="result-electro"></div>
+          <div class="steps" id="steps-electro"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MEDICINA ===== -->
+    <div class="mode-section" id="mode-med">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Medicina</span></div>
+        <div class="panel-body">
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('med','goteo')">Goteo IV</button>
+            <button class="chip" onclick="setFormula('med','dosis')">Dosis mg/kg</button>
+            <button class="chip" onclick="setFormula('med','imc')">IMC</button>
+            <button class="chip" onclick="setFormula('med','tmb')">TMB Harris</button>
+            <button class="chip" onclick="setFormula('med','crcl')">Clearance Cr.</button>
+            <button class="chip" onclick="setFormula('med','peso_ideal')">Peso Ideal</button>
+            <button class="chip" onclick="setFormula('med','asc')">ASC (Mosteller)</button>
+            <button class="chip" onclick="setFormula('med','ascvd')">ASCVD Risk</button>
+            <button class="chip" onclick="setFormula('med','sofa')">SOFA</button>
+            <button class="chip" onclick="setFormula('med','curb65')">CURB-65</button>
+            <button class="chip" onclick="setFormula('med','geneva')">Ginebra TEP</button>
+            <button class="chip" onclick="setFormula('med','gina')">Asma GINA</button>
+            <button class="chip" onclick="setFormula('med','anc')">ANC</button>
+            <button class="chip" onclick="setFormula('med','ganzoni')">Ganzoni (Hierro)</button>
+          </div>
+          <div id="form-med"></div>
+          <div class="result" id="result-med"></div>
+          <div class="steps" id="steps-med"></div>
+          <div style="font-size:9px;color:var(--text3);margin-top:12px;padding-top:8px;border-top:1px solid var(--border)">
+            Herramientas de apoyo. No reemplazan juicio clínico. Rangos según guías ACC/AHA, SEPAR, GINA 2024.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FINANZAS ===== -->
+    <div class="mode-section" id="mode-fin">
+      <div class="panel">
+        <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center">
+          <span class="panel-title">Finanzas</span>
+          <label style="font-size:9px;display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text3)">
+            <input type="checkbox" id="modo-ar" onchange="renderForm('fin', activeFormula['fin'])"> MODO ARGENTINA
+          </label>
+        </div>
+        <div class="panel-body">
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('fin','prestamo')">Préstamo francés</button>
+            <button class="chip" onclick="setFormula('fin','uva')">Préstamo UVA</button>
+            <button class="chip" onclick="setFormula('fin','intcomp')">Interés compuesto</button>
+            <button class="chip" onclick="setFormula('fin','margen')">Margen %</button>
+            <button class="chip" onclick="setFormula('fin','vpn_tir')">VPN / TIR</button>
+            <button class="chip" onclick="setFormula('fin','aleman_amer')">Alemán / Americano</button>
+            <button class="chip" onclick="setFormula('fin','tasas')">Conversor Tasas</button>
+          </div>
+          <div id="form-fin"></div>
+          <div class="result" id="result-fin"></div>
+          <div class="steps" id="steps-fin"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== QUÍMICA ===== -->
+    <div class="mode-section" id="mode-quim">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Química</span></div>
+        <div class="panel-body">
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('quim','molar')">Molaridad</button>
+            <button class="chip" onclick="setFormula('quim','dilucion')">Dilución</button>
+            <button class="chip" onclick="setFormula('quim','ph')">pH</button>
+            <button class="chip" onclick="setFormula('quim','gas')">Gas ideal PV=nRT</button>
+          </div>
+          <div id="form-quim"></div>
+          <div class="result" id="result-quim"></div>
+          <div class="steps" id="steps-quim"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CONSTRUCCIÓN ===== -->
+    <div class="mode-section" id="mode-civil">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Construcción</span></div>
+        <div class="panel-body">
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('civil','hormigon')">Hormigón</button>
+            <button class="chip" onclick="setFormula('civil','ladrillos')">Ladrillos</button>
+            <button class="chip" onclick="setFormula('civil','caida')">Caída de tensión</button>
+          </div>
+          <div id="form-civil"></div>
+          <div class="result" id="result-civil"></div>
+          <div class="steps" id="steps-civil"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MECÁNICA ===== -->
+    <div class="mode-section" id="mode-mec">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Mecánica</span></div>
+        <div class="panel-body">
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('mec','cilindrada')">Cilindrada</button>
+            <button class="chip" onclick="setFormula('mec','potencia')">HP / Torque</button>
+            <button class="chip" onclick="setFormula('mec','consumo')">Consumo km/L</button>
+          </div>
+          <div id="form-mec"></div>
+          <div class="result" id="result-mec"></div>
+          <div class="steps" id="steps-mec"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== GEOMETRÍA ===== -->
+    <div class="mode-section" id="mode-geom">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Geometría</span></div>
+        <div class="panel-body">
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('geom','circulo')">Círculo</button>
+            <button class="chip" onclick="setFormula('geom','triangulo')">Triángulo</button>
+            <button class="chip" onclick="setFormula('geom','esfera')">Esfera</button>
+            <button class="chip" onclick="setFormula('geom','cilindro')">Cilindro</button>
+          </div>
+          <div id="form-geom"></div>
+          <div class="result" id="result-geom"></div>
+          <div class="steps" id="steps-geom"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== UNIDADES ===== -->
+    <div class="mode-section" id="mode-unit">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Conversor de Unidades</span></div>
+        <div class="panel-body">
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('unit','longitud')">Longitud</button>
+            <button class="chip" onclick="setFormula('unit','masa')">Masa</button>
+            <button class="chip" onclick="setFormula('unit','temp')">Temperatura</button>
+            <button class="chip" onclick="setFormula('unit','presion')">Presión</button>
+          </div>
+          <div id="form-unit"></div>
+          <div class="result" id="result-unit"></div>
+          <div class="steps" id="steps-unit"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FÍSICA ===== -->
+    <div class="mode-section" id="mode-fis">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Física</span></div>
+        <div class="panel-body">
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('fis','velocidad')">Velocidad/Acel.</button>
+            <button class="chip" onclick="setFormula('fis','fuerza')">Fuerza (F=m·a)</button>
+            <button class="chip" onclick="setFormula('fis','energia')">Energía</button>
+          </div>
+          <div id="form-fis"></div>
+          <div class="result" id="result-fis"></div>
+          <div class="steps" id="steps-fis"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- DB rápida -->
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">Base de datos</span></div>
+      <div class="panel-body" id="db-panel">
+        <div class="db-grid" id="db-items"></div>
+      </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">Historial</span></div>
+      <div class="panel-body">
+        <div class="history-list" id="history-list">
+          <div style="font-size:11px;color:var(--text3);padding:10px 0">Sin cálculos aún</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="statusbar">
+  <div class="status-item"><span class="status-dot"></span>Motor activo</div>
+  <div class="status-item" id="status-mode">Modo: General</div>
+  <div class="status-item">SumaMente v1.1</div>
+</div>
+
+</div>
+
+<script>
+let currentMode='general';
+let showSteps=false;
+let history=[];
+let genExpr='';
+let genResult='0';
+
+const DB={
+  general:[],
+  electro:[
+    {name:'Vbe transistor',val:'0.7 V'},
+    {name:'LED rojo',val:'2.0 V'},
+    {name:'LED verde',val:'2.2 V'},
+    {name:'LED azul',val:'3.3 V'},
+    {name:'Vz 5V1',val:'5.1 V'},
+    {name:'7805 out',val:'5.0 V'},
+    {name:'E24 paso',val:'±2.5%'},
+    {name:'ρ cobre',val:'0.0178 Ω·mm²/m'},
+  ],
+  med:[
+    {name:'FC normal',val:'60-100 lpm'},
+    {name:'TA normal',val:'120/80 mmHg'},
+    {name:'Glucemia',val:'70-110 mg/dL'},
+    {name:'SpO2 normal',val:'≥95%'},
+    {name:'Goteo std',val:'20 gotas/mL'},
+    {name:'Urea normal',val:'15-43 mg/dL'},
+    {name:'PAM formula',val:'PAD + 1/3(PAS-PAD)'},
+  ],
+  fin:[
+    {name:'UVA ref',val:'~$1,200'},
+    {name:'IPC mensual',val:'~5-8%'},
+    {name:'TNA prom',val:'~90-110%'},
+    {name:'CFT est.',val:'TEA + 5%'},
+  ],
+  quim:[
+    {name:'NaCl PM',val:'58.44 g/mol'},
+    {name:'H₂O PM',val:'18.02 g/mol'},
+    {name:'HCl PM',val:'36.46 g/mol'},
+    {name:'NaOH PM',val:'40.00 g/mol'},
+    {name:'H₂SO₄ PM',val:'98.08 g/mol'},
+    {name:'Kw agua',val:'1×10⁻¹⁴'},
+  ],
+  civil:[
+    {name:'ρ cobre',val:'0.0178 Ω·mm²/m'},
+    {name:'Cemento bolsa',val:'50 kg'},
+    {name:'Ladrillo 8cm',val:'400 ud/m³'},
+    {name:'Concreto H21',val:'210 kg/cm²'},
+  ],
+  mec:[
+    {name:'g',val:'9.81 m/s²'},
+    {name:'ρ nafta',val:'0.75 kg/L'},
+    {name:'ρ diesel',val:'0.84 kg/L'},
+    {name:'π',val:'3.14159'},
+  ],
+  geom:[
+    {name:'π',val:'3.14159'},
+    {name:'φ (Aureo)',val:'1.618'},
+    {name:'e',val:'2.718'},
+  ],
+  unit:[
+    {name:'1 pulgada',val:'25.4 mm'},
+    {name:'1 libra',val:'0.4536 kg'},
+    {name:'1 galón',val:'3.785 L'},
+    {name:'1 PSI',val:'0.0689 bar'},
+  ],
+  fis:[
+    {name:'g',val:'9.81 m/s²'},
+    {name:'c',val:'299,792 km/s'},
+    {name:'G',val:'6.674e-11'},
+    {name:'R (gases)',val:'0.08206'},
+  ],
+};
+
+const MED_CONST = {
+  ascvd: {
+    wf: { lnAge: -29.799, lnAge2: 4.884, lnTC: 13.540, lnAgeTC: -3.114, lnHDL: -13.578, lnAgeHDL: 3.011, lnSBPT: 2.019, lnSBPTA: 0, lnSBPU: 1.957, lnSBPUA: 0, smoke: 7.574, lnAgeSmoke: -1.665, diab: 0.661, s0: 0.9665, mn: -29.18 },
+    af: { lnAge: 17.114, lnAge2: 0, lnTC: 0.940, lnAgeTC: 0, lnHDL: -18.920, lnAgeHDL: 4.475, lnSBPT: 29.081, lnSBPTA: -6.087, lnSBPU: 28.552, lnSBPUA: -6.012, smoke: 0.691, lnAgeSmoke: 0, diab: 0.874, s0: 0.9533, mn: 86.61 },
+    wm: { lnAge: 12.344, lnAge2: 0, lnTC: 11.853, lnAgeTC: -2.664, lnHDL: -7.990, lnAgeHDL: 1.769, lnSBPT: 1.797, lnSBPTA: 0, lnSBPU: 1.764, lnSBPUA: 0, smoke: 7.837, lnAgeSmoke: -1.795, diab: 0.658, s0: 0.9144, mn: 61.18 },
+    am: { lnAge: 2.469, lnAge2: 0, lnTC: 0.302, lnAgeTC: 0, lnHDL: -0.307, lnAgeHDL: 0, lnSBPT: 1.916, lnSBPTA: 0, lnSBPU: 1.809, lnSBPUA: 0, smoke: 0.549, lnAgeSmoke: 0, diab: 0.645, s0: 0.8954, mn: 19.54 }
+  },
+  sofa: {
+    resp: [400, 300, 200, 100], // PaO2/FiO2 > 400 (0), <400 (1), <300 (2), <200+soporte (3), <100+soporte (4)
+    plat: [150, 100, 50, 20],   // x10^3/mm3
+    bili: [1.2, 2.0, 6.0, 12.0], // mg/dL
+    cv: [70], // PAM < 70 (1), Dopamina<=5 (2), Dopamina>5 (3), Dopamina>15 (4)
+    gcs: [15, 13, 10, 6],
+    crea: [1.2, 2.0, 3.5, 5.0]  // mg/dL
+  }
+};
+
+const FIN_UTILS = {
+  calcVPN(r, flows) {
+    return flows.reduce((acc, f, t) => acc + f / Math.pow(1 + r, t), 0);
+  },
+  calcTIR(flows) {
+    if (flows.length < 2) return null;
+    let r = 0.1;
+    for (let i = 0; i < 100; i++) {
+      let vpn = 0, deriv = 0;
+      for (let t = 0; t < flows.length; t++) {
+        vpn += flows[t] / Math.pow(1 + r, t);
+        if (t > 0) deriv -= t * flows[t] / Math.pow(1 + r, t + 1);
+      }
+      let nextR = r - vpn / deriv;
+      if (Math.abs(nextR - r) < 1e-7) return nextR;
+      r = nextR;
+    }
+    return null; // No converge
+  }
+};
+
+const FORMS={
+  electro:{
+    led:{
+      title:'Resistencia para LED',
+      formula:'Rs = (Vfuente − Vled) / Iled',
+      fields:[
+        {id:'vfuente',label:'V fuente (V)',val:'12'},
+        {id:'vled',label:'V led (V)',val:'2'},
+        {id:'iled',label:'I led (mA)',val:'20'},
+      ],
+      calc(f){
+        let Vs=parseFloat(f.vfuente.value),Vl=parseFloat(f.vled.value),Il=parseFloat(f.iled.value)/1000;
+        if(isNaN(Vs)||isNaN(Vl)||isNaN(Il)||Il===0)return null;
+        let Rs=(Vs-Vl)/Il;
+        let P=(Vs-Vl)*Il;
+        let e24=[10,11,12,13,15,16,18,20,22,24,27,30,33,36,39,43,47,51,56,62,68,75,82,91];
+        let com=null;let mul=1;
+        while(mul<1e6){let v=e24.find(x=>x*mul>=Rs);if(v){com=v*mul;break;}mul*=10;}
+        let extras=[
+          {cls:'info',txt:`Resistencia exacta: ${Rs.toFixed(1)} Ω`},
+          {cls:'ok',txt:`Valor comercial E24: ${com} Ω`},
+          {cls:'info',txt:`Potencia disipada: ${(P*1000).toFixed(1)} mW → usar ≥${P<0.125?'1/8':P<0.25?'1/4':P<0.5?'1/2':'1'} W`},
+        ];
+        if(Rs<10)extras.push({cls:'warn',txt:'Resistencia muy baja — verificar corriente'});
+        let steps=[
+          `<strong>1.</strong> ΔV = Vfuente − Vled = ${Vs} − ${Vl} = <strong>${(Vs-Vl).toFixed(1)} V</strong>`,
+          `<strong>2.</strong> Iled = ${Il*1000} mA = <strong>${Il} A</strong>`,
+          `<strong>3.</strong> Rs = ΔV / I = ${(Vs-Vl).toFixed(1)} / ${Il} = <strong>${Rs.toFixed(1)} Ω</strong>`,
+          `<strong>4.</strong> P = ΔV × I = ${(Vs-Vl).toFixed(1)} × ${Il} = <strong>${(P*1000).toFixed(0)} mW</strong>`,
+        ];
+        return{main:`${com} Ω`,label:'Resistencia serie (E24)',extras,steps};
+      }
+    },
+    ohm:{
+      title:'Ley de Ohm — despejar',
+      formula:'V = I × R',
+      fields:[
+        {id:'v',label:'Tensión V (dejar 0 para calcular)',val:''},
+        {id:'i',label:'Corriente mA (dejar 0 para calcular)',val:''},
+        {id:'r',label:'Resistencia Ω (dejar 0 para calcular)',val:''},
+      ],
+      calc(f){
+        let V=parseFloat(f.v.value),I=parseFloat(f.i.value)/1000,R=parseFloat(f.r.value);
+        let main,label,extras=[],steps=[];
+        let nV=isNaN(V)||f.v.value==='',nI=isNaN(I)||f.i.value==='',nR=isNaN(R)||f.r.value==='';
+        if(!nI&&!nR){main=(I*R).toFixed(3)+' V';label='Tensión';steps=[`V = I×R = ${f.i.value}mA × ${R}Ω = <strong>${(I*R).toFixed(3)} V</strong>`];}
+        else if(!nV&&!nR){let Ic=V/R;main=(Ic*1000).toFixed(3)+' mA';label='Corriente';steps=[`I = V/R = ${V}/${R} = <strong>${(Ic*1000).toFixed(3)} mA</strong>`];}
+        else if(!nV&&!nI){let Rc=V/I;main=Rc.toFixed(2)+' Ω';label='Resistencia';steps=[`R = V/I = ${V}/${(I*1000).toFixed(1)}mA = <strong>${Rc.toFixed(2)} Ω</strong>`];}
+        else return null;
+        return{main,label,extras,steps};
+      }
+    },
+    rc:{
+      title:'Filtro RC — Frecuencia de corte',
+      formula:'fc = 1 / (2π·R·C)',
+      fields:[
+        {id:'r',label:'R (Ω)',val:'1000'},
+        {id:'c',label:'C (µF)',val:'0.1'},
+      ],
+      calc(f){
+        let R=parseFloat(f.r.value),C=parseFloat(f.c.value)*1e-6;
+        if(isNaN(R)||isNaN(C))return null;
+        let fc=1/(2*Math.PI*R*C);
+        let Xc=1/(2*Math.PI*fc*C);
+        let extras=[{cls:'info',txt:`Reactancia a fc: Xc = ${Xc.toFixed(1)} Ω`},{cls:'info',txt:`Tau τ = RC = ${(R*C*1000).toFixed(3)} ms`}];
+        let steps=[`fc = 1/(2π × ${R} × ${C.toExponential(2)}) = <strong>${fc.toFixed(2)} Hz</strong>`];
+        return{main:`${fc.toFixed(2)} Hz`,label:'Frecuencia de corte (-3dB)',extras,steps};
+      }
+    },
+    div:{
+      title:'Divisor de tensión',
+      formula:'Vout = Vin × R2/(R1+R2)',
+      fields:[
+        {id:'vin',label:'Vin (V)',val:'12'},
+        {id:'r1',label:'R1 (Ω)',val:'10000'},
+        {id:'r2',label:'R2 (Ω)',val:'4700'},
+      ],
+      calc(f){
+        let Vin=parseFloat(f.vin.value),R1=parseFloat(f.r1.value),R2=parseFloat(f.r2.value);
+        if(isNaN(Vin)||isNaN(R1)||isNaN(R2)||R1+R2===0)return null;
+        let Vout=Vin*R2/(R1+R2);
+        let I=Vin/(R1+R2);
+        let extras=[{cls:'info',txt:`Corriente total: ${(I*1000).toFixed(3)} mA`},{cls:'info',txt:`Ratio: ${(R2/(R1+R2)*100).toFixed(1)}%`}];
+        let steps=[`Vout = ${Vin} × ${R2}/(${R1}+${R2}) = <strong>${Vout.toFixed(3)} V</strong>`];
+        return{main:`${Vout.toFixed(3)} V`,label:'Tensión de salida',extras,steps};
+      }
+    },
+    par:{
+      title:'Resistencias en paralelo',
+      formula:'Rp = 1/(1/R1 + 1/R2 + ...)',
+      fields:[
+        {id:'r1',label:'R1 (Ω)',val:'1000'},
+        {id:'r2',label:'R2 (Ω)',val:'2200'},
+        {id:'r3',label:'R3 (Ω) — opcional',val:''},
+      ],
+      calc(f){
+        let R1=parseFloat(f.r1.value),R2=parseFloat(f.r2.value),R3=parseFloat(f.r3.value);
+        let sum=1/R1+1/R2;
+        let desc=`1/${R1} + 1/${R2}`;
+        if(!isNaN(R3)&&f.r3.value!==''){sum+=1/R3;desc+=` + 1/${R3}`;}
+        let Rp=1/sum;
+        let extras=[{cls:'info',txt:`Conductancia total: ${sum.toFixed(6)} S`},{cls:'ok',txt:`Rp < R mínima (${Math.min(R1,R2).toFixed(0)} Ω)`}];
+        let steps=[`Rp = 1/(${desc}) = <strong>${Rp.toFixed(2)} Ω</strong>`];
+        return{main:`${Rp.toFixed(2)} Ω`,label:'Resistencia paralelo',extras,steps};
+      }
+    },
+    db:{
+      title:'Ganancia en dB',
+      formula:'dB = 20·log₁₀(Vout/Vin)',
+      fields:[
+        {id:'vin',label:'Vin (V)',val:'1'},
+        {id:'vout',label:'Vout (V)',val:'10'},
+      ],
+      calc(f){
+        let Vi=parseFloat(f.vin.value),Vo=parseFloat(f.vout.value);
+        if(isNaN(Vi)||isNaN(Vo)||Vi===0)return null;
+        let dB=20*Math.log10(Vo/Vi);
+        let extras=[{cls:'info',txt:`Ganancia de potencia: ${(10*Math.log10((Vo/Vi)**2)).toFixed(2)} dBW`}];
+        if(dB<0)extras.push({cls:'warn',txt:'Ganancia negativa → atenuación'});
+        let steps=[`dB = 20 × log₁₀(${Vo}/${Vi}) = 20 × ${Math.log10(Vo/Vi).toFixed(4)} = <strong>${dB.toFixed(3)} dB</strong>`];
+        return{main:`${dB.toFixed(3)} dB`,label:'Ganancia de tensión',extras,steps};
+      }
+    },
+    '555':{
+      title:'555 Astable',
+      formula:'f = 1.44/((Ra+2Rb)·C)',
+      fields:[
+        {id:'ra',label:'Ra (kΩ)',val:'10'},
+        {id:'rb',label:'Rb (kΩ)',val:'47'},
+        {id:'c',label:'C (µF)',val:'0.1'},
+      ],
+      calc(f){
+        let Ra=parseFloat(f.ra.value)*1e3,Rb=parseFloat(f.rb.value)*1e3,C=parseFloat(f.c.value)*1e-6;
+        if(isNaN(Ra)||isNaN(Rb)||isNaN(C))return null;
+        let freq=1.44/((Ra+2*Rb)*C);
+        let th=0.693*(Ra+Rb)*C;
+        let tl=0.693*Rb*C;
+        let dc=th/(th+tl)*100;
+        let extras=[
+          {cls:'info',txt:`T alto (th): ${(th*1000).toFixed(2)} ms`},
+          {cls:'info',txt:`T bajo (tl): ${(tl*1000).toFixed(2)} ms`},
+          {cls:'info',txt:`Ciclo de trabajo: ${dc.toFixed(1)}%`},
+        ];
+        let steps=[`f = 1.44/((${Ra/1000}k + 2×${Rb/1000}k) × ${C*1e6}µF) = <strong>${freq.toFixed(2)} Hz</strong>`];
+        return{main:`${freq.toFixed(2)} Hz`,label:'Frecuencia de oscilación',extras,steps};
+      }
+    },
+  },
+  med:{
+    goteo:{
+      title:'Goteo intravenoso',
+      formula:'gotas/min = Vol(mL) × factor / tiempo(min)',
+      fields:[
+        {id:'vol',label:'Volumen (mL)',val:'500'},
+        {id:'tiempo',label:'Tiempo (h)',val:'4'},
+        {id:'factor',label:'Factor (gotas/mL)',val:'20'},
+      ],
+      calc(f){
+        let V=parseFloat(f.vol.value),T=parseFloat(f.tiempo.value)*60,Fc=parseFloat(f.factor.value);
+        if(isNaN(V)||isNaN(T)||isNaN(Fc)||T===0)return null;
+        let G=V*Fc/T;
+        let mlh=V/(T/60);
+        let extras=[{cls:'info',txt:`Velocidad: ${mlh.toFixed(1)} mL/h`}];
+        if(G>60)extras.push({cls:'danger',txt:'ALERTA: >60 gotas/min → riesgo de sobrecarga'});
+        else extras.push({cls:'ok',txt:'Velocidad dentro de rango seguro'});
+        let steps=[`Gotas/min = ${V} × ${Fc} / ${T} = <strong>${G.toFixed(1)} gotas/min</strong>`];
+        return{main:`${G.toFixed(0)} gotas/min`,label:'Velocidad de goteo',extras,steps};
+      }
+    },
+    dosis:{
+      title:'Dosis por kg de peso',
+      formula:'Dosis total = dosis(mg/kg) × peso(kg)',
+      fields:[
+        {id:'dkg',label:'Dosis (mg/kg)',val:'10'},
+        {id:'peso',label:'Peso paciente (kg)',val:'70'},
+        {id:'conc',label:'Concentración ampo (mg/mL)',val:'50'},
+      ],
+      calc(f){
+        let D=parseFloat(f.dkg.value),P=parseFloat(f.peso.value),C=parseFloat(f.conc.value);
+        if(isNaN(D)||isNaN(P))return null;
+        let total=D*P;
+        let extras=[{cls:'info',txt:`Dosis total: ${total.toFixed(1)} mg`}];
+        if(!isNaN(C)&&C>0)extras.push({cls:'info',txt:`Volumen a administrar: ${(total/C).toFixed(2)} mL`});
+        let steps=[`Dosis = ${D} mg/kg × ${P} kg = <strong>${total.toFixed(1)} mg</strong>`];
+        return{main:`${total.toFixed(1)} mg`,label:'Dosis total',extras,steps};
+      }
+    },
+    imc:{
+      title:'Índice de Masa Corporal',
+      formula:'IMC = peso(kg) / talla(m)²',
+      fields:[
+        {id:'peso',label:'Peso (kg)',val:'75'},
+        {id:'talla',label:'Talla (cm)',val:'170'},
+      ],
+      calc(f){
+        let P=parseFloat(f.peso.value),T=parseFloat(f.talla.value)/100;
+        if(isNaN(P)||isNaN(T)||T===0)return null;
+        let imc=P/(T*T);
+        let cat=imc<18.5?'Bajo peso':imc<25?'Peso normal':imc<30?'Sobrepeso':'Obesidad';
+        let cls=imc<18.5?'warn':imc<25?'ok':imc<30?'warn':'danger';
+        let extras=[{cls,txt:`Clasificación: ${cat}`}];
+        let steps=[`IMC = ${P} / (${T})² = ${P} / ${(T*T).toFixed(4)} = <strong>${imc.toFixed(2)}</strong>`];
+        return{main:`${imc.toFixed(2)}`,label:'IMC kg/m²',extras,steps};
+      }
+    },
+    tmb:{
+      title:'TMB Harris-Benedict',
+      formula:'TMB = 66.47 + 13.75P + 5T - 6.75E (♂)',
+      fields:[
+        {id:'peso',label:'Peso (kg)',val:'70'},
+        {id:'talla',label:'Talla (cm)',val:'170'},
+        {id:'edad',label:'Edad (años)',val:'30'},
+        {id:'sexo',label:'Sexo',val:'m',type:'select',opts:[{v:'m',l:'Masculino'},{v:'f',l:'Femenino'}]},
+      ],
+      calc(f){
+        let P=parseFloat(f.peso.value),T=parseFloat(f.talla.value),E=parseFloat(f.edad.value),S=f.sexo.value;
+        if(isNaN(P)||isNaN(T)||isNaN(E))return null;
+        let tmb=S==='m'?66.47+13.75*P+5*T-6.75*E:655.1+9.56*P+1.85*T-4.68*E;
+        let extras=[
+          {cls:'info',txt:`Activ. ligera (×1.375): ${(tmb*1.375).toFixed(0)} kcal`},
+          {cls:'info',txt:`Activ. moderada (×1.55): ${(tmb*1.55).toFixed(0)} kcal`},
+        ];
+        let steps=[`TMB = ${S==='m'?'66.47+13.75×'+P+'+5×'+T+'-6.75×'+E:'655.1+9.56×'+P+'+1.85×'+T+'-4.68×'+E} = <strong>${tmb.toFixed(0)} kcal</strong>`];
+        return{main:`${tmb.toFixed(0)} kcal/día`,label:'Tasa metabólica basal',extras,steps};
+      }
+    },
+    crcl:{
+      title:'Clearance Creatinina (Cockcroft-Gault)',
+      formula:'CrCl = (140-edad)×peso / (72×Cr) [×0.85 si mujer]',
+      fields:[
+        {id:'edad',label:'Edad (años)',val:'55'},
+        {id:'peso',label:'Peso (kg)',val:'70'},
+        {id:'cr',label:'Creatinina sérica (mg/dL)',val:'1.0'},
+        {id:'sexo',label:'Sexo',val:'m',type:'select',opts:[{v:'m',l:'Masculino'},{v:'f',l:'Femenino'}]},
+      ],
+      calc(f){
+        let E=parseFloat(f.edad.value),P=parseFloat(f.peso.value),C=parseFloat(f.cr.value),S=f.sexo.value;
+        if(isNaN(E)||isNaN(P)||isNaN(C)||C===0)return null;
+        let crcl=(140-E)*P/(72*C)*(S==='f'?0.85:1);
+        let cat=crcl>90?'Normal':crcl>60?'Leve':crcl>30?'Moderado':'Severo';
+        let cls=crcl>60?'ok':crcl>30?'warn':'danger';
+        let extras=[{cls,txt:`ERC grado: ${cat} (${crcl.toFixed(0)} mL/min)`}];
+        let steps=[`CrCl = (140-${E})×${P} / (72×${C}) ${S==='f'?'×0.85':''} = <strong>${crcl.toFixed(1)} mL/min</strong>`];
+        return{main:`${crcl.toFixed(1)} mL/min`,label:'Aclaramiento de creatinina',extras,steps};
+      }
+    },
+    peso_ideal:{
+      title:'Peso Ideal y Ajustado',
+      formula:'PI(♂) = 50 + 2.3 × (talla - 152.4) / 2.54',
+      fields:[
+        {id:'talla',label:'Talla (cm)',val:'175'},
+        {id:'peso',label:'Peso actual (kg)',val:'95'},
+        {id:'sexo',label:'Sexo',val:'m',type:'select',opts:[{v:'m',l:'Masculino'},{v:'f',l:'Femenino'}]},
+      ],
+      calc(f){
+        let T=parseFloat(f.talla.value),P=parseFloat(f.peso.value),S=f.sexo.value;
+        if(isNaN(T)||isNaN(P))return null;
+        let pulg=(T-152.4)/2.54;
+        let pi=S==='m'?50+(2.3*pulg):45.5+(2.3*pulg);
+        let pa=pi+0.4*(P-pi);
+        let extras=[
+          {cls:'info',txt:`Peso Ideal (Devine): ${pi.toFixed(1)} kg`},
+          {cls:'ok',txt:`Peso Ajustado (para fármacos): ${pa.toFixed(1)} kg`},
+          {cls:'warn',txt:`Exceso: ${(P-pi).toFixed(1)} kg (${((P/pi-1)*100).toFixed(1)}%)`}
+        ];
+        let steps=[
+          `<strong>1.</strong> Pulgadas sobre 5 pies: (${T} - 152.4) / 2.54 = <strong>${pulg.toFixed(2)}</strong>`,
+          `<strong>2.</strong> PI = ${S==='m'?'50':'45.5'} + (2.3 × ${pulg.toFixed(2)}) = <strong>${pi.toFixed(1)} kg</strong>`,
+          `<strong>3.</strong> PA = ${pi.toFixed(1)} + 0.4 × (${P} - ${pi.toFixed(1)}) = <strong>${pa.toFixed(1)} kg</strong>`
+        ];
+        return{main:`${pi.toFixed(1)} kg`,label:'Peso Ideal Estimado',extras,steps};
+      }
+    },
+    asc:{
+       title:'Superficie Corporal (ASC)',
+       formula:'ASC = √((peso × talla) / 3600)',
+       fields:[
+         {id:'peso',label:'Peso (kg)',val:'70'},
+         {id:'talla',label:'Talla (cm)',val:'170'},
+       ],
+       calc(f){
+         let P=parseFloat(f.peso.value),T=parseFloat(f.talla.value);
+         if(isNaN(P)||isNaN(T))return null;
+         let asc=Math.sqrt((P*T)/3600);
+         let extras=[{cls:'info',txt:`Fórmula de Mosteller`},{cls:'ok',txt:`Útil para dosaje de quimioterapia y gasto cardíaco.`}];
+         let steps=[`ASC = √(${P} × ${T} / 3600) = <strong>${asc.toFixed(2)} m²</strong>`];
+         return{main:`${asc.toFixed(2)} m²`,label:'Superficie Corporal',extras,steps};
+       }
+     },
+     ascvd:{
+       title:'Riesgo Cardiovascular ASCVD (10 años)',
+       formula:'ACC/AHA 2013 - Ecuación de Cohortes agrupadas',
+       fields:[
+         {id:'edad',label:'Edad (40-79)',val:'55'},
+         {id:'sexo',label:'Sexo',val:'m',type:'select',opts:[{v:'m',l:'Masculino'},{v:'f',l:'Femenino'}]},
+         {id:'raza',label:'Raza',val:'w',type:'select',opts:[{v:'w',l:'Blanca'},{v:'a',l:'Afroamericana'}]},
+         {id:'tc',label:'Colest. Total (mg/dL)',val:'213'},
+         {id:'hdl',label:'HDL (mg/dL)',val:'50'},
+         {id:'pas',label:'Presión Sistólica (mmHg)',val:'120'},
+         {id:'tto',label:'Tto HTA',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí'}]},
+         {id:'dbt',label:'Diabetes',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí'}]},
+         {id:'fuma',label:'Fumador',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí'}]},
+       ],
+       calc(f){
+         let edad=parseFloat(f.edad.value), tc=parseFloat(f.tc.value), hdl=parseFloat(f.hdl.value), pas=parseFloat(f.pas.value);
+         if(edad<40 || edad>79 || isNaN(tc) || isNaN(hdl) || isNaN(pas)) return null;
+         let k = MED_CONST.ascvd[f.raza.value + f.sexo.value];
+         let lAge = Math.log(edad), lTC = Math.log(tc), lHDL = Math.log(hdl), lPAS = Math.log(pas);
+         let sum = k.lnAge * lAge + k.lnAge2 * lAge * lAge + k.lnTC * lTC + k.lnAgeTC * lAge * lTC + k.lnHDL * lHDL + k.lnAgeHDL * lAge * lHDL + k.diab * (f.dbt.value==='s'?1:0) + k.smoke * (f.fuma.value==='s'?1:0) + k.lnAgeSmoke * lAge * (f.fuma.value==='s'?1:0);
+         if(f.tto.value==='s') sum += k.lnSBPT * lPAS + k.lnSBPTA * lAge * lPAS;
+         else sum += k.lnSBPU * lPAS + k.lnSBPUA * lAge * lPAS;
+         let risk = 1 - Math.pow(k.s0, Math.exp(sum - k.mn));
+         let p = risk * 100;
+         let cls = p<7.5?'ok':p<20?'warn':'danger';
+         let cat = p<7.5?'Bajo':p<20?'Intermedio':'Alto';
+         let extras = [{cls, txt:`Riesgo: ${cat}`}, {cls:p>=7.5?'warn':'info', txt:p>=7.5?'Considerar estatinas según guía':'Riesgo controlado'}];
+         return {main:`${p.toFixed(1)}%`, label:'Riesgo Cardiovascular a 10 años', extras, steps:[`Suma Logit = ${sum.toFixed(4)}`,`Riesgo = 1 - ${k.s0}^exp(${sum.toFixed(4)} - ${k.mn})`]};
+       }
+     },
+     sofa:{
+       title:'SOFA Score (Sepsis)',
+       formula:'Sequential Organ Failure Assessment',
+       fields:[
+         {id:'pf',label:'PaO2/FiO2',val:'300'},
+         {id:'vent',label:'Ventilación mecánica',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí'}]},
+         {id:'plat',label:'Plaquetas (x10³/µL)',val:'100'},
+         {id:'bili',label:'Bilirrubina (mg/dL)',val:'2.0'},
+         {id:'pam',label:'PAM (mmHg)',val:'65'},
+         {id:'drogas',label:'Vasoactivos',val:'none',type:'select',opts:[{v:'none',l:'Ninguno'},{v:'dopa_b',l:'Dopamina ≤5'},{v:'dopa_m',l:'Dopa >5 o Norad ≤0.1'},{v:'dopa_h',l:'Dopa >15 o Norad >0.1'}]},
+         {id:'gcs',label:'Escala Glasgow (GCS)',val:'15'},
+         {id:'crea',label:'Creatinina (mg/dL)',val:'1.5'},
+       ],
+       calc(f){
+         let s=0, pf=parseFloat(f.pf.value), plat=parseFloat(f.plat.value), bili=parseFloat(f.bili.value), pam=parseFloat(f.pam.value), gcs=parseFloat(f.gcs.value), crea=parseFloat(f.crea.value);
+         if(pf<100 && f.vent.value==='s') s+=4; else if(pf<200 && f.vent.value==='s') s+=3; else if(pf<300) s+=2; else if(pf<400) s+=1;
+         if(plat<20) s+=4; else if(plat<50) s+=3; else if(plat<100) s+=2; else if(plat<150) s+=1;
+         if(bili>=12) s+=4; else if(bili>=6) s+=3; else if(bili>=2) s+=2; else if(bili>=1.2) s+=1;
+         if(f.drogas.value==='dopa_h') s+=4; else if(f.drogas.value==='dopa_m') s+=3; else if(f.drogas.value==='dopa_b') s+=2; else if(pam<70) s+=1;
+         if(gcs<6) s+=4; else if(gcs<10) s+=3; else if(gcs<13) s+=2; else if(gcs<15) s+=1;
+         if(crea>=5) s+=4; else if(crea>=3.5) s+=3; else if(crea>=2) s+=2; else if(crea>=1.2) s+=1;
+         let mort = s<=2?0:s<=7?7:s<=9?15:s<=11?33:s<=14?50:95;
+         return {main:`${s} pts`, label:'SOFA Score', extras:[{cls:s>=6?'danger':'info',txt:`Mortalidad estimada: ~${mort}%`},{cls:'warn',txt:'Si aumenta >2pts en 24h: Riesgo sepsis'}], steps:[`Respiratorio: +${s} pts...`]};
+       }
+     },
+     curb65:{
+       title:'CURB-65 Neumonía',
+       formula:'Confusion, Urea, RR, BP, Age 65',
+       fields:[
+         {id:'conf',label:'Confusión',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí'}]},
+         {id:'urea',label:'Urea >43 mg/dL',val:'s',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí'}]},
+         {id:'fr',label:'FR ≥30 /min',val:'s',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí'}]},
+         {id:'pa',label:'PAS <90 o PAD ≤60',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí'}]},
+         {id:'edad65',label:'Edad ≥65 años',val:'s',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí'}]},
+       ],
+       calc(f){
+         let s = (f.conf.value==='s'?1:0) + (f.urea.value==='s'?1:0) + (f.fr.value==='s'?1:0) + (f.pa.value==='s'?1:0) + (f.edad65.value==='s'?1:0);
+         let rec = s<=1?'Tratamiento ambulatorio':s===2?'Internación o vigilancia estrecha':'Internación urgente (considerar UCI)';
+         let cls = s<=1?'ok':s===2?'warn':'danger';
+         return {main:`${s} pts`, label:'CURB-65 Score', extras:[{cls, txt:rec}, {cls:'info', txt:'Disclaimer: La decisión clínica prevalece'}], steps:[`${s} puntos positivos de 5 posibles.`]};
+       }
+     },
+     geneva:{
+       title:'Score Ginebra (TEP)',
+       formula:'Probabilidad de Tromboembolismo Pulmonar',
+       fields:[
+         {id:'edad65',label:'Edad >65 años',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí (+1)'}]},
+         {id:'prev',label:'TEP o TVP previo',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí (+3)'}]},
+         {id:'ciru',label:'Cirugía o fractura (<1 mes)',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí (+2)'}]},
+         {id:'ca',label:'Cáncer activo',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí (+2)'}]},
+         {id:'dolor',label:'Dolor pierna unilateral',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí (+3)'}]},
+         {id:'hemo',label:'Hemoptisis',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí (+2)'}]},
+         {id:'fc',label:'Frecuencia Cardíaca',val:'75',type:'select',opts:[{v:'0',l:'<75'},{v:'3',l:'75-94 (+3)'},{v:'5',l:'≥95 (+5)'}]},
+         {id:'palpa',label:'Dolor palpación venosa profunda',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí (+3)'}]},
+       ],
+       calc(f){
+         let s = (f.edad65.value==='s'?1:0) + (f.prev.value==='s'?3:0) + (f.ciru.value==='s'?2:0) + (f.ca.value==='s'?2:0) + (f.dolor.value==='s'?3:0) + (f.hemo.value==='s'?2:0) + parseInt(f.fc.value) + (f.palpa.value==='s'?3:0);
+         let cat = s<=3?'Bajo':s<=10?'Intermedio':'Alto';
+         let cls = s<=3?'ok':s<=10?'warn':'danger';
+         return {main:`${s} pts`, label:`Riesgo ${cat}`, extras:[{cls, txt:s>=4?'Considerar Dímero D o AngioTAC':'Baja probabilidad clínica'}], steps:[`Suma total de puntos: ${s}`]};
+        }
+      },
+      gina:{
+        title:'GASA Asma (GINA 2024)',
+        formula:'Clasificación de control y gravedad',
+        fields:[
+          {id:'dia',label:'Síntomas diurnos (>2/sem)',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí'}]},
+          {id:'noche',label:'Despertar nocturno',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí'}]},
+          {id:'saba',label:'Uso SABA (>2/sem)',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí'}]},
+          {id:'lim',label:'Limitación actividad',val:'n',type:'select',opts:[{v:'n',l:'No'},{v:'s',l:'Sí'}]},
+          {id:'vef',label:'VEF1 o FEM (% predicho)',val:'85'},
+        ],
+        calc(f){
+          let s = (f.dia.value==='s'?1:0) + (f.noche.value==='s'?1:0) + (f.saba.value==='s'?1:0) + (f.lim.value==='s'?1:0);
+          let vef = parseFloat(f.vef.value);
+          let ctrl = s===0?'Bien controlado':s<=2?'Parcialmente controlado':'No controlado';
+          let esc = s===0?1:s<=2?2:3;
+          if(vef<60) esc=4;
+          return {main:ctrl, label:'Control de Asma', extras:[{cls:s===0?'ok':s<=2?'warn':'danger', txt:`Escalón de tto sugerido: ${esc}`},{cls:'info',txt:'Ajustar según GINA vigente'}], steps:[`${s} criterios de falta de control presentes.`]};
+        }
+      },
+      anc:{
+        title:'Recuento Absoluto de Neutrófilos (ANC)',
+        formula:'ANC = Leucos × (%Seg + %Cay) / 100',
+        fields:[
+          {id:'leuco',label:'Leucocitos totales (/µL)',val:'5000'},
+          {id:'seg',label:'% Neutrófilos Segmentados',val:'60'},
+          {id:'cay',label:'% Neutrófilos Cayados (Bands)',val:'0'},
+        ],
+        calc(f){
+          let l=parseFloat(f.leuco.value), s=parseFloat(f.seg.value), c=parseFloat(f.cay.value);
+          if(isNaN(l)||isNaN(s)||isNaN(c)) return null;
+          let anc = l * (s + c) / 100;
+          let cls = anc>=1500?'ok':anc>=1000?'warn':anc>=500?'warn':'danger';
+          let cat = anc>=1500?'Normal':anc>=1000?'Neutropenia Leve':anc>=500?'Neutropenia Moderada':'Neutropenia Severa';
+          return {main:`${anc.toFixed(0)} /µL`, label:cat, extras:[{cls, txt:anc<500?'Riesgo infección severa. Aislamiento':'Riesgo bajo/moderado'}], steps:[`ANC = ${l} × (${s} + ${c}) / 100 = ${anc.toFixed(0)}`]};
+        }
+      },
+      ganzoni:{
+        title:'Déficit de Hierro (Fórmula Ganzoni)',
+        formula:'Déficit = Peso × (Hb_obj - Hb_act) × 2.4 + 500',
+        fields:[
+          {id:'peso',label:'Peso (kg)',val:'70'},
+          {id:'hb_act',label:'Hb actual (g/dL)',val:'10'},
+          {id:'hb_obj',label:'Hb objetivo (g/dL)',val:'15'},
+          {id:'sexo',label:'Sexo',val:'m',type:'select',opts:[{v:'m',l:'Masculino (Reserva 500mg)'},{v:'f',l:'Femenino (Reserva 500mg)'}]},
+        ],
+        calc(f){
+          let p=parseFloat(f.peso.value), ha=parseFloat(f.hb_act.value), ho=parseFloat(f.hb_obj.value);
+          if(isNaN(p)||isNaN(ha)||isNaN(ho)) return null;
+          let def = p * (ho - ha) * 2.4 + 500;
+          return {main:`${def.toFixed(0)} mg Fe`, label:'Déficit de Hierro Total', extras:[{cls:'info',txt:'Solo uso médico. Fraccionar dosis según producto.'}], steps:[`Hierro = ${p} × (${ho} - ${ha}) × 2.4 + 500 = ${def.toFixed(0)} mg`]};
+        }
+      },
+    },
+  fin:{
+    prestamo:{
+      title:'Préstamo sistema francés',
+      formula:'C = P × i(1+i)ⁿ / ((1+i)ⁿ−1)',
+      fields:[
+        {id:'capital',label:'Capital ($)',val:'1000000'},
+        {id:'tna',label:'TNA (%)',val:'90'},
+        {id:'plazo',label:'Plazo (meses)',val:'24'},
+      ],
+      calc(f){
+        let P=parseFloat(f.capital.value),TNA=parseFloat(f.tna.value)/100,N=parseFloat(f.plazo.value);
+        if(isNaN(P)||isNaN(TNA)||isNaN(N))return null;
+        let i=TNA/12;
+        let C=P*i*Math.pow(1+i,N)/(Math.pow(1+i,N)-1);
+        let total=C*N;
+        let extras=[
+          {cls:'info',txt:`Total a pagar: $${total.toLocaleString('es-AR',{maximumFractionDigits:0})}`},
+          {cls:'warn',txt:`Interés total: $${(total-P).toLocaleString('es-AR',{maximumFractionDigits:0})}`},
+          {cls:'info',txt:`TEA: ${((Math.pow(1+TNA/12,12)-1)*100).toFixed(2)}%`},
+        ];
+        let steps=[
+          `i mensual = ${TNA*100}%/12 = <strong>${(i*100).toFixed(4)}%</strong>`,
+          `C = ${P.toLocaleString()} × i(1+i)ⁿ/((1+i)ⁿ−1) = <strong>$${C.toLocaleString('es-AR',{maximumFractionDigits:0})}</strong>`,
+        ];
+        return{main:`$${C.toLocaleString('es-AR',{maximumFractionDigits:0})}`,label:'Cuota mensual (sistema francés)',extras,steps};
+      }
+    },
+    uva:{
+      title:'Préstamo UVA',
+      formula:'Cuota UVA = amortización + intereses',
+      fields:[
+        {id:'capital',label:'Capital ($)',val:'2000000'},
+        {id:'plazo',label:'Plazo (meses)',val:'360'},
+        {id:'uva',label:'Valor UVA actual ($)',val:'1200'},
+        {id:'tasa',label:'Tasa nominal UVA (%)',val:'5'},
+      ],
+      calc(f){
+        let P=parseFloat(f.capital.value),N=parseFloat(f.plazo.value),UVA=parseFloat(f.uva.value),T=parseFloat(f.tasa.value)/100;
+        if(isNaN(P)||isNaN(N)||isNaN(UVA)||isNaN(T))return null;
+        let i=T/12;
+        let capital_uva=P/UVA;
+        let cuota_uva=capital_uva*i*Math.pow(1+i,N)/(Math.pow(1+i,N)-1);
+        let cuota_pesos=cuota_uva*UVA;
+        let extras=[
+          {cls:'info',txt:`Capital en UVAs: ${capital_uva.toFixed(2)} UVAs`},
+          {cls:'warn',txt:`Cuota en pesos (hoy): $${cuota_pesos.toLocaleString('es-AR',{maximumFractionDigits:0})}`},
+          {cls:'danger',txt:'La cuota sube con la inflación (UVA). Riesgo real.'},
+        ];
+        let steps=[
+          `Cap UVA = ${P.toLocaleString()}/UVA ${UVA} = <strong>${capital_uva.toFixed(2)} UVAs</strong>`,
+          `Cuota = ${cuota_uva.toFixed(4)} UVAs = <strong>$${cuota_pesos.toLocaleString('es-AR',{maximumFractionDigits:0})}</strong>`,
+        ];
+        return{main:`${cuota_uva.toFixed(2)} UVAs`,label:`= $${cuota_pesos.toLocaleString('es-AR',{maximumFractionDigits:0})} al valor actual`,extras,steps};
+      }
+    },
+    intcomp:{
+      title:'Interés compuesto',
+      formula:'M = C × (1 + i)ⁿ',
+      fields:[
+        {id:'capital',label:'Capital inicial ($)',val:'100000'},
+        {id:'tasa',label:'Tasa anual (%)',val:'80'},
+        {id:'años',label:'Años',val:'3'},
+      ],
+      calc(f){
+        let C=parseFloat(f.capital.value),T=parseFloat(f.tasa.value)/100,A=parseFloat(f.años.value);
+        if(isNaN(C)||isNaN(T)||isNaN(A))return null;
+        let M=C*Math.pow(1+T,A);
+        let extras=[{cls:'ok',txt:`Ganancia: $${(M-C).toLocaleString('es-AR',{maximumFractionDigits:0})}`},{cls:'info',txt:`Factor: ×${Math.pow(1+T,A).toFixed(2)}`}];
+        let steps=[`M = ${C.toLocaleString()} × (1+${T*100}%)^${A} = <strong>$${M.toLocaleString('es-AR',{maximumFractionDigits:0})}</strong>`];
+        return{main:`$${M.toLocaleString('es-AR',{maximumFractionDigits:0})}`,label:'Monto final',extras,steps};
+      }
+    },
+    margen:{
+        title:'Margen y punto de equilibrio',
+        formula:'Margen = (PV − PC) / PV × 100',
+        fields:[
+          {id:'pc',label:'Precio de costo ($)',val:'1000'},
+          {id:'pv',label:'Precio de venta ($)',val:'1500'},
+          {id:'fc',label:'Costos fijos/mes ($)',val:'50000'},
+        ],
+        calc(f){
+          let PC=parseFloat(f.pc.value),PV=parseFloat(f.pv.value),FC=parseFloat(f.fc.value);
+          if(isNaN(PC)||isNaN(PV)||PV===0)return null;
+          let margen=(PV-PC)/PV*100;
+          let markup=(PV-PC)/PC*100;
+          let extras=[{cls:'info',txt:`Markup: ${markup.toFixed(1)}%`}];
+          if(!isNaN(FC)){let pe=FC/(PV-PC);extras.push({cls:'info',txt:`Punto equilibrio: ${pe.toFixed(0)} unidades/mes`});}
+          let steps=[`Margen = (${PV}-${PC})/${PV} × 100 = <strong>${margen.toFixed(2)}%</strong>`];
+          return{main:`${margen.toFixed(2)}%`,label:'Margen sobre precio de venta',extras,steps};
+        }
+      },
+      vpn_tir:{
+        title:'VPN y TIR',
+        formula:'VPN = -I0 + Σ FCt/(1+r)^t',
+        fields:[
+          {id:'i0',label:'Inversión inicial (negativo)',val:'-1000'},
+          {id:'f1',label:'Flujo Año 1',val:'600'},
+          {id:'f2',label:'Flujo Año 2',val:'600'},
+          {id:'f3',label:'Flujo Año 3 (opcional)',val:''},
+          {id:'tasa',label:'Tasa de descuento (%)',val:'10'},
+        ],
+        calc(f){
+          let i0=parseFloat(f.i0.value), r=parseFloat(f.tasa.value)/100;
+          let flows = [i0, parseFloat(f.f1.value), parseFloat(f.f2.value)];
+          if(f.f3.value) flows.push(parseFloat(f.f3.value));
+          if(flows.some(isNaN)) return null;
+          if(i0>=0) return {main:'Error', label:'Falta inversión inicial (negativa)', extras:[{cls:'danger',txt:'La inversión inicial debe ser negativa'}], steps:[]};
+          
+          let vpn = FIN_UTILS.calcVPN(r, flows);
+          let tir = FIN_UTILS.calcTIR(flows);
+          let extras = [{cls:vpn>0?'ok':'danger', txt:vpn>0?'Proyecto Rentable':'No rentable (VPN < 0)'}];
+          if(tir === null) extras.push({cls:'warn', txt:'TIR no converge o no existe'});
+          else extras.push({cls:tir>r?'ok':'danger', txt:`TIR (${(tir*100).toFixed(2)}%) ${tir>r?'>':'<'} Tasa`});
+          
+          let ar = document.getElementById('modo-ar').checked;
+          if(ar) {
+            let tea_pf = 0.70; // Ejemplo Plazo Fijo Argentina
+            extras.push({cls:'info', txt:`Equiv. Plazo Fijo: ${tir > tea_pf ? 'SUPERIOR' : 'INFERIOR'} a PF (70%)`});
+          }
+
+          return {main:`VPN: $${vpn.toFixed(2)}`, label:`TIR: ${tir !== null ? (tir*100).toFixed(2)+'%' : 'N/A'}`, extras, steps:flows.map((fl,i)=>`Año ${i}: ${fl} / (1+r)^${i} = ${(fl/Math.pow(1+r,i)).toFixed(2)}`)};
+        }
+      },
+      aleman_amer:{
+        title:'Préstamo Alemán / Americano',
+        formula:'Alemán: Amort. Constante | Americano: Interés solo',
+        fields:[
+          {id:'cap',label:'Capital ($)',val:'100000'},
+          {id:'plazo',label:'Plazo (meses)',val:'12'},
+          {id:'tasa',label:'TNA (%)',val:'80'},
+          {id:'sistema',label:'Sistema',val:'aleman',type:'select',opts:[{v:'aleman',l:'Alemán (Cuota decreciente)'},{v:'americano',l:'Americano (Capital al final)'}]},
+        ],
+        calc(f){
+          let cap=parseFloat(f.cap.value), n=parseFloat(f.plazo.value), tna=parseFloat(f.tasa.value)/100, sis=f.sistema.value;
+          if(isNaN(cap)||isNaN(n)||isNaN(tna)) return null;
+          let i = tna/12, totalInt=0, cuotas=[];
+          let ar = document.getElementById('modo-ar').checked;
+          let cft_adj = ar ? 1.05 : 1.0;
+
+          if(sis==='aleman'){
+            let amort = cap/n;
+            for(let m=1; m<=n; m++){
+              let int = (cap - amort*(m-1)) * i;
+              totalInt += int;
+              if(m===1 || m===n) cuotas.push({m, c: amort+int});
+            }
+          } else {
+            totalInt = cap * i * n;
+            cuotas = [{m:1, c:cap*i}, {m:n, c:cap + cap*i}];
+          }
+
+          let extras = [{cls:'info', txt:`Interés Total: $${totalInt.toFixed(2)}`}];
+          if(ar) extras.push({cls:'warn', txt:`CFT Estimado (inc. gastos): ${((tna*cft_adj)*100).toFixed(1)}%`});
+
+          return {main:`Cuota 1: $${cuotas[0].c.toFixed(2)}`, label:`Sistema ${sis.toUpperCase()}`, extras, steps:[`Interés total devengado: $${totalInt.toFixed(2)}`,`Cuota final: $${cuotas[1].c.toFixed(2)}`]};
+        }
+      },
+      tasas:{
+        title:'Conversor de Tasas',
+        formula:'TEA = (1 + TNA/n)^n - 1',
+        fields:[
+          {id:'tna_in',label:'TNA (%)',val:'80'},
+          {id:'m',label:'Capitalizaciones/año (n)',val:'12'},
+        ],
+        calc(f){
+          let tna=parseFloat(f.tna_in.value)/100, m=parseFloat(f.m.value);
+          if(isNaN(tna)||isNaN(m)) return null;
+          let tea = Math.pow(1 + tna/m, m) - 1;
+          let tem = Math.pow(1 + tea, 1/12) - 1;
+          let ted = Math.pow(1 + tea, 1/365) - 1;
+          let extras = [
+            {cls:'info', txt:`TEM (Mensual): ${(tem*100).toFixed(2)}%`},
+            {cls:'info', txt:`TED (Diaria): ${(ted*100).toFixed(4)}%`},
+            {cls:'warn', txt:'TNA no incluye capitalización'}
+          ];
+          return {main:`TEA: ${(tea*100).toFixed(2)}%`, label:'Tasas Equivalentes', extras, steps:[`TEA = (1 + ${tna}/${m})^${m} - 1 = ${(tea*100).toFixed(2)}%`]};
+        }
+      },
+    },
+  quim:{
+    molar:{
+      title:'Preparar solución por molaridad',
+      formula:'m = M × V(L) × PM',
+      fields:[
+        {id:'mol',label:'Molaridad M (mol/L)',val:'0.9'},
+        {id:'vol',label:'Volumen final (mL)',val:'250'},
+        {id:'pm',label:'Peso molecular (g/mol)',val:'58.44'},
+        {id:'comp',label:'Compuesto',val:'NaCl',type:'select',opts:[{v:'58.44',l:'NaCl'},{v:'40.00',l:'NaOH'},{v:'36.46',l:'HCl'},{v:'98.08',l:'H₂SO₄'},{v:'18.02',l:'H₂O'},{v:'custom',l:'Otro'}]},
+      ],
+      calc(f){
+        let M=parseFloat(f.mol.value),V=parseFloat(f.vol.value)/1000,PM=parseFloat(f.pm.value);
+        if(f.comp.value!=='custom')PM=parseFloat(f.comp.value);
+        if(isNaN(M)||isNaN(V)||isNaN(PM))return null;
+        let m=M*V*PM;
+        let extras=[
+          {cls:'info',txt:`Moles necesarios: ${(M*V).toFixed(4)} mol`},
+          {cls:'ok',txt:`Procedimiento: pesar ${m.toFixed(2)}g, disolver y enrasar a ${f.vol.value}mL`},
+        ];
+        let steps=[`m = ${M} mol/L × ${V*1000}mL/1000 × ${PM} g/mol = <strong>${m.toFixed(2)} g</strong>`];
+        return{main:`${m.toFixed(2)} g`,label:'Masa a pesar',extras,steps};
+      }
+    },
+    dilucion:{
+      title:'Dilución C₁V₁ = C₂V₂',
+      formula:'V1 = C2 × V2 / C1',
+      fields:[
+        {id:'c1',label:'Concentración stock C1 (M)',val:'12'},
+        {id:'c2',label:'Concentración final C2 (M)',val:'0.1'},
+        {id:'v2',label:'Volumen final V2 (mL)',val:'500'},
+      ],
+      calc(f){
+        let C1=parseFloat(f.c1.value),C2=parseFloat(f.c2.value),V2=parseFloat(f.v2.value);
+        if(isNaN(C1)||isNaN(C2)||isNaN(V2)||C1===0)return null;
+        let V1=C2*V2/C1;
+        let extras=[{cls:'ok',txt:`Tomar ${V1.toFixed(2)} mL de stock y completar a ${V2} mL`},{cls:'info',txt:`Factor de dilución: 1:${(C1/C2).toFixed(0)}`}];
+        let steps=[`V1 = ${C2}×${V2}/${C1} = <strong>${V1.toFixed(2)} mL</strong>`];
+        return{main:`${V1.toFixed(2)} mL`,label:'Volumen de stock a tomar',extras,steps};
+      }
+    },
+    ph:{
+      title:'pH de solución ácida',
+      formula:'pH = -log₁₀([H⁺])',
+      fields:[
+        {id:'conc',label:'Concentración ácido (M)',val:'0.01'},
+        {id:'tipo',label:'Tipo',val:'fuerte',type:'select',opts:[{v:'fuerte',l:'Ácido fuerte'},{v:'debil',l:'Ácido débil'}]},
+        {id:'ka',label:'Ka (solo ácido débil)',val:'1.8e-5'},
+      ],
+      calc(f){
+        let C=parseFloat(f.conc.value),T=f.tipo.value,Ka=parseFloat(f.ka.value);
+        let H,ph;
+        if(T==='fuerte'){H=C;ph=-Math.log10(H);}
+        else{H=(-Ka+Math.sqrt(Ka*Ka+4*Ka*C))/2;ph=-Math.log10(H);}
+        let extras=[{cls:'info',txt:`[H⁺] = ${H.toExponential(3)} M`},{cls:(ph<7?'warn':(ph>7?'ok':'info')),txt:ph<7?'Solución ácida':ph>7?'Solución básica':'Solución neutra'}];
+        let steps=[T==='fuerte'?`pH = -log₁₀(${C}) = <strong>${ph.toFixed(3)}</strong>`:`[H⁺] resuelto por fórmula cuadrática → pH = <strong>${ph.toFixed(3)}</strong>`];
+        return{main:ph.toFixed(3),label:'pH de la solución',extras,steps};
+      }
+    },
+    gas:{
+      title:'Gas ideal — PV = nRT',
+      formula:'PV = nRT  |  R = 0.08206 L·atm/mol·K',
+      fields:[
+        {id:'p',label:'P (atm) — 0 para calcular',val:''},
+        {id:'v',label:'V (L) — 0 para calcular',val:''},
+        {id:'n',label:'n (mol)',val:'1'},
+        {id:'t',label:'T (°C)',val:'25'},
+      ],
+      calc(f){
+        const R=0.08206;
+        let P=parseFloat(f.p.value),V=parseFloat(f.v.value),n=parseFloat(f.n.value),T=parseFloat(f.t.value)+273.15;
+        let nP=isNaN(P)||f.p.value==='',nV=isNaN(V)||f.v.value==='';
+        let main,label,steps;
+        if(!nP&&!nV){let nc=P*V/(R*T);main=`${nc.toFixed(4)} mol`;label='Moles';steps=[`n = PV/RT = ${P}×${V}/(${R}×${T.toFixed(2)}) = <strong>${nc.toFixed(4)} mol</strong>`];}
+        else if(nP){let Pc=n*R*T/V;main=`${Pc.toFixed(4)} atm`;label='Presión';steps=[`P = nRT/V = ${n}×${R}×${T.toFixed(2)}/${V} = <strong>${Pc.toFixed(4)} atm</strong>`];}
+        else{let Vc=n*R*T/P;main=`${Vc.toFixed(4)} L`;label='Volumen';steps=[`V = nRT/P = ${n}×${R}×${T.toFixed(2)}/${P} = <strong>${Vc.toFixed(4)} L</strong>`];}
+        return{main,label,extras:[{cls:'info',txt:`T = ${T.toFixed(2)} K`}],steps};
+      }
+    },
+  },
+  civil:{
+    hormigon:{
+      title:'Cálculo de hormigón',
+      formula:'Volumen = Largo × Ancho × Espesor',
+      fields:[
+        {id:'largo',label:'Largo (m)',val:'4'},
+        {id:'ancho',label:'Ancho (m)',val:'5'},
+        {id:'esp',label:'Espesor (cm)',val:'10'},
+        {id:'dosis',label:'Dosificación cemento (kg/m³)',val:'350'},
+      ],
+      calc(f){
+        let L=parseFloat(f.largo.value),A=parseFloat(f.ancho.value),E=parseFloat(f.esp.value)/100,D=parseFloat(f.dosis.value);
+        if(isNaN(L)||isNaN(A)||isNaN(E))return null;
+        let V=L*A*E;
+        let Vd=V*1.1;
+        let cemento=D*Vd;
+        let bolsas=Math.ceil(cemento/50);
+        let arena=Vd*0.55;
+        let piedra=Vd*0.55;
+        let extras=[
+          {cls:'info',txt:`Volumen neto: ${V.toFixed(2)} m³`},
+          {cls:'info',txt:`Con 10% desperdicio: ${Vd.toFixed(2)} m³`},
+          {cls:'ok',txt:`Cemento: ${cemento.toFixed(0)} kg = ${bolsas} bolsas x50kg`},
+          {cls:'info',txt:`Arena: ${arena.toFixed(2)} m³  |  Piedra: ${piedra.toFixed(2)} m³`},
+        ];
+        let steps=[`V = ${L}×${A}×${E} = ${V.toFixed(2)} m³ (+10% = ${Vd.toFixed(2)} m³)`];
+        return{main:`${bolsas} bolsas`,label:'Cemento necesario (50 kg c/u)',extras,steps};
+      }
+    },
+    ladrillos:{
+      title:'Ladrillos por superficie',
+      formula:'N = m² × ladrillos/m²',
+      fields:[
+        {id:'largo',label:'Largo muro (m)',val:'5'},
+        {id:'alto',label:'Alto muro (m)',val:'2.5'},
+        {id:'tipo',label:'Tipo ladrillo',val:'8',type:'select',opts:[{v:'8',l:'8cm → 50/m²'},{v:'12',l:'12cm → 40/m²'},{v:'18',l:'18cm → 33/m²'}]},
+      ],
+      calc(f){
+        let L=parseFloat(f.largo.value),A=parseFloat(f.alto.value);
+        let densidad=f.tipo.value==='8'?50:f.tipo.value==='12'?40:33;
+        if(isNaN(L)||isNaN(A))return null;
+        let m2=L*A;
+        let N=Math.ceil(m2*densidad*1.05);
+        let extras=[{cls:'info',txt:`Superficie: ${m2.toFixed(1)} m²`},{cls:'ok',txt:`Con 5% rotura: ${N} ladrillos`}];
+        let steps=[`N = ${m2.toFixed(1)} m² × ${densidad} lad/m² × 1.05 = <strong>${N}</strong>`];
+        return{main:`${N} ladrillos`,label:`Muro ${f.largo.value}×${f.alto.value}m`,extras,steps};
+      }
+    },
+    caida:{
+      title:'Caída de tensión en conductores',
+      formula:'ΔV = 2 × ρ × L × I / S',
+      fields:[
+        {id:'l',label:'Longitud (m)',val:'50'},
+        {id:'i',label:'Corriente (A)',val:'10'},
+        {id:'s',label:'Sección conductor (mm²)',val:'2.5'},
+        {id:'vin',label:'Tensión de línea (V)',val:'220'},
+      ],
+      calc(f){
+        let L=parseFloat(f.l.value),I=parseFloat(f.i.value),S=parseFloat(f.s.value),Vin=parseFloat(f.vin.value);
+        const rho=0.0178;
+        if(isNaN(L)||isNaN(I)||isNaN(S))return null;
+        let dV=2*rho*L*I/S;
+        let pct=dV/Vin*100;
+        let cls=pct<3?'ok':pct<5?'warn':'danger';
+        let txt=pct<3?'Dentro del 3% admisible':pct<5?'Supera el 3% — considerar sección mayor':'EXCEDE 5% — sección insuficiente';
+        let extras=[{cls,txt:`Caída: ${dV.toFixed(3)} V (${pct.toFixed(2)}%) → ${txt}`}];
+        let steps=[`ΔV = 2 × 0.0178 × ${L} × ${I} / ${S} = <strong>${dV.toFixed(3)} V</strong>`];
+        return{main:`${dV.toFixed(3)} V`,label:`Caída de tensión (${pct.toFixed(2)}%)`,extras,steps};
+      }
+    },
+  },
+  mec:{
+    cilindrada:{
+      title:'Cilindrada del motor',
+      formula:'Vd = π/4 × D² × L × N',
+      fields:[
+        {id:'diam',label:'Diámetro pistón (mm)',val:'79'},
+        {id:'carr',label:'Carrera (mm)',val:'81.5'},
+        {id:'cil',label:'N° cilindros',val:'4'},
+        {id:'diam2',label:'Diámetro nuevo (mm) — opcional',val:'80'},
+      ],
+      calc(f){
+        let D=parseFloat(f.diam.value)/10,D2=parseFloat(f.diam2.value)/10,L=parseFloat(f.carr.value)/10,N=parseFloat(f.cil.value);
+        if(isNaN(D)||isNaN(L)||isNaN(N))return null;
+        let V1=Math.PI/4*D*D*L*N*1000;
+        let extras=[{cls:'info',txt:`Cilindrada original: ${V1.toFixed(0)} cc`}];
+        let steps=[`Vd = π/4 × ${D*10}² × ${L*10} × ${N} / 1000 = <strong>${V1.toFixed(0)} cc</strong>`];
+        let main=`${V1.toFixed(0)} cc`,label='Cilindrada original';
+        if(!isNaN(D2)&&f.diam2.value!==''){
+          let V2=Math.PI/4*D2*D2*L*N*1000;
+          extras.push({cls:'ok',txt:`Cilindrada nueva (∅${f.diam2.value}mm): ${V2.toFixed(0)} cc`});
+          extras.push({cls:'info',txt:`Incremento: +${(V2-V1).toFixed(0)} cc`});
+          steps.push(`V2 = π/4 × ${D2*10}² × ${L*10} × ${N} / 1000 = <strong>${V2.toFixed(0)} cc</strong>`);
+        }
+        return{main,label,extras,steps};
+      }
+    },
+    potencia:{
+      title:'Potencia — Torque — RPM',
+      formula:'HP = Torque(lb·ft) × RPM / 5252',
+      fields:[
+        {id:'torque',label:'Torque (Nm)',val:'200'},
+        {id:'rpm',label:'RPM',val:'5000'},
+      ],
+      calc(f){
+        let T=parseFloat(f.torque.value),R=parseFloat(f.rpm.value);
+        if(isNaN(T)||isNaN(R))return null;
+        let W=T*R*2*Math.PI/60;
+        let HP=W/745.7;
+        let torquelb=T*0.7376;
+        let extras=[
+          {cls:'info',txt:`Potencia: ${(W/1000).toFixed(2)} kW`},
+          {cls:'info',txt:`Torque: ${torquelb.toFixed(1)} lb·ft`},
+        ];
+        let steps=[`P = T×ω = ${T}×${(R*2*Math.PI/60).toFixed(2)} = ${W.toFixed(0)} W = <strong>${HP.toFixed(1)} HP</strong>`];
+        return{main:`${HP.toFixed(1)} HP`,label:'Potencia al freno',extras,steps};
+      }
+    },
+    consumo:{
+      title:'Consumo de combustible',
+      formula:'L/100km = litros / km × 100',
+      fields:[
+        {id:'litros',label:'Litros cargados (L)',val:'40'},
+        {id:'km',label:'Kilómetros recorridos',val:'400'},
+        {id:'precio',label:'Precio litro ($)',val:'1200'},
+      ],
+      calc(f){
+        let L=parseFloat(f.litros.value),K=parseFloat(f.km.value),P=parseFloat(f.precio.value);
+        if(isNaN(L)||isNaN(K)||K===0)return null;
+        let l100=L/K*100;
+        let kml=K/L;
+        let extras=[{cls:'info',txt:`Rendimiento: ${kml.toFixed(2)} km/L`}];
+        if(!isNaN(P))extras.push({cls:'info',txt:`Costo por km: $${(L*P/K).toFixed(2)}`});
+        let steps=[`L/100km = ${L}/${K}×100 = <strong>${l100.toFixed(2)} L/100km</strong>`];
+        return{main:`${l100.toFixed(2)} L/100km`,label:'Consumo',extras,steps};
+      }
+    },
+  },
+  geom:{
+    circulo:{
+      title:'Círculo',
+      formula:'Área = π·r² | Perímetro = 2·π·r',
+      fields:[
+        {id:'radio',label:'Radio (r)',val:'10'},
+      ],
+      calc(f){
+        let r=parseFloat(f.radio.value);
+        if(isNaN(r))return null;
+        let area=Math.PI*r*r;
+        let per=2*Math.PI*r;
+        let extras=[{cls:'info',txt:`Diámetro: ${(r*2).toFixed(2)}`},{cls:'ok',txt:`Perímetro: ${per.toFixed(3)}`}];
+        let steps=[`Área = π × ${r}² = <strong>${area.toFixed(3)}</strong>`,`Perímetro = 2 × π × ${r} = <strong>${per.toFixed(3)}</strong>`];
+        return{main:`${area.toFixed(3)}`,label:'Área del círculo',extras,steps};
+      }
+    },
+    triangulo:{
+      title:'Triángulo',
+      formula:'Área = (base × altura) / 2',
+      fields:[
+        {id:'base',label:'Base (b)',val:'10'},
+        {id:'altura',label:'Altura (h)',val:'5'},
+      ],
+      calc(f){
+        let b=parseFloat(f.base.value),h=parseFloat(f.altura.value);
+        if(isNaN(b)||isNaN(h))return null;
+        let area=(b*h)/2;
+        let steps=[`Área = (${b} × ${h}) / 2 = <strong>${area.toFixed(2)}</strong>`];
+        return{main:`${area.toFixed(2)}`,label:'Área del triángulo',extras:[],steps};
+      }
+    },
+    esfera:{
+      title:'Esfera',
+      formula:'Volumen = 4/3·π·r³ | Área = 4·π·r²',
+      fields:[
+        {id:'radio',label:'Radio (r)',val:'5'},
+      ],
+      calc(f){
+        let r=parseFloat(f.radio.value);
+        if(isNaN(r))return null;
+        let vol=(4/3)*Math.PI*Math.pow(r,3);
+        let area=4*Math.PI*r*r;
+        let extras=[{cls:'ok',txt:`Superficie: ${area.toFixed(3)}`}];
+        let steps=[`Volumen = 4/3 × π × ${r}³ = <strong>${vol.toFixed(3)}</strong>`,`Área = 4 × π × ${r}² = <strong>${area.toFixed(3)}</strong>`];
+        return{main:`${vol.toFixed(3)}`,label:'Volumen de la esfera',extras,steps};
+      }
+    },
+    cilindro:{
+      title:'Cilindro',
+      formula:'Volumen = π·r²·h',
+      fields:[
+        {id:'radio',label:'Radio (r)',val:'5'},
+        {id:'altura',label:'Altura (h)',val:'10'},
+      ],
+      calc(f){
+        let r=parseFloat(f.radio.value),h=parseFloat(f.altura.value);
+        if(isNaN(r)||isNaN(h))return null;
+        let vol=Math.PI*r*r*h;
+        let areaLat=2*Math.PI*r*h;
+        let areaTotal=areaLat+2*(Math.PI*r*r);
+        let extras=[{cls:'info',txt:`Área Lateral: ${areaLat.toFixed(2)}`},{cls:'ok',txt:`Área Total: ${areaTotal.toFixed(2)}`}];
+        let steps=[`Volumen = π × ${r}² × ${h} = <strong>${vol.toFixed(3)}</strong>`];
+        return{main:`${vol.toFixed(3)}`,label:'Volumen del cilindro',extras,steps};
+      }
+    },
+  },
+  unit:{
+    longitud:{
+      title:'Conversión de Longitud',
+      formula:'Escala métrica e imperial',
+      fields:[
+        {id:'val',label:'Valor',val:'1'},
+        {id:'desde',label:'Desde',val:'m',type:'select',opts:[{v:'m',l:'Metros (m)'},{v:'cm',l:'Centímetros (cm)'},{v:'mm',l:'Milímetros (mm)'},{v:'km',l:'Kilómetros (km)'},{v:'in',l:'Pulgadas (in)'},{v:'ft',l:'Pies (ft)'},{v:'yd',l:'Yardas (yd)'},{v:'mi',l:'Millas (mi)'}]},
+      ],
+      calc(f){
+        let v=parseFloat(f.val.value),d=f.desde.value;
+        if(isNaN(v))return null;
+        const toM={m:1,cm:0.01,mm:0.001,km:1000,in:0.0254,ft:0.3048,yd:0.9144,mi:1609.34};
+        let m=v*toM[d];
+        let extras=[
+          {cls:'info',txt:`${(m*100).toFixed(2)} cm`},
+          {cls:'info',txt:`${(m/0.0254).toFixed(2)} in`},
+          {cls:'info',txt:`${(m/0.3048).toFixed(2)} ft`},
+          {cls:'info',txt:`${(m/1609.34).toFixed(4)} mi`},
+        ];
+        return{main:`${m.toFixed(4)} m`,label:'Resultado en metros',extras,steps:[`${v} ${d} → ${m.toFixed(4)} m`]};
+      }
+    },
+    masa:{
+      title:'Conversión de Masa',
+      formula:'Kilogramos, Libras, Onzas',
+      fields:[
+        {id:'val',label:'Valor',val:'1'},
+        {id:'desde',label:'Desde',val:'kg',type:'select',opts:[{v:'kg',l:'Kilogramos (kg)'},{v:'g',l:'Gramos (g)'},{v:'mg',l:'Miligramos (mg)'},{v:'lb',l:'Libras (lb)'},{v:'oz',l:'Onzas (oz)'}]},
+      ],
+      calc(f){
+        let v=parseFloat(f.val.value),d=f.desde.value;
+        if(isNaN(v))return null;
+        const toKg={kg:1,g:0.001,mg:1e-6,lb:0.453592,oz:0.0283495};
+        let kg=v*toKg[d];
+        let extras=[
+          {cls:'info',txt:`${(kg*1000).toFixed(2)} g`},
+          {cls:'info',txt:`${(kg/0.453592).toFixed(2)} lb`},
+          {cls:'info',txt:`${(kg/0.0283495).toFixed(2)} oz`},
+        ];
+        return{main:`${kg.toFixed(4)} kg`,label:'Resultado en kilogramos',extras,steps:[`${v} ${d} → ${kg.toFixed(4)} kg`]};
+      }
+    },
+    temp:{
+      title:'Conversión de Temperatura',
+      formula:'°C, °F, K',
+      fields:[
+        {id:'val',label:'Valor',val:'25'},
+        {id:'desde',label:'Desde',val:'c',type:'select',opts:[{v:'c',l:'Celsius (°C)'},{v:'f',l:'Fahrenheit (°F)'},{v:'k',l:'Kelvin (K)'}]},
+      ],
+      calc(f){
+        let v=parseFloat(f.val.value),d=f.desde.value;
+        if(isNaN(v))return null;
+        let c,f_res,k;
+        if(d==='c'){c=v;f_res=v*9/5+32;k=v+273.15;}
+        else if(d==='f'){c=(v-32)*5/9;f_res=v;k=c+273.15;}
+        else{c=v-273.15;f_res=c*9/5+32;k=v;}
+        let extras=[{cls:'info',txt:`${f_res.toFixed(1)} °F`},{cls:'info',txt:`${k.toFixed(1)} K`}];
+        return{main:`${c.toFixed(1)} °C`,label:'Resultado en Celsius',extras,steps:[`${v}°${d.toUpperCase()} → ${c.toFixed(1)}°C`]};
+      }
+    },
+    presion:{
+      title:'Conversión de Presión',
+      formula:'Bar, PSI, Atm, mmHg',
+      fields:[
+        {id:'val',label:'Valor',val:'1'},
+        {id:'desde',label:'Desde',val:'bar',type:'select',opts:[{v:'bar',l:'Bar'},{v:'psi',l:'PSI'},{v:'atm',l:'Atmósfera'},{v:'mmhg',l:'mmHg'},{v:'pa',l:'Pascal (Pa)'}]},
+      ],
+      calc(f){
+        let v=parseFloat(f.val.value),d=f.desde.value;
+        if(isNaN(v))return null;
+        const toBar={bar:1,psi:0.0689476,atm:1.01325,mmhg:0.00133322,pa:1e-5};
+        let bar=v*toBar[d];
+        let extras=[
+          {cls:'info',txt:`${(bar/0.0689476).toFixed(2)} PSI`},
+          {cls:'info',txt:`${(bar/1.01325).toFixed(3)} atm`},
+          {cls:'info',txt:`${(bar/0.00133322).toFixed(1)} mmHg`},
+          {cls:'info',txt:`${(bar*100000).toExponential(2)} Pa`},
+        ];
+        return{main:`${bar.toFixed(4)} bar`,label:'Resultado en Bar',extras,steps:[`${v} ${d} → ${bar.toFixed(4)} bar`]};
+      }
+    },
+  },
+  fis:{
+    velocidad:{
+      title:'Cinemática: Velocidad final',
+      formula:'vf = v0 + a · t',
+      fields:[
+        {id:'v0',label:'V inicial (m/s)',val:'0'},
+        {id:'a',label:'Aceleración (m/s²)',val:'9.81'},
+        {id:'t',label:'Tiempo (s)',val:'10'},
+      ],
+      calc(f){
+        let v0=parseFloat(f.v0.value),a=parseFloat(f.a.value),t=parseFloat(f.t.value);
+        if(isNaN(v0)||isNaN(a)||isNaN(t))return null;
+        let vf=v0+a*t;
+        let d=v0*t+0.5*a*t*t;
+        let extras=[{cls:'ok',txt:`Distancia recorrida: ${d.toFixed(2)} m`},{cls:'info',txt:`En km/h: ${(vf*3.6).toFixed(1)} km/h`}];
+        let steps=[`vf = ${v0} + ${a} × ${t} = <strong>${vf.toFixed(2)} m/s</strong>`];
+        return{main:`${vf.toFixed(2)} m/s`,label:'Velocidad final',extras,steps};
+      }
+    },
+    fuerza:{
+      title:'Segunda Ley de Newton',
+      formula:'F = m · a',
+      fields:[
+        {id:'m',label:'Masa (kg)',val:'10'},
+        {id:'a',label:'Aceleración (m/s²)',val:'9.81'},
+      ],
+      calc(f){
+        let m=parseFloat(f.m.value),a=parseFloat(f.a.value);
+        if(isNaN(m)||isNaN(a))return null;
+        let f_res=m*a;
+        let extras=[{cls:'info',txt:`Equivale a ${ (f_res/9.81).toFixed(2) } kg-fuerza`}];
+        let steps=[`F = ${m}kg × ${a}m/s² = <strong>${f_res.toFixed(2)} N</strong>`];
+        return{main:`${f_res.toFixed(2)} N`,label:'Fuerza Resultante',extras,steps};
+      }
+    },
+    energia:{
+      title:'Energía Cinética y Potencial',
+      formula:'Ec = ½·m·v² | Ep = m·g·h',
+      fields:[
+        {id:'m',label:'Masa (kg)',val:'1'},
+        {id:'v',label:'Velocidad (m/s)',val:'10'},
+        {id:'h',label:'Altura (m)',val:'5'},
+      ],
+      calc(f){
+        let m=parseFloat(f.m.value),v=parseFloat(f.v.value),h=parseFloat(f.h.value);
+        if(isNaN(m)||isNaN(v)||isNaN(h))return null;
+        let ec=0.5*m*v*v;
+        let ep=m*9.81*h;
+        let extras=[{cls:'ok',txt:`Ec: ${ec.toFixed(1)} J`},{cls:'warn',txt:`Ep: ${ep.toFixed(1)} J`},{cls:'info',txt:`Total: ${(ec+ep).toFixed(1)} J`}];
+        let steps=[`Ec = 0.5 × ${m} × ${v}² = <strong>${ec.toFixed(1)} J</strong>`,`Ep = ${m} × 9.81 × ${h} = <strong>${ep.toFixed(1)} J</strong>`];
+        return{main:`${(ec+ep).toFixed(1)} J`,label:'Energía Mecánica Total',extras,steps};
+      }
+    },
+  },
+};
+
+let activeFormula={electro:'led',med:'goteo',fin:'prestamo',quim:'molar',civil:'hormigon',mec:'cilindrada',geom:'circulo',unit:'longitud',fis:'velocidad'};
+
+function setMode(mode){
+  document.querySelectorAll('.mode-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('mode-'+mode).classList.add('active');
+  currentMode=mode;
+  
+  // Update display
+  const modeNames = {
+    general: 'General', electro: 'Electrónica', med: 'Medicina', fin: 'Finanzas', 
+    quim: 'Química', civil: 'Construcción', mec: 'Mecánica', geom: 'Geometría', 
+    unit: 'Unidades', fis: 'Física'
+  };
+  const modeColors = {
+    general: '#4f9cf9', electro: '#38e8c8', med: '#f97b4f', fin: '#a78bfa', 
+    quim: '#f9c74f', civil: '#4ff97b', mec: '#f94f4f', geom: '#f94fa7', 
+    unit: '#4fdbf9', fis: '#f9f54f'
+  };
+  
+  document.getElementById('current-name').textContent = modeNames[mode];
+  document.getElementById('current-dot').style.background = modeColors[mode];
+  document.getElementById('status-mode').textContent = 'Modo: ' + modeNames[mode];
+  
+  renderDB(mode);
+  if(mode!=='general'){
+    let f=activeFormula[mode];
+    if(f)renderForm(mode,f);
+  }
+}
+
+function toggleModal(show){
+  document.getElementById('modal-modules').classList.toggle('show', show);
+}
+
+function selectModule(mode){
+  setMode(mode);
+  toggleModal(false);
+}
+
+function setFormula(module,key){
+  document.querySelectorAll('#mode-'+module+' .chip').forEach(c=>c.classList.remove('active'));
+  event.target.classList.add('active');
+  activeFormula[module]=key;
+  renderForm(module,key);
+  document.getElementById('result-'+module).classList.remove('show');
+  document.getElementById('steps-'+module).classList.remove('show');
+}
+
+function renderForm(module,key){
+  let def=FORMS[module][key];
+  if(!def)return;
+  let el=document.getElementById('form-'+module);
+  let html=`<div class="display"><div class="display-mode">${def.title}</div><div class="display-formula" style="margin-top:18px">${def.formula}</div></div>`;
+  let fields=def.fields;
+  for(let i=0;i<fields.length;i+=2){
+    let f1=fields[i],f2=fields[i+1];
+    if(f2){
+      html+=`<div class="field-row"><div class="field"><label>${f1.label}</label>${renderInput(f1)}</div><div class="field"><label>${f2.label}</label>${renderInput(f2)}</div></div>`;
+    }else{
+      html+=`<div class="field-full"><div class="field"><label>${f1.label}</label>${renderInput(f1)}</div></div>`;
+    }
+  }
+  html+=`<button class="btn-calc" onclick="calculate('${module}','${key}')">Calcular →</button>`;
+  el.innerHTML=html;
+}
+
+function renderInput(f){
+  if(f.type==='select'){
+    let opts=f.opts.map(o=>`<option value="${o.v}">${o.l}</option>`).join('');
+    return `<select id="field-${f.id}">${opts}</select>`;
+  }
+  return `<input type="number" id="field-${f.id}" value="${f.val}" placeholder="${f.label}">`;
+}
+
+function getFields(module,key){
+  let def=FORMS[module][key];
+  let obj={};
+  def.fields.forEach(f=>{
+    obj[f.id]=document.getElementById('field-'+f.id);
+  });
+  return obj;
+}
+
+function calculate(module,key){
+  let def=FORMS[module][key];
+  let fields=getFields(module,key);
+  let res;
+  try{res=def.calc(fields);}catch(e){res=null;}
+  let rel=document.getElementById('result-'+module);
+  let sel=document.getElementById('steps-'+module);
+  if(!res){rel.innerHTML='<div class="result-label" style="color:var(--danger)">Error: verificá los valores ingresados</div>';rel.classList.add('show');return;}
+  let extrasHtml=res.extras.map(e=>`<div class="result-extra ${e.cls}">${e.txt}</div>`).join('');
+  rel.innerHTML=`<div class="result-label">${res.label}</div><div class="result-main">${res.main}</div><div class="result-extras">${extrasHtml}</div>`;
+  rel.classList.add('show');
+  let stepsHtml=res.steps.map(s=>`<div class="step">${s}</div>`).join('');
+  sel.innerHTML=stepsHtml;
+  if(showSteps)sel.classList.add('show');
+  addHistory(module,key,res.main,res.label);
+}
+
+function addHistory(module,key,val,label){
+  history.unshift({module,key,val,label,time:new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})});
+  if(history.length>10)history.pop();
+  renderHistory();
+}
+
+function renderHistory(){
+  let el=document.getElementById('history-list');
+  if(!history.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:10px 0">Sin cálculos aún</div>';return;}
+  el.innerHTML=history.map(h=>`<div class="history-item"><div class="history-label">${h.module} · ${h.key} · ${h.time}</div><div class="history-val">${h.val}</div></div>`).join('');
+}
+
+function clearHistory(){history=[];renderHistory();}
+
+function toggleSteps(){
+  showSteps=!showSteps;
+  document.querySelectorAll('.steps').forEach(s=>{
+    if(showSteps)s.classList.add('show');else s.classList.remove('show');
+  });
+}
+
+function renderDB(mode){
+  let items=DB[mode]||[];
+  let el=document.getElementById('db-items');
+  if(!items.length){el.innerHTML='<div style="font-size:11px;color:var(--text3)">Sin datos para este módulo</div>';return;}
+  el.innerHTML=items.map(i=>`<div class="db-item"><div class="db-name">${i.name}</div><div class="db-val">${i.val}</div></div>`).join('');
+}
+
+// GENERAL CALCULATOR
+function genKey(k){
+  if(genResult==='Error')genResult='';
+  genExpr+=k;
+  document.getElementById('gen-expr').textContent=genExpr;
+}
+function genClear(){genExpr='';genResult='0';document.getElementById('gen-expr').textContent='';document.getElementById('gen-result').textContent='0';}
+function genBack(){genExpr=genExpr.slice(0,-1);document.getElementById('gen-expr').textContent=genExpr;}
+function genEval(){
+  try{
+    let expr=genExpr.replace(/sin\(/g,'Math.sin(').replace(/cos\(/g,'Math.cos(').replace(/tan\(/g,'Math.tan(');
+    let r=Function('"use strict";return ('+expr+')')();
+    if(!isFinite(r))throw new Error('inf');
+    genResult=parseFloat(r.toFixed(10)).toString();
+    document.getElementById('gen-result').textContent=genResult;
+    document.getElementById('gen-expr').textContent=genExpr+' =';
+    addHistory('general','expr',genResult,genExpr);
+    genExpr='';
+  }catch(e){
+    document.getElementById('gen-result').textContent='Error';
+    genResult='Error';genExpr='';
+  }
+}
+
+// INIT
+renderDB('general');
+setFormula('electro','led');
+setFormula('med','goteo');
+setFormula('fin','prestamo');
+setFormula('quim','molar');
+setFormula('civil','hormigon');
+setFormula('mec','cilindrada');
+setFormula('geom','circulo');
+setFormula('unit','longitud');
+setFormula('fis','velocidad');
+
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(err => console.log('SW error:', err));
+  });
+}
+</script>
+</body>
+</html>

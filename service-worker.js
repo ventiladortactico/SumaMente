@@ -1,9 +1,21 @@
-const CACHE_NAME = 'sumamente-v5-final';
+const CACHE_NAME = 'sumamente-v10-full-modules';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './logo.png',
+  './js/data.js',
+  './js/forms.js',
+  './js/modulos/electro.js',
+  './js/modulos/medicina.js',
+  './js/modulos/finanzas.js',
+  './js/modulos/quimica.js',
+  './js/modulos/civil.js',
+  './js/modulos/mecanica.js',
+  './js/modulos/geometria.js',
+  './js/modulos/unidades.js',
+  './js/modulos/fisica.js',
+  './js/app.js',
   'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800&display=swap'
 ];
 

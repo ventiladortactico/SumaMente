@@ -281,11 +281,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
             <button class="key fn" onclick="genKey('sin(')">sin</button>
             <button class="key fn" onclick="genKey('cos(')">cos</button>
             <button class="key fn" onclick="genKey('tan(')">tan</button>
-            <button class="key fn" onclick="genKey('Math.sqrt(')">√</button>
-            <button class="key fn" onclick="genKey('Math.log10(')">log</button>
-            <button class="key fn" onclick="genKey('Math.log(')">ln</button>
-            <button class="key fn" onclick="genKey('Math.PI')">π</button>
-            <button class="key fn" onclick="genKey('**')">xʸ</button>
+            <button class="key fn" onclick="genKey('√(')">√</button>
+            <button class="key fn" onclick="genKey('log(')">log</button>
+            <button class="key fn" onclick="genKey('ln(')">ln</button>
+            <button class="key fn" onclick="genKey('π')">π</button>
+            <button class="key fn" onclick="genKey('^')">xʸ</button>
             <button class="key op" onclick="genClear()">C</button>
             <button class="key op" onclick="genBack()">⌫</button>
             <button class="key op" onclick="genKey('(')">(</button>
@@ -1814,7 +1814,15 @@ function genClear(){genExpr='';genResult='0';document.getElementById('gen-expr')
 function genBack(){genExpr=genExpr.slice(0,-1);document.getElementById('gen-expr').textContent=genExpr;}
 function genEval(){
   try{
-    let expr=genExpr.replace(/sin\(/g,'Math.sin(').replace(/cos\(/g,'Math.cos(').replace(/tan\(/g,'Math.tan(');
+    let expr=genExpr
+      .replace(/sin\(/g,'Math.sin(')
+      .replace(/cos\(/g,'Math.cos(')
+      .replace(/tan\(/g,'Math.tan(')
+      .replace(/√\(/g,'Math.sqrt(')
+      .replace(/log\(/g,'Math.log10(')
+      .replace(/ln\(/g,'Math.log(')
+      .replace(/π/g,'Math.PI')
+      .replace(/\^/g,'**');
     let r=Function('"use strict";return ('+expr+')')();
     if(!isFinite(r))throw new Error('inf');
     genResult=parseFloat(r.toFixed(10)).toString();

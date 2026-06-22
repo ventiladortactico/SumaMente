@@ -11,7 +11,7 @@ function setDebugInfo(msg) {
     if (!el) {
         el = document.createElement('div');
         el.id = 'graph-debug';
-        el.style.cssText = 'font-size:10px;color:var(--text3);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px;margin-top:6px;white-space:pre-wrap;word-break:break-all;font-family:monospace';
+        el.style.cssText = 'font-size:10px;color:#ff6b6b;background:var(--surface);border:1px solid #ff6b6b;border-radius:6px;padding:6px 10px;margin-top:6px;white-space:pre-wrap;word-break:break-all;font-family:monospace';
         var canvas = document.getElementById('chart-canvas-general');
         if (canvas && canvas.parentElement) canvas.parentElement.appendChild(el);
     }
@@ -45,7 +45,7 @@ function genPlotFunc(expr, preserveView) {
             const y = safeMathEval(expr, { x });
             if (isFinite(y)) points.push({ x, y });
             else points.push({ x, y: null });
-        } catch(e) { points.push({ x, y: null }); }
+        } catch(e) { points.push({ x, y: null }); if (i === 0) setDebugInfo('Error en x=' + x + ': ' + (e.message || e)); }
     }
     
     // Ajustar rango Y basado en los puntos (con recorte de outliers)
@@ -610,6 +610,7 @@ function genPlotEquation(equation) {
         } catch(e) {
             leftPoints.push({ x, y: null });
             rightPoints.push({ x, y: null });
+            if (i === 0) setDebugInfo('Error eq x=' + x + ': ' + (e.message || e));
         }
     }
     

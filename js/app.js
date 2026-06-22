@@ -363,20 +363,98 @@ const BillingManager = {
     }
 };
 
-function exportGenPDF() {
-    const expr = document.getElementById('gen-expr').textContent;
-    const result = document.getElementById('gen-result').textContent;
-    const stepsEl = document.getElementById('gen-steps');
-    let steps = [];
-    if (stepsEl) {
-        const stepDivs = stepsEl.querySelectorAll('.step');
-        steps = Array.from(stepDivs).map(d => d.innerHTML);
+function getCanvasImage(module) {
+    const canvas = document.getElementById('chart-canvas-' + module);
+    if (canvas && canvas.style.display !== 'none' && canvas.width > 0) {
+        return canvas.toDataURL('image/png');
     }
-    if (!expr && result === '0') return;
-    exportResultPDF('General', expr || 'resultado', result, expr ? `Resultado: ${expr}` : 'Resultado', steps);
+    return null;
 }
 
-function exportResultPDF(module, key, val, label, steps) {
+function exportGenPDF() {
+    if (!LicenseManager.isPro) { alert('Exportar PDF es exclusivo de PRO'); return; }
+    showPDFChoice((mode) => {
+        if (mode === 'last') {
+            const expr = document.getElementById('gen-expr').textContent;
+            const result = document.getElementById('gen-result').textContent;
+            const stepsEl = document.getElementById('gen-steps');
+            let steps = [];
+            if (stepsEl) {
+                const stepDivs = stepsEl.querySelectorAll('.step');
+                steps = Array.from(stepDivs).map(d => d.innerHTML);
+            }
+            if (!expr && result === '0') return;
+            const chartImg = getCanvasImage('general');
+            exportResultPDF('General', expr || 'resultado', result, expr ? `Resultado: ${expr}` : 'Resultado', steps, chartImg);
+        } else {
+            exportHistoryPDF();
+        }
+    });
+}
+
+function showPDFChoice(callback) {
+    const overlay = document.createElement('div');
+    overlay.id = 'pdf-choice-overlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s';
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+        <div style="background:var(--surface2,#181c24);border:1px solid var(--border,#2a3040);border-radius:12px;padding:24px;max-width:340px;width:90%;text-align:center">
+            <div style="font-size:32px;margin-bottom:8px">📄</div>
+            <div style="font-family:var(--sans,'Syne',sans-serif);font-size:18px;font-weight:700;color:var(--text,#e8edf5);margin-bottom:4px">Exportar PDF</div>
+            <div style="font-size:12px;color:var(--text3,#4a5570);margin-bottom:20px">¿Qué querés exportar?</div>
+            <button id="pdf-choice-last" style="display:block;width:100%;padding:12px;margin-bottom:8px;background:var(--accent,#4f9cf9);color:#0a0b0e;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Último cálculo</button>
+            <button id="pdf-choice-history" style="display:block;width:100%;padding:12px;margin-bottom:12px;background:var(--surface3,#1e232f);color:var(--text,#e8edf5);border:1px solid var(--border,#2a3040);border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">Historial completo (${history.length} cálculos)</button>
+            <button id="pdf-choice-cancel" style="background:none;border:none;color:var(--text3,#4a5570);font-size:12px;cursor:pointer;padding:4px">Cancelar</button>
+        </div>`;
+    document.body.appendChild(overlay);
+    document.getElementById('pdf-choice-last').onclick = () => { overlay.remove(); callback('last'); };
+    document.getElementById('pdf-choice-history').onclick = () => { overlay.remove(); callback('history'); };
+    document.getElementById('pdf-choice-cancel').onclick = () => { overlay.remove(); };
+    document.addEventListener('keydown', function handler(e) { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', handler); } });
+}
+
+function exportModulePDF(module, key, val, label, stepsData) {
+    if (!LicenseManager.isPro) { alert('Exportar PDF es exclusivo de PRO'); return; }
+    const chartImg = getCanvasImage(module);
+    let steps = [];
+    if (stepsData) {
+        try { steps = JSON.parse(decodeURIComponent(stepsData)); } catch(e) {}
+    }
+    exportResultPDF(module, key, val, label, steps, chartImg);
+}
+
+function exportHistoryPDF() {
+    if (!LicenseManager.isPro) { alert('Exportar PDF es exclusivo de PRO'); return; }
+    if (history.length === 0) { alert('No hay cálculos en el historial'); return; }
+    let html = '';
+    history.forEach((h, idx) => {
+        html += `<div style="margin-bottom:20px;padding-bottom:15px;${idx < history.length - 1 ? 'border-bottom:1px solid #2a3040' : ''}">
+            <div style="font-size:11px;color:#4a5570;margin-bottom:2px">${h.module} · ${h.key} · ${h.time}</div>
+            <div style="font-size:13px;color:#8a97b0;margin-bottom:4px">${h.label || ''}</div>
+            <div style="font-size:22px;font-weight:700;color:#e8edf5">${h.val}</div>
+        </div>`;
+    });
+    const isPro = LicenseManager.isPro;
+    const w = window.open('', '_blank');
+    if (!w) { alert('Permite ventanas emergentes para exportar PDF'); return; }
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SumaMente - Historial</title><style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{background:#0a0b0e;color:#e8edf5;font-family:'JetBrains Mono',monospace;padding:30px;max-width:800px;margin:0 auto}
+        h1{font-family:'Syne',sans-serif;font-size:22px;color:#4f9cf9;margin-bottom:5px}
+        .sub{font-size:11px;color:#4a5570;margin-bottom:25px}
+        .footer{margin-top:30px;padding-top:15px;border-top:1px solid #2a3040;font-size:10px;color:#4a5570;text-align:center}
+        .badge{display:inline-block;background:#38e8c8;color:#0a0b0e;font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;margin-left:8px}
+        @media print{body{padding:15px}@page{margin:1.5cm}}
+    </style></head><body>
+    <h1>SumaMente${isPro ? ' <span class="badge">PRO</span>' : ''}</h1>
+    <div class="sub">Historial completo · ${history.length} cálculos · ${new Date().toLocaleString('es-AR')}</div>
+    ${html}
+    <div class="footer">Generado por SumaMente Cientifica</div></body></html>`);
+    w.document.close();
+    setTimeout(() => { w.focus(); w.print(); }, 500);
+}
+
+function exportResultPDF(module, key, val, label, steps, chartImg) {
     if (typeof steps === 'string' && steps.startsWith('%')) {
         try { steps = JSON.parse(decodeURIComponent(steps)); } catch(e) { steps = []; }
     }
@@ -384,6 +462,8 @@ function exportResultPDF(module, key, val, label, steps) {
     const w = window.open('', '_blank');
     if (!w) { alert('Permite ventanas emergentes para exportar PDF'); return; }
     const isPro = LicenseManager.isPro;
+    const date = new Date().toLocaleString('es-AR');
+    const chartHtml = chartImg ? `<div style="margin:20px 0;text-align:center"><img src="${chartImg}" style="max-width:100%;border-radius:8px;border:1px solid #2a3040"></div>` : '';
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SumaMente - ${label}</title><style>
         *{box-sizing:border-box;margin:0;padding:0}
         body{background:#0a0b0e;color:#e8edf5;font-family:'JetBrains Mono',monospace;padding:30px;max-width:800px;margin:0 auto}
@@ -392,15 +472,16 @@ function exportResultPDF(module, key, val, label, steps) {
         .label{font-size:12px;color:#8a97b0;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
         .value{font-size:28px;font-weight:700;color:#e8edf5;margin-bottom:20px;word-break:break-all}
         .step{background:#111318;border:1px solid #2a3040;border-radius:6px;padding:8px 12px;margin-bottom:4px;font-size:12px;color:#e8edf5}
-        .steps-title{font-size:12px;color:#4a5570;margin-bottom:8px;margin-top:20px}
+        .steps-title{font-size:12px;color:#4a5570;margin-bottom:8px;margin-top:20px;text-transform:uppercase;letter-spacing:1px}
         .footer{margin-top:30px;padding-top:15px;border-top:1px solid #2a3040;font-size:10px;color:#4a5570;text-align:center}
         .badge{display:inline-block;background:#38e8c8;color:#0a0b0e;font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;margin-left:8px}
         @media print{body{padding:15px}@page{margin:1.5cm}}
     </style></head><body>
     <h1>SumaMente${isPro ? ' <span class="badge">PRO</span>' : ''}</h1>
-    <div class="sub">${module} · ${key} · ${new Date().toLocaleString('es-AR')}</div>
+    <div class="sub">${module} · ${key} · ${date}</div>
     <div class="label">${label}</div>
-    <div class="value">${val}</div>`);
+    <div class="value">${val}</div>
+    ${chartHtml}`);
     if (steps && steps.length) {
         w.document.write(`<div class="steps-title">Pasos de resolución</div>`);
         steps.forEach(s => w.document.write(`<div class="step">${s}</div>`));
@@ -709,7 +790,7 @@ function calculate(module, key) {
     const stepsEl = document.getElementById('steps-' + module);
     const stepTexts = stepsEl ? Array.from(stepsEl.querySelectorAll('.step')).map(d => d.innerHTML) : [];
     const stepsData = encodeURIComponent(JSON.stringify(stepTexts));
-    const pdfBtn = LicenseManager.isPro ? `<button class="btn-pdf" onclick="exportResultPDF('${module}','${key}','${formattedMain.replace(/'/g, "\\'")}','${res.label.replace(/'/g, "\\'")}','${stepsData}')" title="Exportar PDF" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;margin-left:8px;transition:all 0.15s" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='var(--accent2)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">📄 PDF</button>` : '';
+    const pdfBtn = LicenseManager.isPro ? `<button class="btn-pdf" onclick="exportModulePDF('${module}','${key}','${formattedMain.replace(/'/g, "\\'")}','${res.label.replace(/'/g, "\\'")}','${stepsData}')" title="Exportar PDF" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;margin-left:8px;transition:all 0.15s" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='var(--accent2)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">📄 PDF</button>` : '';
     rel.innerHTML = `<div class="result-label" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><span>${res.label}</span>${pdfBtn}</div><div class="result-main">${formattedMain}</div><div class="result-extras">${extrasHtml}</div>`;
     rel.classList.add('show');
 
@@ -1139,6 +1220,7 @@ function safeMathEval(expr, vars) {
             prepared = prepared.replace(/(\d|\))y/g, '$1*y').replace(/y(\d)/g, 'y*$1');
             prepared = prepared.replace(/y/g, vars.y);
         }
+        prepared = prepared.replace(/\^/g, '**');
         if (prepared !== expr && !(angleMode === 'deg' && /(sin|cos|tan)\(/.test(expr))) {
             try {
                 const result = eval(prepared);
@@ -1334,11 +1416,19 @@ function genPlotFunc(expr) {
         } catch(e) { points.push({ x, y: null }); }
     }
     
-    // Ajustar rango Y basado en los puntos
+    // Ajustar rango Y basado en los puntos (con recorte de outliers)
     let allY = points.filter(p => p.y !== null).map(p => p.y);
     if (allY.length > 0) {
-        minY = Math.min(...allY);
-        maxY = Math.max(...allY);
+        if (allY.length > 10) {
+            const sorted = [...allY].sort((a, b) => a - b);
+            const lo = sorted[Math.floor(sorted.length * 0.02)];
+            const hi = sorted[Math.ceil(sorted.length * 0.98)];
+            minY = Math.min(lo, ...sorted.slice(Math.floor(sorted.length * 0.1), Math.ceil(sorted.length * 0.9)));
+            maxY = Math.max(hi, ...sorted.slice(Math.floor(sorted.length * 0.1), Math.ceil(sorted.length * 0.9)));
+        } else {
+            minY = Math.min(...allY);
+            maxY = Math.max(...allY);
+        }
         const range = maxY - minY || 1;
         minY -= range * 0.1;
         maxY += range * 0.1;

@@ -51,11 +51,14 @@ function genPlotFunc(expr, preserveView) {
         plotMaxY = maxY;
     }
     
+    var dpr = window.devicePixelRatio || 1;
     canvas.style.display = 'block';
-    canvas.width = w * (window.devicePixelRatio || 1);
-    canvas.height = h * (window.devicePixelRatio || 1);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+    ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, w, h);
     
     // Funciones de conversión
@@ -406,11 +409,14 @@ function genPlotSystem2x2(eq1, eq2) {
     minY -= range * 0.1; maxY += range * 0.1;
     plotMinY = minY; plotMaxY = maxY;
     
+    var dpr = window.devicePixelRatio || 1;
     canvas.style.display = 'block';
-    canvas.width = w * (window.devicePixelRatio || 1);
-    canvas.height = h * (window.devicePixelRatio || 1);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+    ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, w, h);
     
     const toX = (x) => margin + (x - plotMinX) / (plotMaxX - plotMinX) * plotW;
@@ -612,11 +618,14 @@ function genPlotEquation(equation) {
         maxY += range * 0.1;
     }
     
+    var dpr = window.devicePixelRatio || 1;
     canvas.style.display = 'block';
-    canvas.width = w * (window.devicePixelRatio || 1);
-    canvas.height = h * (window.devicePixelRatio || 1);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+    ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, w, h);
     
     const toCanvasX = (x) => margin + (x - minX) / (maxX - minX) * plotW;

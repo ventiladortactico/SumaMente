@@ -262,7 +262,7 @@ function getCanvasImage(module) {
 }
 
 function exportGenPDF() {
-    if (!LicenseManager.isPro) { alert('Exportar PDF es exclusivo de PRO'); return; }
+    if (!LicenseManager.isPro) { showProUpgradeModal('Exportar PDF', 'Exportá tus cálculos y gráficos en formato PDF con un solo clic.'); return; }
     showPDFChoice((mode) => {
         if (mode === 'last') {
             let expr = document.getElementById('gen-expr').textContent;
@@ -318,7 +318,7 @@ function showPDFChoice(callback) {
 }
 
 function exportModulePDF(module, key, val, label, stepsData) {
-    if (!LicenseManager.isPro) { alert('Exportar PDF es exclusivo de PRO'); return; }
+    if (!LicenseManager.isPro) { showProUpgradeModal('Exportar PDF del módulo', 'Exportá los resultados detallados de cada módulo en PDF.'); return; }
     const chartImg = getCanvasImage(module);
     let steps = [];
     if (stepsData) {
@@ -452,7 +452,7 @@ function _downloadHTMLasPDF(htmlContent, filename) {
 
 // ── exportHistoryPDF: descarga HTML con gráficos SVG inline ──
 function exportHistoryPDF() {
-    if (!LicenseManager.isPro) { alert('Exportar PDF es exclusivo de PRO'); return; }
+    if (!LicenseManager.isPro) { showProUpgradeModal('Exportar historial en PDF', 'Exportá todo tu historial de cálculos en un PDF completo.'); return; }
     if (history.length === 0) { alert('No hay cálculos en el historial'); return; }
 
     const _v = (ThemeManager.themes[ThemeManager.current || 'dark'] || ThemeManager.themes.dark).vars;
@@ -889,12 +889,7 @@ function showHistoryDetail(idx) {
     const h = history[idx];
     if (!h) return;
     if (!LicenseManager.isPro) {
-        if (currentMode === 'general') {
-            genResult = h.val;
-            document.getElementById('gen-result').textContent = h.val;
-            genExpr = h.expr || '';
-            document.getElementById('gen-expr').textContent = genExpr;
-        }
+        showProUpgradeModal('Ver detalle del cálculo', 'Accedé al desglose completo de cada cálculo paso a paso.');
         return;
     }
 
@@ -1971,6 +1966,19 @@ function toggleProModal(show) {
     }
 }
 
+function showProUpgradeModal(feature, desc) {
+    document.getElementById('up-feature-name').textContent = feature;
+    document.getElementById('up-feature-desc').textContent = desc || 'Esta funcionalidad es exclusiva de PRO. Actualizá para acceder a todas las herramientas premium.';
+    document.getElementById('pro-upgrade-overlay').classList.add('show');
+}
+function closeProUpgrade() {
+    document.getElementById('pro-upgrade-overlay').classList.remove('show');
+}
+function openProFromUpgrade() {
+    closeProUpgrade();
+    toggleProModal(true);
+}
+
 function renderThemeOptions() {
     const container = document.getElementById('theme-options');
     if (!container) return;
@@ -2191,6 +2199,8 @@ document.addEventListener('keydown', e => {
         if (searchModal && searchModal.classList.contains('show')) { toggleSearch(false); return; }
         const proModal = document.getElementById('modal-pro');
         if (proModal && proModal.classList.contains('show')) { toggleProModal(false); return; }
+        const upOverlay = document.getElementById('pro-upgrade-overlay');
+        if (upOverlay && upOverlay.classList.contains('show')) { closeProUpgrade(); return; }
     }
 
     // Teclado para la calculadora general (solo si el modo general está activo)

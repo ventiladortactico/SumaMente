@@ -366,11 +366,21 @@ const BillingManager = {
 function exportGenPDF() {
     const expr = document.getElementById('gen-expr').textContent;
     const result = document.getElementById('gen-result').textContent;
+    const stepsEl = document.getElementById('gen-steps');
+    let steps = [];
+    if (stepsEl) {
+        const stepDivs = stepsEl.querySelectorAll('.step');
+        steps = Array.from(stepDivs).map(d => d.innerHTML);
+    }
     if (!expr && result === '0') return;
-    exportResultPDF('General', expr || 'resultado', result, expr ? `Resultado: ${expr}` : 'Resultado');
+    exportResultPDF('General', expr || 'resultado', result, expr ? `Resultado: ${expr}` : 'Resultado', steps);
 }
 
 function exportResultPDF(module, key, val, label, steps) {
+    if (typeof steps === 'string' && steps.startsWith('%')) {
+        try { steps = JSON.parse(decodeURIComponent(steps)); } catch(e) { steps = []; }
+    }
+    if (!Array.isArray(steps)) steps = [];
     const w = window.open('', '_blank');
     if (!w) { alert('Permite ventanas emergentes para exportar PDF'); return; }
     const isPro = LicenseManager.isPro;
@@ -696,7 +706,10 @@ function calculate(module, key) {
         extrasHtml += `<button id="audio-toggle-btn" class="btn-secondary" onclick="toggleAudioContinuous()" style="margin-top:10px;width:100%">${buttonText}</button>`;
     }
 
-    const pdfBtn = LicenseManager.isPro ? `<button class="btn-pdf" onclick="exportResultPDF('${module}','${key}','${formattedMain.replace(/'/g, "\\'")}','${res.label.replace(/'/g, "\\'")}')" title="Exportar PDF" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;margin-left:8px;transition:all 0.15s" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='var(--accent2)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">📄 PDF</button>` : '';
+    const stepsEl = document.getElementById('steps-' + module);
+    const stepTexts = stepsEl ? Array.from(stepsEl.querySelectorAll('.step')).map(d => d.innerHTML) : [];
+    const stepsData = encodeURIComponent(JSON.stringify(stepTexts));
+    const pdfBtn = LicenseManager.isPro ? `<button class="btn-pdf" onclick="exportResultPDF('${module}','${key}','${formattedMain.replace(/'/g, "\\'")}','${res.label.replace(/'/g, "\\'")}','${stepsData}')" title="Exportar PDF" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;margin-left:8px;transition:all 0.15s" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='var(--accent2)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">📄 PDF</button>` : '';
     rel.innerHTML = `<div class="result-label" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><span>${res.label}</span>${pdfBtn}</div><div class="result-main">${formattedMain}</div><div class="result-extras">${extrasHtml}</div>`;
     rel.classList.add('show');
 
@@ -2206,6 +2219,79 @@ function resetGraphView() {
     }
 }
 
+function parseQuadraticCoefs(expr) {
+    let s = expr.replace(/\s+/g, '').replace(/π/g, 'pi');
+    s = s.replace(/(\d)x/g, '$1*x').replace(/x\^2/g, 'x²').replace(/\*?\*?x²/g, 'x²');
+    let a = 0, b = 0, c = 0;
+    const termParts = s.match(/[+-]?[^+-]+/g) || [];
+    for (let term of termParts) {
+        let sign = 1;
+        if (term.startsWith('-')) { sign = -1; term = term.slice(1); }
+        else if (term.startsWith('+')) { term = term.slice(1); }
+        if (/x\*?\^?\s*2|x²/.test(term)) {
+            let coef = term.replace(/[\*]?x\^?\s*2|x²/, '');
+            a = sign * (coef === '' || coef === '1' ? 1 : coef === '-' ? -1 : parseFloat(coef));
+        } else if (/x/.test(term)) {
+            let coef = term.replace(/\*?x/, '');
+            b = sign * (coef === '' || coef === '1' ? 1 : coef === '-' ? -1 : parseFloat(coef));
+        } else {
+            let val = parseFloat(term);
+            if (!isNaN(val)) c = sign * val;
+        }
+    }
+    return { a, b, c };
+}
+
+function analyzeQuadratic(expr) {
+    const { a, b, c } = parseQuadraticCoefs(expr);
+    if (a === 0) return null;
+    const steps = [];
+    const nf = v => parseFloat(v.toFixed(4)).toString();
+    const t = v => v < 0 ? `(${v})` : `${v}`;
+    steps.push(`<strong>Función cuadrática: f(x) = ${expr}</strong>`);
+    steps.push(`<strong>Paso 1:</strong> Identificar coeficientes`);
+    steps.push(`a = ${nf(a)}, b = ${nf(b)}, c = ${nf(c)}`);
+    const opensUp = a > 0;
+    steps.push(`a = ${nf(a)} → <strong>${opensUp ? 'Abre hacia ARRIBA (∪)' : 'Abre hacia ABAJO (∩)'}</strong>`);
+    if (opensUp) {
+        steps.push(`El vértice es el <strong>punto mínimo</strong> de la parábola`);
+    } else {
+        steps.push(`El vértice es el <strong>punto máximo</strong> de la parábola`);
+    }
+    const h = -b / (2 * a);
+    const k = safeMathEval(expr, { x: h });
+    steps.push(`<strong>Paso 2:</strong> Calcular el vértice`);
+    steps.push(`x_v = -b / (2a) = -(${nf(b)}) / (2·${nf(a)}) = ${nf(h)}`);
+    steps.push(`y_v = f(x_v) = ${expr.replace(/x/g, t(h)).replace(/pi/g, 'π')}`);
+    steps.push(`y_v = ${nf(k)}`);
+    steps.push(`<strong>Vértice → (${nf(h)}, ${nf(k)})</strong>`);
+    steps.push(`<strong>Paso 3:</strong> Intercepto con el eje Y`);
+    steps.push(`f(0) = c = ${nf(c)} → <strong>(0, ${nf(c)})</strong>`);
+    const disc = b * b - 4 * a * c;
+    steps.push(`<strong>Paso 4:</strong> Calcular el discriminante`);
+    steps.push(`Δ = b² - 4ac = ${nf(b)}² - 4·${nf(a)}·${nf(c)} = ${nf(disc)}`);
+    if (disc > 0) {
+        const x1 = (-b + Math.sqrt(disc)) / (2 * a);
+        const x2 = (-b - Math.sqrt(disc)) / (2 * a);
+        steps.push(`Δ > 0 → <strong>Dos raíces reales distintas</strong>`);
+        steps.push(`x₁ = (-b + √Δ) / (2a) = (-(${nf(b)}) + √${nf(disc)}) / (2·${nf(a)}) = ${nf(x1)}`);
+        steps.push(`x₂ = (-b - √Δ) / (2a) = (-(${nf(b)}) - √${nf(disc)}) / (2·${nf(a)}) = ${nf(x2)}`);
+        steps.push(`<strong>Raíces → (${nf(x1)}, 0) y (${nf(x2)}, 0)</strong>`);
+    } else if (disc === 0) {
+        const x0 = -b / (2 * a);
+        steps.push(`Δ = 0 → <strong>Una raíz real doble</strong>`);
+        steps.push(`x₀ = -b / (2a) = ${nf(x0)}`);
+        steps.push(`<strong>Raíz → (${nf(x0)}, 0)</strong>`);
+    } else {
+        steps.push(`Δ < 0 → <strong>No tiene raíces reales</strong>`);
+        steps.push(`La parábola no cruza el eje X`);
+    }
+    steps.push(`<div style="padding:8px 10px;margin-top:6px;background:linear-gradient(135deg,rgba(79,252,124,0.12),rgba(79,156,249,0.12));border-left:3px solid var(--accent2);border-radius:0 6px 6px 0;font-size:14px;font-weight:700;color:var(--accent2)">`);
+    steps.push(`Resumen → Vértice (${nf(h)}, ${nf(k)}) · ${opensUp ? 'Abre arriba' : 'Abre abajo'} · Δ = ${nf(disc)}`);
+    steps.push(`</div>`);
+    return { steps, h, k, a };
+}
+
 function showGenPDFBtn() {
     const btn = document.getElementById('gen-pdf-btn');
     if (btn) btn.style.display = LicenseManager.isPro ? 'block' : 'none';
@@ -2299,6 +2385,29 @@ function genEval() {
                 genExpr = '';
                 genLastResult = null;
                 return;
+            }
+            
+            // Detectar y analizar funciones cuadráticas
+            if (/x\^2|x²/.test(expr)) {
+                const analysis = analyzeQuadratic(expr);
+                if (analysis) {
+                    const sp = document.getElementById('gen-steps') || createStepsPanel();
+                    sp.innerHTML = '<details open style="cursor:pointer"><summary style="color:var(--accent);font-weight:700;font-size:12px;padding:4px 0">📐 Análisis de la parábola</summary>' +
+                        analysis.steps.map(s => `<div class="step">${s}</div>`).join('') + '</details>';
+                    sp.classList.add('show');
+                    // Centrar gráfico en el vértice
+                    plotMinX = analysis.h - 6;
+                    plotMaxX = analysis.h + 6;
+                    genPlotFunc(expr);
+                    genResult = `Vértice (${parseFloat(analysis.h.toFixed(3))}, ${parseFloat(analysis.k.toFixed(3))})`;
+                    document.getElementById('gen-result').textContent = genResult;
+                    document.getElementById('gen-expr').textContent = 'f(x) = ' + genExpr;
+                    addHistory('general', 'quadratic', genResult, 'f(x) = ' + genExpr);
+                    showGenPDFBtn();
+                    genExpr = '';
+                    genLastResult = null;
+                    return;
+                }
             }
             
             genPlotFunc(expr);

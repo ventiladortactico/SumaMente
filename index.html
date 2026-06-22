@@ -465,6 +465,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
       </div>
       <div id="code-status" style="font-size:11px;text-align:center;margin-top:6px"></div>
     </div>
+    <div id="theme-section" style="margin-top:15px;border-top:1px solid var(--border);padding-top:12px;display:none">
+      <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:8px">🎨 Tema visual</div>
+      <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap" id="theme-options"></div>
+    </div>
   </div>
 </div>
 
@@ -479,6 +483,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
           <div class="gen-display">
             <div class="gen-expr" id="gen-expr"></div>
             <div class="gen-result" id="gen-result">0</div>
+            <button id="gen-pdf-btn" onclick="exportGenPDF()" title="Exportar PDF" style="display:none;background:none;border:1px solid var(--border2);color:var(--text3);border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;position:absolute;right:8px;bottom:8px" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='var(--accent2)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">📄 PDF</button>
           </div>
           <div class="keypad">
             <button class="key fn" onclick="genKey('sin(')">sin</button>

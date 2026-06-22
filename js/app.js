@@ -123,6 +123,80 @@ const LicenseManager = {
     }
 };
 
+// ── Gestor de temas visuales ──
+const ThemeManager = {
+    themes: {
+        dark: {
+            name: 'Dark',
+            icon: '🌙',
+            vars: {
+                '--bg': '#0a0b0e', '--surface': '#111318', '--surface2': '#181c24',
+                '--surface3': '#1e232f', '--border': '#2a3040', '--border2': '#3a4558',
+                '--accent': '#4f9cf9', '--accent2': '#38e8c8', '--accent3': '#f97b4f',
+                '--accent4': '#a78bfa', '--text': '#e8edf5', '--text2': '#8a97b0', '--text3': '#4a5570'
+            }
+        },
+        ocean: {
+            name: 'Océano',
+            icon: '🌊',
+            vars: {
+                '--bg': '#0a0e1a', '--surface': '#0f1a2e', '--surface2': '#142240',
+                '--surface3': '#1a2d52', '--border': '#1e3a6e', '--border2': '#2a5090',
+                '--accent': '#5bc0eb', '--accent2': '#48e5c2', '--accent3': '#f9a84f',
+                '--accent4': '#9b72cf', '--text': '#e0f0ff', '--text2': '#7ab0d4', '--text3': '#3a6080'
+            }
+        },
+        forest: {
+            name: 'Bosque',
+            icon: '🌿',
+            vars: {
+                '--bg': '#0a1008', '--surface': '#111a10', '--surface2': '#1a2a18',
+                '--surface3': '#243a20', '--border': '#2a4a28', '--border2': '#3a6a38',
+                '--accent': '#6bc46e', '--accent2': '#4ade80', '--accent3': '#f9c74f',
+                '--accent4': '#a78bfa', '--text': '#e0f0d8', '--text2': '#7aa878', '--text3': '#3a6838'
+            }
+        },
+        midnight: {
+            name: 'Midnight',
+            icon: '🌃',
+            vars: {
+                '--bg': '#0d0d1a', '--surface': '#151528', '--surface2': '#1e1e3a',
+                '--surface3': '#2a2a4a', '--border': '#3a3a5a', '--border2': '#4a4a7a',
+                '--accent': '#818cf8', '--accent2': '#c084fc', '--accent3': '#f472b6',
+                '--accent4': '#34d399', '--text': '#e8e0f5', '--text2': '#9890b0', '--text3': '#58507a'
+            }
+        }
+    },
+    _current: null,
+
+    load() {
+        try { this._current = localStorage.getItem('SumaMente_theme') || 'dark'; } catch(e) { this._current = 'dark'; }
+        this.apply(this._current);
+        return this;
+    },
+
+    get current() { return this._current; },
+
+    apply(key) {
+        const theme = this.themes[key];
+        if (!theme) return;
+        this._current = key;
+        localStorage.setItem('SumaMente_theme', key);
+        const root = document.documentElement;
+        Object.entries(theme.vars).forEach(([prop, val]) => root.style.setProperty(prop, val));
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.content = theme.vars['--bg'];
+    },
+
+    applyThemeFromLicense() {
+        if (LicenseManager.isPro) {
+            const saved = localStorage.getItem('SumaMente_theme');
+            if (saved && this.themes[saved]) { this.apply(saved); return; }
+        }
+        this.apply('dark');
+    }
+};
+
 // ── Gestor de métricas de uso (Analytics) ──
 const AnalyticsManager = {
     _data: null,
@@ -288,6 +362,43 @@ const BillingManager = {
         }
     }
 };
+
+function exportGenPDF() {
+    const expr = document.getElementById('gen-expr').textContent;
+    const result = document.getElementById('gen-result').textContent;
+    if (!expr && result === '0') return;
+    exportResultPDF('General', expr || 'resultado', result, expr ? `Resultado: ${expr}` : 'Resultado');
+}
+
+function exportResultPDF(module, key, val, label, steps) {
+    const w = window.open('', '_blank');
+    if (!w) { alert('Permite ventanas emergentes para exportar PDF'); return; }
+    const isPro = LicenseManager.isPro;
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SumaMente - ${label}</title><style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{background:#0a0b0e;color:#e8edf5;font-family:'JetBrains Mono',monospace;padding:30px;max-width:800px;margin:0 auto}
+        h1{font-family:'Syne',sans-serif;font-size:22px;color:#4f9cf9;margin-bottom:5px}
+        .sub{font-size:11px;color:#4a5570;margin-bottom:25px}
+        .label{font-size:12px;color:#8a97b0;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+        .value{font-size:28px;font-weight:700;color:#e8edf5;margin-bottom:20px;word-break:break-all}
+        .step{background:#111318;border:1px solid #2a3040;border-radius:6px;padding:8px 12px;margin-bottom:4px;font-size:12px;color:#e8edf5}
+        .steps-title{font-size:12px;color:#4a5570;margin-bottom:8px;margin-top:20px}
+        .footer{margin-top:30px;padding-top:15px;border-top:1px solid #2a3040;font-size:10px;color:#4a5570;text-align:center}
+        .badge{display:inline-block;background:#38e8c8;color:#0a0b0e;font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;margin-left:8px}
+        @media print{body{padding:15px}@page{margin:1.5cm}}
+    </style></head><body>
+    <h1>SumaMente${isPro ? ' <span class="badge">PRO</span>' : ''}</h1>
+    <div class="sub">${module} · ${key} · ${new Date().toLocaleString('es-AR')}</div>
+    <div class="label">${label}</div>
+    <div class="value">${val}</div>`);
+    if (steps && steps.length) {
+        w.document.write(`<div class="steps-title">Pasos de resolución</div>`);
+        steps.forEach(s => w.document.write(`<div class="step">${s}</div>`));
+    }
+    w.document.write(`<div class="footer">Generado por SumaMente Cientifica</div></body></html>`);
+    w.document.close();
+    setTimeout(() => { w.focus(); w.print(); }, 500);
+}
 
 // Formato inteligente: muestra enteros sin decimales, decimales con precisión necesaria
 function formatNumber(num, decimals = 3) {
@@ -585,7 +696,8 @@ function calculate(module, key) {
         extrasHtml += `<button id="audio-toggle-btn" class="btn-secondary" onclick="toggleAudioContinuous()" style="margin-top:10px;width:100%">${buttonText}</button>`;
     }
 
-    rel.innerHTML = `<div class="result-label">${res.label}</div><div class="result-main">${formattedMain}</div><div class="result-extras">${extrasHtml}</div>`;
+    const pdfBtn = LicenseManager.isPro ? `<button class="btn-pdf" onclick="exportResultPDF('${module}','${key}','${formattedMain.replace(/'/g, "\\'")}','${res.label.replace(/'/g, "\\'")}')" title="Exportar PDF" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;margin-left:8px;transition:all 0.15s" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='var(--accent2)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">📄 PDF</button>` : '';
+    rel.innerHTML = `<div class="result-label" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><span>${res.label}</span>${pdfBtn}</div><div class="result-main">${formattedMain}</div><div class="result-extras">${extrasHtml}</div>`;
     rel.classList.add('show');
 
         document.getElementById('steps-' + module).innerHTML = (res.steps || []).map(s => `<div class="step">${s}</div>`).join('');
@@ -595,8 +707,9 @@ function calculate(module, key) {
 }
 
 function addHistory(module, key, val, label) {
+    const maxHistory = LicenseManager.isPro ? 500 : 10;
     history.unshift({ module, key, val, label, time: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) });
-    if (history.length > 10) history.pop();
+    if (history.length > maxHistory) history.pop();
     localStorage.setItem('sumamente_history', JSON.stringify(history));
     renderHistory();
 }
@@ -608,7 +721,9 @@ function renderHistory() {
     }
     let el = document.getElementById('history-list');
     if (!history.length) { el.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:10px 0">Sin cálculos aún</div>'; return; }
-    el.innerHTML = history.map(h => `<div class="history-item" onclick="injectHistory('${h.val}')"><div class="history-label">${h.module} · ${h.key} · ${h.time}</div><div class="history-val">${h.val}</div></div>`).join('');
+    const maxHistory = LicenseManager.isPro ? 500 : 10;
+    const counter = LicenseManager.isPro ? `${history.length}` : `${history.length}/${maxHistory}`;
+    el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:10px;color:var(--text3)"><span>${counter} cálculos</span>${LicenseManager.isPro ? '<span style="color:var(--accent2)">PRO</span>' : ''}</div>` + history.map(h => `<div class="history-item" onclick="injectHistory('${h.val}')"><div class="history-label">${h.module} · ${h.key} · ${h.time}</div><div class="history-val">${h.val}</div></div>`).join('');
 }
 
 function clearHistory() { history = []; localStorage.removeItem('sumamente_history'); renderHistory(); }
@@ -995,7 +1110,7 @@ function genKey(k) {
     document.getElementById('gen-expr').textContent = genExpr; 
 }
 
-function genClear() { genExpr = ''; genResult = '0'; genLastResult = null; document.getElementById('gen-expr').textContent = ''; document.getElementById('gen-result').textContent = '0'; const cv = document.getElementById('chart-canvas-general'); if (cv) cv.style.display = 'none'; document.getElementById('graph-controls').style.display = 'none'; }
+function genClear() { genExpr = ''; genResult = '0'; genLastResult = null; document.getElementById('gen-expr').textContent = ''; document.getElementById('gen-result').textContent = '0'; const cv = document.getElementById('chart-canvas-general'); if (cv) cv.style.display = 'none'; document.getElementById('graph-controls').style.display = 'none'; const pdfBtn = document.getElementById('gen-pdf-btn'); if (pdfBtn) pdfBtn.style.display = 'none'; }
 function genBack() { genExpr = genExpr.slice(0, -1); document.getElementById('gen-expr').textContent = genExpr; }
 function genNegate() { genKey('-'); }
 // Evaluador matemático seguro (sin eval/Function)
@@ -2091,6 +2206,11 @@ function resetGraphView() {
     }
 }
 
+function showGenPDFBtn() {
+    const btn = document.getElementById('gen-pdf-btn');
+    if (btn) btn.style.display = LicenseManager.isPro ? 'block' : 'none';
+}
+
 function genEval() {
     try {
         if (!genExpr) {
@@ -2128,6 +2248,7 @@ function genEval() {
                 document.getElementById('gen-expr').textContent = genExpr;
                 document.getElementById('gen-result').textContent = genResult || 'Sistema resuelto';
                 addHistory('general', 'system', genResult || 'Sistema resuelto', genExpr);
+                showGenPDFBtn();
                 genExpr = '';
                 genLastResult = null;
                 return;
@@ -2154,6 +2275,7 @@ function genEval() {
                     document.getElementById('gen-result').textContent = 'y despejada';
                     document.getElementById('gen-expr').textContent = genExpr;
                     addHistory('general', 'linear2var', genResult, genExpr);
+                    showGenPDFBtn();
                     genExpr = '';
                     genLastResult = null;
                     return;
@@ -2173,6 +2295,7 @@ function genEval() {
                 document.getElementById('gen-expr').textContent = genExpr;
                 document.getElementById('gen-result').textContent = genResult || 'Ecuación graficada';
                 addHistory('general', 'eq', genResult || 'Ecuación graficada', genExpr);
+                showGenPDFBtn();
                 genExpr = '';
                 genLastResult = null;
                 return;
@@ -2185,6 +2308,7 @@ function genEval() {
             document.getElementById('gen-result').textContent = genResult;
             document.getElementById('gen-expr').textContent = 'f(x) = ' + genExpr;
             addHistory('general', 'func', 'f(x) graficada', 'f(x) = ' + genExpr);
+            showGenPDFBtn();
             genExpr = '';
             genLastResult = null;
             return;
@@ -2197,6 +2321,7 @@ function genEval() {
         document.getElementById('gen-result').textContent = genResult;
         document.getElementById('gen-expr').textContent = genExpr + ' =';
         addHistory('general', 'expr', genResult, genExpr);
+        showGenPDFBtn();
 
         // Ocultar canvas de función si estaba visible
         const canvas = document.getElementById('chart-canvas-general');
@@ -2284,12 +2409,27 @@ function toggleProModal(show) {
     }
 }
 
+function renderThemeOptions() {
+    const container = document.getElementById('theme-options');
+    if (!container) return;
+    const current = ThemeManager.current;
+    container.innerHTML = Object.entries(ThemeManager.themes).map(([key, t]) =>
+        `<button class="chip${key === current ? ' active' : ''}" onclick="selectTheme('${key}')" style="font-size:11px;padding:4px 10px">${t.icon} ${t.name}</button>`
+    ).join('');
+}
+
+function selectTheme(key) {
+    ThemeManager.apply(key);
+    renderThemeOptions();
+}
+
 function updateProModal() {
     const statusDiv = document.getElementById('pro-status');
     const buyBtn = document.getElementById('btn-buy-pro');
     const restoreBtn = document.getElementById('btn-restore-pro');
     const codeStatus = document.getElementById('code-status');
     const codeInput = document.getElementById('collab-code');
+    const themeSection = document.getElementById('theme-section');
     if (codeStatus) codeStatus.innerHTML = '';
     if (codeInput) codeInput.value = '';
 
@@ -2297,10 +2437,12 @@ function updateProModal() {
         statusDiv.innerHTML = '<div style="text-align:center;color:var(--accent2);font-size:13px;font-weight:700">✓ Ya tienes PRO activado</div>';
         buyBtn.style.display = 'none';
         restoreBtn.style.display = 'none';
+        if (themeSection) { themeSection.style.display = 'block'; renderThemeOptions(); }
     } else {
         statusDiv.innerHTML = '';
         buyBtn.style.display = 'block';
         restoreBtn.style.display = 'block';
+        if (themeSection) themeSection.style.display = 'none';
     }
 }
 
@@ -2517,6 +2659,8 @@ document.addEventListener('keydown', e => {
 document.addEventListener('DOMContentLoaded', () => {
     LicenseManager.load();
     AnalyticsManager.load().recordSession();
+    ThemeManager.load();
+    if (!LicenseManager.isPro) ThemeManager.apply('dark');
     updateProButton();
 
     // Inicializar Billing (solo en Capacitor/Android)

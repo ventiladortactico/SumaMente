@@ -6,6 +6,19 @@ let plotLastX = 0, plotLastY = 0;
 let currentPlotExpr = '';
 let currentPlotType = ''; // 'function' | 'equation' | 'system'
 
+function setDebugInfo(msg) {
+    var el = document.getElementById('graph-debug');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'graph-debug';
+        el.style.cssText = 'font-size:10px;color:var(--text3);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px;margin-top:6px;white-space:pre-wrap;word-break:break-all;font-family:monospace';
+        var canvas = document.getElementById('chart-canvas-general');
+        if (canvas && canvas.parentElement) canvas.parentElement.appendChild(el);
+    }
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+
 function genPlotFunc(expr, preserveView) {
     const canvas = document.getElementById('chart-canvas-general');
     if (!canvas) {
@@ -15,6 +28,8 @@ function genPlotFunc(expr, preserveView) {
     var pw = (canvas.parentElement && canvas.parentElement.clientWidth) || window.innerWidth || 320;
     const w = Math.max(pw - 28, 200);
     const h = 250;
+    const dpr = window.devicePixelRatio || 1;
+    setDebugInfo('pw=' + pw + ' w=' + w + ' dpr=' + dpr + ' cw=' + Math.round(w * dpr) + ' ch=' + Math.round(250 * dpr));
     const margin = 40;
     const plotW = w - margin * 2;
     const plotH = h - margin * 2;

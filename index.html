@@ -432,7 +432,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <div style="text-align:center;margin-bottom:20px">
       <div style="font-size:40px;margin-bottom:10px">⭐</div>
       <div style="font-family:var(--sans);font-size:24px;font-weight:800;color:var(--accent)">SumaMente PRO</div>
-      <div style="font-size:13px;color:var(--text3);margin-top:5px">Compra única • USD 2.99 - 4.99</div>
+      <div style="font-size:13px;color:var(--text3);margin-top:5px">Compra única • USD 3.50</div>
     </div>
     <div style="margin-bottom:20px">
       <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase">Beneficios</div>
@@ -457,8 +457,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <div id="pro-status" style="margin-bottom:15px"></div>
     <button class="btn-calc" id="btn-buy-pro" onclick="purchasePro()">Comprar PRO</button>
     <button class="btn-secondary" id="btn-restore-pro" onclick="restorePro()" style="width:100%;margin-top:8px">Restaurar compra</button>
-    <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:15px">
-      ¿Colaborador? Usa un código de regalo
+    <div id="collab-section" style="margin-top:15px;border-top:1px solid var(--border);padding-top:12px">
+      <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:8px">¿Colaborador? Ingresa tu código</div>
+      <div style="display:flex;gap:6px">
+        <input type="text" id="collab-code" placeholder="Código de regalo" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:var(--sans);outline:none">
+        <button class="btn-secondary" id="btn-redeem-code" onclick="redeemProCode()" style="padding:6px 12px;font-size:11px;font-weight:600">Canjear</button>
+      </div>
+      <div id="code-status" style="font-size:11px;text-align:center;margin-top:6px"></div>
     </div>
   </div>
 </div>

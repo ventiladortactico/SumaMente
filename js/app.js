@@ -2288,6 +2288,10 @@ function updateProModal() {
     const statusDiv = document.getElementById('pro-status');
     const buyBtn = document.getElementById('btn-buy-pro');
     const restoreBtn = document.getElementById('btn-restore-pro');
+    const codeStatus = document.getElementById('code-status');
+    const codeInput = document.getElementById('collab-code');
+    if (codeStatus) codeStatus.innerHTML = '';
+    if (codeInput) codeInput.value = '';
 
     if (LicenseManager.isPro || LicenseManager.isCollaborator) {
         statusDiv.innerHTML = '<div style="text-align:center;color:var(--accent2);font-size:13px;font-weight:700">✓ Ya tienes PRO activado</div>';
@@ -2340,6 +2344,24 @@ function updateProButton() {
         btn.textContent = '⭐ PRO';
         btn.style.background = 'var(--accent)';
         btn.style.borderColor = 'var(--accent)';
+    }
+}
+
+function redeemProCode() {
+    const input = document.getElementById('collab-code');
+    const status = document.getElementById('code-status');
+    const code = input.value.trim();
+    if (!code) {
+        status.innerHTML = '<span style="color:var(--danger)">Ingresa un código</span>';
+        return;
+    }
+    if (LicenseManager.redeemCode(code)) {
+        status.innerHTML = '<span style="color:var(--accent2);font-weight:700">✓ Colaborador activado</span>';
+        input.value = '';
+        updateProButton();
+        setTimeout(() => toggleProModal(false), 1500);
+    } else {
+        status.innerHTML = '<span style="color:var(--danger)">✗ Código inválido</span>';
     }
 }
 

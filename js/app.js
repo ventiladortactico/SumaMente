@@ -1886,7 +1886,9 @@ function genEval() {
 
         genExpr = '';
     } catch (e) { 
+        var errMsg = (e && e.message) || String(e) || 'Error';
         document.getElementById('gen-result').textContent = 'Error'; 
+        document.getElementById('gen-expr').textContent = errMsg; 
         genResult = 'Error'; 
         genExpr = ''; 
     }

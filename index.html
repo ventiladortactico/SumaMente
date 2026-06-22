@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0b0e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SumaMente">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-touch-fullscreen" content="yes">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#0a0b0e;
+--surface:#111318;
+--surface2:#181c24;
+--surface3:#1e232f;
+--border:#2a3040;
+--border2:#3a4558;
+--accent:#4f9cf9;
+--accent2:#38e8c8;
+--accent3:#f97b4f;
+--accent4:#a78bfa;
+--warn:#f9c74f;
+--danger:#f94f4f;
+--success:#4ff97b;
+--text:#e8edf5;
+--text2:#8a97b0;
+--text3:#4a5570;
+--mono:'JetBrains Mono',monospace;
+--sans:'Syne',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;overflow-x:hidden}
+.app{max-width:820px;margin:0 auto;padding:16px}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 0 16px;border-bottom:1px solid var(--border)}
+.logo{font-family:var(--sans);font-size:18px;font-weight:800;letter-spacing:-0.5px}
+.logo span{color:var(--accent)}
+.version{font-size:10px;color:var(--text3);letter-spacing:2px;text-transform:uppercase}
+
+/* Responsive header */
+@media(max-width:480px){
+  .header{flex-wrap:wrap;gap:8px;padding:10px 0 12px}
+  .header>div:first-child{flex:1;min-width:0}
+  .logo{font-size:16px}
+  .version{font-size:9px}
+  .header>div:last-child{flex-wrap:wrap;gap:4px;justify-content:flex-end}
+  .btn-secondary{padding:6px 8px;font-size:10px;white-space:nowrap}
+  .kbd{display:none}
+}
+
+/* TABS & NAVIGATION */
+.nav-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:8px}
+.current-mode-display{display:flex;align-items:center;gap:10px}
+.current-mode-display .dot{width:8px;height:8px;border-radius:50%}
+.current-mode-name{font-family:var(--sans);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text)}
+
+.btn-menu{background:var(--surface3);border:1px solid var(--accent);color:var(--accent);padding:10px 18px;border-radius:8px;cursor:pointer;font-family:var(--mono);font-size:12px;font-weight:700;white-space:nowrap;transition:all 0.15s;display:flex;align-items:center;gap:8px}
+.btn-menu:hover{background:var(--accent);color:var(--bg)}
+.btn-menu svg{width:16px;height:16px}
+
+/* MODULE SELECTOR MODAL */
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,11,14,0.95);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)}
+.modal.show{display:flex}
+.modal-content{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:680px;padding:24px;position:relative;max-height:85vh;overflow-y:auto}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer}
+.modal-close:hover{color:var(--text)}
+.modal-grid{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.search-content{max-width:520px}
+.search-header{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:12px}
+.search-header input{flex:1;background:none;border:none;color:var(--text);font-family:var(--mono);font-size:14px;outline:none}
+.search-header input::placeholder{color:var(--text3)}
+.search-header svg{color:var(--text3);flex-shrink:0}
+#search-results{max-height:50vh;overflow-y:auto;display:none}
+#search-results.show{display:block}
+.search-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:all 0.12s}
+.search-item:hover,.search-item.hover{background:var(--surface3)}
+.search-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.search-item .si-mod{font-size:10px;color:var(--text3);flex-shrink:0;min-width:60px}
+.search-item .si-name{font-size:13px;color:var(--text);flex:1}
+.search-item .si-star{font-size:14px;cursor:pointer;color:var(--text3);transition:color 0.15s;background:none;border:none;padding:2px}
+.search-item .si-star.active{color:#f9c74f}
+.search-item .si-star:hover{color:#f9c74f}
+.search-favorites{margin-top:12px;border-top:1px solid var(--border);padding-top:12px}
+.search-favorites .fav-title{font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.search-favorites .fav-empty{font-size:12px;color:var(--text3);padding:10px 0}
+.search-favorites .search-item{padding:6px 12px}
+.search-hint{font-size:10px;color:var(--text3);margin-top:8px;text-align:center;letter-spacing:0.5px}
+.kbd{display:inline-block;background:var(--surface3);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:10px;font-family:var(--mono);color:var(--text2)}
+.chip-star{font-size:10px;margin-right:4px;cursor:pointer;color:var(--text3);transition:color 0.15s;line-height:1}
+.chip-star.active{color:#f9c74f}
+.chip-star:hover{color:#f9c74f}
+.db-panel{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:8px 14px 14px}
+.db-panel summary{list-style:none}
+.db-panel summary::-webkit-details-marker{display:none}
+.db-panel[open] summary{margin-bottom:8px}
+.db-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.db-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px}
+.db-item .dbi-name{color:var(--accent);font-weight:700;font-size:11px;margin-bottom:2px}
+.db-item .dbi-formula{color:var(--text2);font-family:var(--mono);font-size:12px}
+.db-item .dbi-desc{color:var(--text3);font-size:10px;margin-top:2px}
+.module-card{background:var(--surface2);border:1px solid var(--border);padding:14px 12px;border-radius:12px;text-align:center;cursor:pointer;transition:all 0.2s}
+.module-card:hover{border-color:var(--accent);transform:translateY(-2px);background:var(--surface3)}
+.module-card .dot{width:10px;height:10px;border-radius:50%;margin:0 auto 8px;display:block}
+.module-card .name{font-size:12px;font-weight:700;color:var(--text)}
+.module-card .desc{font-size:9px;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:1px}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:1fr 280px;gap:12px;margin-top:12px}
+@media(max-width:640px){.layout{grid-template-columns:1fr}}
+
+/* PANEL */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.panel-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.panel-title{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)}
+.panel-body{padding:14px}
+
+/* DISPLAY */
+.display{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:12px;min-height:90px;position:relative}
+.display-formula{font-size:11px;color:var(--text3);margin-bottom:4px;min-height:16px}
+.display-value{font-size:28px;font-weight:300;color:var(--text);text-align:right;word-break:break-all;line-height:1.2}
+.display-unit{font-size:13px;color:var(--accent2);margin-top:2px;text-align:right}
+.display-mode{position:absolute;top:10px;left:12px;font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase}
+
+/* FIELDS */
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.field-full{margin-bottom:8px}
+.field label{font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px}
+.field input,.field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:all 0.15s}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.field select option{background:var(--surface2)}
+/* Campo deshabilitado: más oscuro, cursor no permitido, texto más tenue */
+.field input:disabled,.field select:disabled{
+    background:var(--surface);
+    border-color:var(--surface3);
+    color:var(--text3);
+    cursor:not-allowed;
+    opacity:0.6;
+}
+.field input:disabled::placeholder{color:var(--text3)}
+
+/* BUTTONS */
+.btn-calc{width:100%;padding:11px;background:var(--accent);border:none;border-radius:7px;color:#0a0b0e;font-family:var(--mono);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:opacity 0.15s;margin-top:4px}
+.btn-calc:hover{opacity:0.85}
+.btn-secondary{padding:7px 12px;background:transparent;border:1px solid var(--border2);border-radius:6px;color:var(--text2);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all 0.15s}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+
+/* RESULT CARD */
+.result{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:10px;display:none}
+.result.show{display:block}
+.result-main{font-size:22px;font-weight:500;color:var(--accent2);margin-bottom:4px}
+.result-label{font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
+.result-extras{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.result-extra{font-size:12px;color:var(--text2);padding:6px 10px;background:var(--surface3);border-radius:5px;border-left:2px solid var(--border2)}
+.result-extra.warn{border-left-color:var(--warn);color:var(--warn)}
+.result-extra.danger{border-left-color:var(--danger);color:var(--danger)}
+.result-extra.ok{border-left-color:var(--success);color:var(--success)}
+.result-extra.info{border-left-color:var(--accent);color:var(--accent)}
+
+/* KEYPAD */
+.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.key{padding:9px 4px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-family:var(--mono);font-size:12px;cursor:pointer;text-align:center;transition:all 0.12s;user-select:none}
+.key:hover{background:var(--surface3);color:var(--text);border-color:var(--border2)}
+.key:active{transform:scale(0.94)}
+.key.op{color:var(--accent)}
+.key.fn{color:var(--accent4);font-size:10px}
+.key.eq{background:var(--accent);color:#0a0b0e;font-weight:700;border-color:var(--accent)}
+.key.eq:hover{opacity:0.85}
+.key.spec{color:var(--accent2);font-size:10px}
+.key.wide{grid-column:span 2}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:12px}
+
+/* HISTORY */
+.history-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto}
+.history-item{padding:8px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);cursor:pointer;transition:border-color 0.15s}
+.history-item:hover{border-color:var(--border2)}
+.history-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.history-val{font-size:13px;color:var(--text);margin-top:2px;word-break:break-all;overflow-wrap:break-word}
+
+/* DB QUICK */
+.db-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.db-item{padding:7px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all 0.15s}
+.db-item:hover{border-color:var(--accent2);background:var(--surface3)}
+.db-name{font-size:10px;color:var(--text3)}
+.db-val{font-size:12px;color:var(--accent2);font-weight:500}
+
+/* FORMULA SEARCH */
+.search-box{position:relative;margin-bottom:8px}
+.search-box input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 10px 7px 30px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none}
+.search-box input:focus{border-color:var(--accent)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px}
+
+/* STEPS */
+.steps{margin-top:10px;display:none}
+.steps.show{display:block}
+.step{padding:6px 10px;margin-bottom:4px;font-size:11px;color:var(--text2);border-left:2px solid var(--border2)}
+.step strong{color:var(--accent);font-weight:500}
+
+/* STATUS BAR */
+.statusbar{display:flex;justify-content:space-between;align-items:center;padding:8px 0 0;border-top:1px solid var(--border);margin-top:12px}
+.status-item{font-size:10px;color:var(--text3);letter-spacing:0.5px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block;margin-right:5px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* FORMULA CHIPS */
+.formula-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.chip{padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:10px;color:var(--text2);cursor:pointer;transition:all 0.15s}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.active{background:var(--surface3);border-color:var(--accent);color:var(--accent)}
+
+/* HIDDEN MODES */
+.mode-section{display:none}
+.mode-section.active{display:block}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* GENERAL CALC DISPLAY */
+.gen-display{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:10px}
+.gen-expr{font-size:13px;color:var(--text3);text-align:right;min-height:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gen-result{font-size:34px;font-weight:300;text-align:right;color:var(--text);min-height:46px}
+
+.separator{height:1px;background:var(--border);margin:10px 0}
+
+/* MODAL CATEGORIES */
+.modal-category{margin-bottom:16px}
+.modal-category:last-child{margin-bottom:0}
+.category-header{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px;letter-spacing:0.5px;display:flex;align-items:center}
+.category-modules{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.category-divider{height:1px;background:var(--border);margin:16px 0}
+.module-card.coming-soon{opacity:0.45;cursor:default;pointer-events:none}
+.module-card.coming-soon:hover{transform:none;border-color:var(--border)}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="header">
+  <div>
+    <div class="logo">SUMA<span>MENTE</span></div>
+    <div class="version">v1.2 © Pro Dynamic</div>
+  </div>
+  <div style="display:flex;gap:6px">
+    <button class="btn-secondary" onclick="toggleSteps()">◀ pasos</button>
+    <button class="btn-secondary" onclick="clearHistory()">limpiar</button>
+  </div>
+</div>
+
+<div class="nav-bar">
+  <div class="current-mode-display">
+    <span class="dot" id="current-dot" style="background:#4f9cf9"></span>
+    <span class="current-mode-name" id="current-name">General</span>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="btn-secondary" onclick="toggleSearch()" title="Buscar fórmula (Ctrl+K)" style="padding:7px 10px"><span style="font-size:15px">🔍</span></button>
+    <button class="btn-secondary" id="btn-pro" onclick="toggleProModal()" style="padding:7px 10px;background:var(--accent);color:#0a0b0e;border-color:var(--accent);font-weight:700">⭐ PRO</button>
+    <button class="btn-menu" onclick="toggleModal(true)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      MÓDULOS
+    </button>
+  </div>
+</div>
+
+<!-- Modal Selector de Módulos -->
+<div class="modal" id="modal-modules" onclick="toggleModal(false)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="toggleModal(false)">✕</button>
+    <div class="panel-title" style="margin-bottom:10px">Seleccionar Módulo</div>
+    <div class="modal-grid">
+
+      <!-- General destacado -->
+      <div class="module-card" onclick="selectModule('general')" data-category="general" data-tags="calculadora,cientifica" data-key="general" data-name="General">
+        <span class="dot" style="background:#4f9cf9"></span>
+        <div class="name">🧮 General</div>
+        <div class="desc">Científica</div>
+      </div>
+
+      <div class="category-divider"></div>
+
+      <!-- 📚 Académico -->
+      <section class="modal-category">
+        <div class="category-header">📚 Académico</div>
+        <div class="category-modules">
+          <div class="module-card" onclick="selectModule('estad')" data-category="academico" data-tags="estadistica,analisis,datos" data-key="estad" data-name="Estadística">
+            <span class="dot" style="background:#f9f94f"></span>
+            <div class="name">Estadística</div>
+            <div class="desc">Análisis</div>
+          </div>
+          <div class="module-card" onclick="selectModule('fis')" data-category="academico" data-tags="fisica,cinematica,movimiento" data-key="fis" data-name="Física">
+            <span class="dot" style="background:#f9f54f"></span>
+            <div class="name">Física</div>
+            <div class="desc">Cinemática</div>
+          </div>
+          <div class="module-card" onclick="selectModule('quim')" data-category="academico" data-tags="quimica,laboratorio" data-key="quim" data-name="Química">
+            <span class="dot" style="background:#f9c74f"></span>
+            <div class="name">Química</div>
+            <div class="desc">Laboratorio</div>
+          </div>
+          <div class="module-card" onclick="selectModule('geom')" data-category="academico" data-tags="geometria,formas,matematicas" data-key="geom" data-name="Geometría">
+            <span class="dot" style="background:#f94fa7"></span>
+            <div class="name">Geometría</div>
+            <div class="desc">Formas</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 🏗️ Ingeniería -->
+      <section class="modal-category">
+        <div class="category-header">🏗️ Ingeniería</div>
+        <div class="category-modules">
+          <div class="module-card" onclick="selectModule('electro')" data-category="ingenieria" data-tags="electronica,circuitos,voltaje" data-key="electro" data-name="Electrónica">
+            <span class="dot" style="background:#38e8c8"></span>
+            <div class="name">Electrónica</div>
+            <div class="desc">Circuitos</div>
+          </div>
+          <div class="module-card" onclick="selectModule('mec')" data-category="ingenieria" data-tags="mecanica,motores" data-key="mec" data-name="Mecánica">
+            <span class="dot" style="background:#f94f4f"></span>
+            <div class="name">Mecánica</div>
+            <div class="desc">Motores</div>
+          </div>
+          <div class="module-card" onclick="selectModule('civil')" data-category="ingenieria" data-tags="construccion,arquitectura,civil" data-key="civil" data-name="Arquitectura y Construcción">
+            <span class="dot" style="background:#4ff97b"></span>
+            <div class="name">Arquitectura y Construcción</div>
+            <div class="desc">Ingeniería</div>
+          </div>
+          <div class="module-card" onclick="selectModule('acust')" data-category="ingenieria" data-tags="acustica,sonido,audio" data-key="acust" data-name="Acústica">
+            <span class="dot" style="background:#4fbfa7"></span>
+            <div class="name">Acústica</div>
+            <div class="desc">Sonido</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 💻 Tecnología -->
+      <section class="modal-category">
+        <div class="category-header">💻 Tecnología</div>
+        <div class="category-modules">
+          <div class="module-card" onclick="selectModule('prog')" data-category="tecnologia" data-tags="programacion,informatica,algoritmos" data-key="prog" data-name="Programación">
+            <span class="dot" style="background:#7b4ff9"></span>
+            <div class="name">Programación</div>
+            <div class="desc">Informática</div>
+          </div>
+          <div class="module-card" onclick="selectModule('redes')" data-category="tecnologia" data-tags="redes" data-key="redes" data-name="Redes">
+            <div class="name">🌐 Redes</div>
+            <div class="desc">Subneteo y Conectividad</div>
+          </div>
+          <div class="module-card coming-soon" data-category="tecnologia" data-tags="ia,datos" data-key="" data-name="IA y Ciencia de Datos">
+            <div class="name">🤖 IA y Ciencia de Datos</div>
+            <div class="desc">⌛ Próximamente</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 💼 Profesional -->
+      <section class="modal-category">
+        <div class="category-header">💼 Profesional</div>
+        <div class="category-modules">
+          <div class="module-card" onclick="selectModule('fin')" data-category="profesional" data-tags="finanzas,economia,prestamos" data-key="fin" data-name="Finanzas">
+            <span class="dot" style="background:#a78bfa"></span>
+            <div class="name">Finanzas</div>
+            <div class="desc">Económico</div>
+          </div>
+          <div class="module-card" onclick="selectModule('med')" data-category="profesional" data-tags="medicina,hospital,clinico" data-key="med" data-name="Medicina">
+            <span class="dot" style="background:#f97b4f"></span>
+            <div class="name">Medicina</div>
+            <div class="desc">Hospitalario</div>
+          </div>
+          <div class="module-card" onclick="selectModule('nutri')" data-category="profesional" data-tags="nutricion,dietetica,alimentos" data-key="nutri" data-name="Nutrición">
+            <span class="dot" style="background:#f97ba7"></span>
+            <div class="name">Nutrición</div>
+            <div class="desc">Dietética</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 🎨 Creativo -->
+      <section class="modal-category">
+        <div class="category-header">🎨 Creativo</div>
+        <div class="category-modules">
+          <div class="module-card" onclick="selectModule('diseno')" data-category="creativo" data-tags="diseno,multimedia,imprenta" data-key="diseno" data-name="Diseño y Multimedia">
+            <span class="dot" style="background:#f9a74f"></span>
+            <div class="name">Diseño y Multimedia</div>
+            <div class="desc">Imprenta</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 🔄 Utilidades -->
+      <section class="modal-category">
+        <div class="category-header">🔄 Utilidades</div>
+        <div class="category-modules">
+          <div class="module-card" onclick="selectModule('unit')" data-category="utilidades" data-tags="unidades,conversor" data-key="unit" data-name="Conversores de Unidades">
+            <span class="dot" style="background:#4fdbf9"></span>
+            <div class="name">Conversores de Unidades</div>
+            <div class="desc">Conversor</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal Search -->
+<div class="modal" id="modal-search" onclick="toggleSearch(false)">
+  <div class="modal-content search-content" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="toggleSearch(false)">✕</button>
+    <div class="search-header">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="search-input" placeholder="Buscar fórmula (ej: ohm, imc, ph, subred...)">
+    </div>
+    <div id="search-results"></div>
+    <div id="search-favorites" class="search-favorites"></div>
+    <div class="search-hint"><span class="kbd">↑</span> <span class="kbd">↓</span> navegar · <span class="kbd">↵</span> seleccionar · <span class="kbd">Esc</span> cerrar</div>
+  </div>
+</div>
+
+<!-- Modal PRO -->
+<div class="modal" id="modal-pro" onclick="toggleProModal(false)">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width:400px">
+    <button class="modal-close" onclick="toggleProModal(false)">✕</button>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:40px;margin-bottom:10px">⭐</div>
+      <div style="font-family:var(--sans);font-size:24px;font-weight:800;color:var(--accent)">SumaMente PRO</div>
+      <div style="font-size:13px;color:var(--text3);margin-top:5px">Compra única • USD 2.99 - 4.99</div>
+    </div>
+    <div style="margin-bottom:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase">Beneficios</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text)">
+          <span style="color:var(--accent2)">✓</span> Sin publicidad
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text)">
+          <span style="color:var(--accent2)">✓</span> Historial ilimitado
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text)">
+          <span style="color:var(--accent2)">✓</span> Exportación PDF
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text)">
+          <span style="color:var(--accent2)">✓</span> Temas visuales
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text)">
+          <span style="color:var(--accent2)">✓</span> Herramientas premium futuras
+        </div>
+      </div>
+    </div>
+    <div id="pro-status" style="margin-bottom:15px"></div>
+    <button class="btn-calc" id="btn-buy-pro" onclick="purchasePro()">Comprar PRO</button>
+    <button class="btn-secondary" id="btn-restore-pro" onclick="restorePro()" style="width:100%;margin-top:8px">Restaurar compra</button>
+    <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:15px">
+      ¿Colaborador? Usa un código de regalo
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <div>
+
+    <!-- ===== GENERAL ===== -->
+    <div class="mode-section active" id="mode-general">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Calculadora científica</span></div>
+        <div class="panel-body">
+          <div class="gen-display">
+            <div class="gen-expr" id="gen-expr"></div>
+            <div class="gen-result" id="gen-result">0</div>
+          </div>
+          <div class="keypad">
+            <button class="key fn" onclick="genKey('sin(')">sin</button>
+            <button class="key fn" onclick="genKey('cos(')">cos</button>
+            <button class="key fn" onclick="genKey('tan(')">tan</button>
+            <button class="key fn" onclick="genKey('log(')">log</button>
+
+            <button class="key fn" onclick="genKey('ln(')">ln</button>
+            <button class="key fn" onclick="genKey('sqrt(')">√</button>
+            <button class="key fn" onclick="genKey('^')">x^y</button>
+            <button class="key fn" onclick="genKey('π')">π</button>
+
+            <button class="key fn" onclick="genKey('e')">e</button>
+            <button class="key fn" onclick="genFactorial()">x!</button>
+            <button class="key fn" onclick="genKey('x')">x</button>
+            <button class="key fn" onclick="genKey('y')">y</button>
+
+            <button class="key fn" onclick="genKey('=')">=</button>
+            <button class="key fn" onclick="genNegate()">(−)</button>
+            <button class="key fn" onclick="genKey('^2')">x²</button>
+            <button class="key fn" onclick="genKey(',')">,</button>
+
+            <button class="key op" onclick="genKey('(')">(</button>
+            <button class="key op" onclick="genKey(')')">)</button>
+            <button class="key op" onclick="genClear()">AC</button>
+            <button class="key op" onclick="genBack()">⌫</button>
+
+            <button class="key" onclick="genKey('7')">7</button>
+            <button class="key" onclick="genKey('8')">8</button>
+            <button class="key" onclick="genKey('9')">9</button>
+            <button class="key op" onclick="genKey('*')">×</button>
+
+            <button class="key" onclick="genKey('4')">4</button>
+            <button class="key" onclick="genKey('5')">5</button>
+            <button class="key" onclick="genKey('6')">6</button>
+            <button class="key op" onclick="genKey('-')">-</button>
+
+            <button class="key" onclick="genKey('1')">1</button>
+            <button class="key" onclick="genKey('2')">2</button>
+            <button class="key" onclick="genKey('3')">3</button>
+            <button class="key op" onclick="genKey('+')">+</button>
+
+            <button class="key" onclick="genKey('0')">0</button>
+            <button class="key" onclick="genKey('.')">.</button>
+            <button class="key" onclick="genKey('=')">=</button>
+            <button class="key eq" onclick="genEval()">↵</button>
+          </div>
+            <div id="graph-controls" style="display:none;gap:8px;margin-top:8px;justify-content:center;align-items:center;">
+              <button class="btn-secondary" onclick="resetGraphView()">⟲ Reset Vista</button>
+              <span id="graph-coords" style="font-size:11px;color:var(--text3);font-family:var(--mono)">x: 0, y: 0</span>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:8px;justify-content:flex-end">
+              <button class="btn-secondary" id="angle-btn" onclick="toggleAngleMode()" style="font-size:11px;padding:3px 10px;min-width:48px;font-weight:700">DEG</button>
+            </div>
+          <canvas id="chart-canvas-general" style="display:none;width:100%;height:250px;border-radius:8px;margin-top:12px;background:linear-gradient(135deg, rgba(46,49,73,0.3) 0%, rgba(30,32,40,0.8) 100%);"></canvas>
+          <details class="db-panel" id="gen-db-panel" style="margin-top:16px">
+            <summary style="cursor:pointer;color:var(--accent);font-size:13px;font-weight:700;padding:8px 0;user-select:none">📚 Base de datos de constantes y fórmulas</summary>
+            <div id="gen-db-content" style="margin-top:8px"></div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ELECTRÓNICA ===== -->
+    <div class="mode-section" id="mode-electro">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Electrónica</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">⚡ Electricidad</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('electro','ohm',event)">Ley de Ohm</button>
+            <button class="chip" onclick="setFormula('electro','potencia',event)">Potencia</button>
+            <button class="chip" onclick="setFormula('electro','serie',event)">Serie</button>
+            <button class="chip" onclick="setFormula('electro','paralelo',event)">Paralelo</button>
+            <button class="chip" onclick="setFormula('electro','divisor',event)">Divisor V</button>
+            <button class="chip" onclick="setFormula('electro','kirchhoff',event)">Kirchhoff</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🔬 Electrónica</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('electro','led',event)">LED</button>
+            <button class="chip" onclick="setFormula('electro','astable555',event)">555 Astable</button>
+            <button class="chip" onclick="setFormula('electro','rc',event)">Filtro RC</button>
+            <button class="chip" onclick="setFormula('electro','db',event)">dB Ganancia</button>
+            <button class="chip" onclick="setFormula('electro','rectificador',event)">Rectificador</button>
+            <button class="chip" onclick="setFormula('electro','opamp',event)">Op-Amp</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent3);font-weight:700;font-size:0.8rem">📐 Electrónica Escolar</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('electro','capacitores',event)">Capacitores</button>
+            <button class="chip" onclick="setFormula('electro','frecuencia_periodo',event)">Frec/Período</button>
+            <button class="chip" onclick="setFormula('electro','transformador',event)">Transformador</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🔌 Potencia y Reactancia</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('electro','potencia_trifasica',event)">Pot. Trifásica</button>
+            <button class="chip" onclick="setFormula('electro','reactancia_capacitiva',event)">React. Capacitiva</button>
+            <button class="chip" onclick="setFormula('electro','reactancia_inductiva',event)">React. Inductiva</button>
+            <button class="chip" onclick="setFormula('electro','frecuencia_corte',event)">Frec. Corte</button>
+            <button class="chip" onclick="setFormula('electro','energia_kwh',event)">Energía kWh</button>
+          </div>
+          <div id="form-electro"></div>
+          <div class="result" id="result-electro"></div>
+          <div class="steps" id="steps-electro"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MEDICINA ===== -->
+    <div class="mode-section" id="mode-med">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Medicina</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">💊 Fórmulas Clínicas</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('med','goteo',event)">Goteo IV</button>
+            <button class="chip" onclick="setFormula('med','dosis',event)">Dosis mg/kg</button>
+            <button class="chip" onclick="setFormula('med','imc',event)">IMC</button>
+            <button class="chip" onclick="setFormula('med','peso_ideal',event)">Peso Ideal</button>
+            <button class="chip" onclick="setFormula('med','asc',event)">ASC (Mosteller)</button>
+            <button class="chip" onclick="setFormula('med','ascvd',event)">ASCVD Risk</button>
+            <button class="chip" onclick="setFormula('med','apgar',event)">APGAR</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🫁 Scores y Riesgo</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('med','sofa',event)">SOFA</button>
+            <button class="chip" onclick="setFormula('med','curb65',event)">CURB-65</button>
+            <button class="chip" onclick="setFormula('med','geneva',event)">Ginebra TEP</button>
+            <button class="chip" onclick="setFormula('med','gina',event)">Asma GINA</button>
+            <button class="chip" onclick="setFormula('med','shock',event)">Índice Shock</button>
+            <button class="chip" onclick="setFormula('med','gcs',event)">GCS</button>
+            <button class="chip" onclick="setFormula('med','pf_ratio',event)">P/F Ratio</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🧪 Laboratorio</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('med','tmb',event)">TMB Harris</button>
+            <button class="chip" onclick="setFormula('med','crcl',event)">Clearance Cr.</button>
+            <button class="chip" onclick="setFormula('med','anc',event)">ANC</button>
+            <button class="chip" onclick="setFormula('med','ganzoni',event)">Ganzoni (Hierro)</button>
+            <button class="chip" onclick="setFormula('med','correccion_sodio',event)">Na corregido</button>
+            <button class="chip" onclick="setFormula('med','anion_gap',event)">Anion Gap</button>
+          </div>
+          <div id="form-med"></div>
+          <div class="result" id="result-med"></div>
+          <div class="steps" id="steps-med"></div>
+            <div style="font-size:9px;color:var(--text3);margin-top:12px;padding-top:8px;border-top:1px solid var(--border)">
+              Herramientas de apoyo. No reemplazan juicio clínico.
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FINANZAS ===== -->
+    <div class="mode-section" id="mode-fin">
+      <div class="panel">
+        <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center">
+          <span class="panel-title">Finanzas</span>
+          <label style="font-size:9px;display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text3)">
+            <input type="checkbox" id="modo-ar" onchange="renderForm('fin', activeFormula['fin'])"> MODO ARGENTINA
+          </label>
+        </div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">💰 Préstamos y Tasas</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('fin','prestamo',event)">Préstamo francés</button>
+            <button class="chip" onclick="setFormula('fin','interes_simple',event)">Int. Simple</button>
+            <button class="chip" onclick="setFormula('fin','interes_compuesto',event)">Int. Compuesto</button>
+            <button class="chip" onclick="setFormula('fin','tasas',event)">Conversor Tasas</button>
+            <button class="chip" onclick="setFormula('fin','descuento',event)">Descuento</button>
+            <button class="chip" onclick="setFormula('fin','tir',event)">TIR</button>
+            <button class="chip" onclick="setFormula('fin','valor_futuro',event)">Valor Futuro</button>
+            <button class="chip" onclick="setFormula('fin','cuota_aleman',event)">Cuota Alemán</button>
+            <button class="chip" onclick="setFormula('fin','cuota_americano',event)">Cuota Americano</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📋 Contabilidad</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('fin','equilibrio',event)">Punto Equilibrio</button>
+            <button class="chip" onclick="setFormula('fin','van',event)">VAN / VPN</button>
+            <button class="chip" onclick="setFormula('fin','margen_bruto',event)">Margen Bruto</button>
+            <button class="chip" onclick="setFormula('fin','roi',event)">ROI</button>
+            <button class="chip" onclick="setFormula('fin','inflacion',event)">Inflación</button>
+            <button class="chip" onclick="setFormula('fin','vpn_simple',event)">VPN Simple</button>
+            <button class="chip" onclick="setFormula('fin','payback',event)">Payback</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🧾 Impuestos y Sueldos</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('fin','iva',event)">IVA</button>
+            <button class="chip" onclick="setFormula('fin','sueldo_neto',event)">Sueldo Neto</button>
+            <button class="chip" onclick="setFormula('fin','depreciacion',event)">Depreciación</button>
+            <button class="chip" onclick="setFormula('fin','tabla_amort',event)">Tabla Amort.</button>
+          </div>
+          <div id="form-fin"></div>
+          <div class="result" id="result-fin"></div>
+          <div class="steps" id="steps-fin"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== QUÍMICA ===== -->
+    <div class="mode-section" id="mode-quim">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Química</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🧪 Soluciones</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('quim','molar',event)">Molaridad</button>
+            <button class="chip" onclick="setFormula('quim','normalidad',event)">Normalidad</button>
+            <button class="chip" onclick="setFormula('quim','porcentaje',event)">% Concentración</button>
+            <button class="chip" onclick="setFormula('quim','dilucion',event)">Dilución C·V</button>
+            <button class="chip" onclick="setFormula('quim','ph',event)">pH / pOH</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">⚗️ Reacciones y Gases</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('quim','estequiometria',event)">Masa ↔ Moles</button>
+            <button class="chip" onclick="setFormula('quim','calor',event)">Calorimetría Q</button>
+            <button class="chip" onclick="setFormula('quim','gas',event)">Gas ideal PV=nRT</button>
+            <button class="chip" onclick="setFormula('quim','gases_combinada',event)">Gases Combinada</button>
+            <button class="chip" onclick="setFormula('quim','equilibrio',event)">Equilibrio Kc</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🔬 Leyes y Conceptos</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('quim','boyle',event)">Boyle P·V</button>
+            <button class="chip" onclick="setFormula('quim','charles',event)">Charles V/T</button>
+            <button class="chip" onclick="setFormula('quim','dalton',event)">Dalton P. Parcial</button>
+            <button class="chip" onclick="setFormula('quim','velocidad_reaccion',event)">Velocidad Reacción</button>
+            <button class="chip" onclick="setFormula('quim','numero_avogadro',event)">N° Avogadro</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🧮 Propiedades y Cinética</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('quim','masa_molar',event)">Masa Molar</button>
+            <button class="chip" onclick="setFormula('quim','rendimiento',event)">Rendimiento</button>
+            <button class="chip" onclick="setFormula('quim','henderson',event)">Henderson-H.</button>
+            <button class="chip" onclick="setFormula('quim','graham',event)">Graham (Efusión)</button>
+            <button class="chip" onclick="setFormula('quim','arrhenius',event)">Arrhenius</button>
+          </div>
+          <div id="form-quim"></div>
+          <div class="result" id="result-quim"></div>
+          <div class="steps" id="steps-quim"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CONSTRUCCIÓN ===== -->
+    <div class="mode-section" id="mode-civil">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Arquitectura y Construcción</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🏗️ Estructural / Hormigón</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('civil','hormigon',event)">Hormigón</button>
+            <button class="chip" onclick="setFormula('civil','ladrillos',event)">Ladrillos</button>
+            <button class="chip" onclick="setFormula('civil','flector',event)">Momento Flector</button>
+            <button class="chip" onclick="setFormula('civil','euler',event)">Pandeo (Euler)</button>
+            <button class="chip" onclick="setFormula('civil','anclaje',event)">Anclaje</button>
+            <button class="chip" onclick="setFormula('civil','mortero',event)">Mortero</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🌍 Geotecnia / Suelos</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('civil','asentamiento',event)">Asentamiento</button>
+            <button class="chip" onclick="setFormula('civil','terzaghi',event)">Terzaghi (σ')</button>
+            <button class="chip" onclick="setFormula('civil','rankine',event)">Rankine (Empuje)</button>
+            <button class="chip" onclick="setFormula('civil','esponjamiento',event)">Esponjamiento</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">💧 Hidráulica / Clima</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('civil','escorrentia',event)">Drenaje Pluvial</button>
+            <button class="chip" onclick="setFormula('civil','evaporacion',event)">Evaporación ACI</button>
+            <button class="chip" onclick="setFormula('civil','caida',event)">Caída de tensión</button>
+            <button class="chip" onclick="setFormula('civil','pendiente',event)">Pendientes</button>
+            <button class="chip" onclick="setFormula('civil','factor_seguridad',event)">Factor Seg.</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📋 Cómputo y Regulación</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('civil','excavacion',event)">Excavación</button>
+            <button class="chip" onclick="setFormula('civil','pintura',event)">Pintura</button>
+            <button class="chip" onclick="setFormula('civil','carga_muerta',event)">Carga Muerta</button>
+            <button class="chip" onclick="setFormula('civil','fos_fot',event)">FOS / FOT</button>
+          </div>
+          <div id="form-civil"></div>
+          <div class="result" id="result-civil"></div>
+          <div class="steps" id="steps-civil"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MECÁNICA ===== -->
+    <div class="mode-section" id="mode-mec">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Mecánica</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">⚙️ Máquinas Simples</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('mec','palanca',event)">Palanca</button>
+            <button class="chip" onclick="setFormula('mec','polea',event)">Polea</button>
+            <button class="chip" onclick="setFormula('mec','plano_inclinado',event)">Plano Incl.</button>
+            <button class="chip" onclick="setFormula('mec','torno',event)">Torno</button>
+            <button class="chip" onclick="setFormula('mec','engranajes',event)">Engranajes</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🔄 Movimiento</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('mec','torque',event)">Torque</button>
+            <button class="chip" onclick="setFormula('mec','velocidad_angular',event)">Vel. Angular</button>
+            <button class="chip" onclick="setFormula('mec','transmision',event)">Transmisión</button>
+            <button class="chip" onclick="setFormula('mec','rendimiento',event)">Rendimiento</button>
+            <button class="chip" onclick="setFormula('mec','potencia',event)">Potencia Mec.</button>
+            <button class="chip" onclick="setFormula('mec','energia_potencial',event)">En. Potencial</button>
+            <button class="chip" onclick="setFormula('mec','cantidad_movimiento',event)">Momentum</button>
+            <button class="chip" onclick="setFormula('mec','fuerza_centrifuga',event)">F. Centrífuga</button>
+            <button class="chip" onclick="setFormula('mec','velocidad_tangencial',event)">Vel. Tang.</button>
+            <button class="chip" onclick="setFormula('mec','aceleracion_angular',event)">Acel. Ang.</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">💪 Resistencia y Fluidos</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('mec','pascal',event)">Prensa Hidráulica</button>
+            <button class="chip" onclick="setFormula('mec','presion_solidos',event)">Presión Sól.</button>
+            <button class="chip" onclick="setFormula('mec','esfuerzo_deformacion',event)">Esf./Deform.</button>
+            <button class="chip" onclick="setFormula('mec','hooke',event)">Hooke</button>
+            <button class="chip" onclick="setFormula('mec','consumo',event)">Consumo km/L</button>
+          </div>
+          <div id="form-mec"></div>
+          <div class="result" id="result-mec"></div>
+          <div class="steps" id="steps-mec"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== GEOMETRÍA ===== -->
+    <div class="mode-section" id="mode-geom">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Geometría</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📐 Figuras Planas</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('geom','circulo',event)">Círculo</button>
+            <button class="chip" onclick="setFormula('geom','triangulo',event)">Triángulo</button>
+            <button class="chip" onclick="setFormula('geom','pitagoras',event)">Pitágoras</button>
+            <button class="chip" onclick="setFormula('geom','rectangulo',event)">Rectángulo</button>
+            <button class="chip" onclick="setFormula('geom','rombo',event)">Rombo</button>
+            <button class="chip" onclick="setFormula('geom','elipse',event)">Elipse</button>
+            <button class="chip" onclick="setFormula('geom','trapecio',event)">Trapecio</button>
+            <button class="chip" onclick="setFormula('geom','poligono_regular',event)">Polígono Reg.</button>
+            <button class="chip" onclick="setFormula('geom','sector_circular',event)">Sector Circ.</button>
+            <button class="chip" onclick="setFormula('geom','hexagono',event)">Hexágono Reg.</button>
+            <button class="chip" onclick="setFormula('geom','octogono',event)">Octógono Reg.</button>
+            <button class="chip" onclick="setFormula('geom','corona_circular',event)">Corona Circ.</button>
+            <button class="chip" onclick="setFormula('geom','segmento_circular',event)">Segmento Circ.</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🧊 Cuerpos 3D</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('geom','esfera',event)">Esfera</button>
+            <button class="chip" onclick="setFormula('geom','cilindro',event)">Cilindro</button>
+            <button class="chip" onclick="setFormula('geom','cono',event)">Cono</button>
+            <button class="chip" onclick="setFormula('geom','cubo',event)">Cubo</button>
+            <button class="chip" onclick="setFormula('geom','prisma_rectangular',event)">Prisma Rect.</button>
+            <button class="chip" onclick="setFormula('geom','piramide',event)">Pirámide</button>
+            <button class="chip" onclick="setFormula('geom','tronco_cono',event)">Tronco Cono</button>
+          </div>
+          <div id="form-geom"></div>
+          <div class="result" id="result-geom"></div>
+          <div class="steps" id="steps-geom"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== UNIDADES ===== -->
+    <div class="mode-section" id="mode-unit">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Conversor de Unidades</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📏 Longitud y Masa</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('unit','longitud',event)">Longitud</button>
+            <button class="chip" onclick="setFormula('unit','masa',event)">Masa</button>
+            <button class="chip" onclick="setFormula('unit','densidad',event)">Densidad</button>
+            <button class="chip" onclick="setFormula('unit','fuerza_newton',event)">Fuerza</button>
+            <button class="chip" onclick="setFormula('unit','torque',event)">Torque</button>
+            <button class="chip" onclick="setFormula('unit','viscosidad',event)">Viscosidad</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🌡️ Temperatura y Presión</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('unit','temp',event)">Temperatura</button>
+            <button class="chip" onclick="setFormula('unit','presion',event)">Presión</button>
+            <button class="chip" onclick="setFormula('unit','frecuencia_hz',event)">Frecuencia</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📐 Área, Volumen y Tiempo</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('unit','area_vol',event)">Área / Vol</button>
+            <button class="chip" onclick="setFormula('unit','angulos',event)">Ángulos</button>
+            <button class="chip" onclick="setFormula('unit','tiempo',event)">Tiempo</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">⚡ Energía y Datos</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('unit','energia',event)">Energía / Pot.</button>
+            <button class="chip" onclick="setFormula('unit','datos',event)">Datos Digitales</button>
+            <button class="chip" onclick="setFormula('unit','velocidad',event)">Velocidad</button>
+            <button class="chip" onclick="setFormula('unit','flujo',event)">Flujo Volumétrico</button>
+            <button class="chip" onclick="setFormula('unit','carga_electrica',event)">Carga Eléc.</button>
+            <button class="chip" onclick="setFormula('unit','flops',event)">FLOPS</button>
+            <button class="chip" onclick="setFormula('unit','conductividad',event)">Conductividad</button>
+            <button class="chip" onclick="setFormula('unit','iluminancia',event)">Iluminancia</button>
+          </div>
+          <div id="form-unit"></div>
+          <div class="result" id="result-unit"></div>
+          <div class="steps" id="steps-unit"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FÍSICA ===== -->
+    <div class="mode-section" id="mode-fis">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Física</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📐 Cinemática</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('fis','velocidad',event)">Velocidad/Acel.</button>
+            <button class="chip" onclick="setFormula('fis','posicion_mruv',event)">Posición MRUV</button>
+            <button class="chip" onclick="setFormula('fis','cinematica_indep',event)">Indep. Tiempo</button>
+            <button class="chip" onclick="setFormula('fis','caida_libre',event)">Caída Libre</button>
+            <button class="chip" onclick="setFormula('fis','parabolico',event)">Mov. Parabólico</button>
+            <button class="chip" onclick="setFormula('fis','gravedad',event)">Gravedad</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🔋 Fuerza y Energía</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('fis','fuerza',event)">Fuerza (F=má)</button>
+            <button class="chip" onclick="setFormula('fis','rozamiento',event)">Rozamiento</button>
+            <button class="chip" onclick="setFormula('fis','energia',event)">Energía</button>
+            <button class="chip" onclick="setFormula('fis','trabajo',event)">Trabajo</button>
+            <button class="chip" onclick="setFormula('fis','newton',event)">Leyes de Newton</button>
+            <button class="chip" onclick="setFormula('fis','impulso',event)">Impulso</button>
+            <button class="chip" onclick="setFormula('fis','conservacion_momento',event)">Conserv. Momento</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🌀 Ondas y Fluidos</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('fis','ondas',event)">Ondas</button>
+            <button class="chip" onclick="setFormula('fis','resorte',event)">Resorte</button>
+            <button class="chip" onclick="setFormula('fis','densidad',event)">Densidad</button>
+            <button class="chip" onclick="setFormula('fis','presion_hidrostatica',event)">Presión Hidr.</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">⚡ Electricidad</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('fis','ley_coulomb',event)">Ley de Coulomb</button>
+            <button class="chip" onclick="setFormula('fis','campo_electrico',event)">Campo Eléctrico</button>
+            <button class="chip" onclick="setFormula('fis','potencial_electrico',event)">Potencial Eléc.</button>
+          </div>
+          <div id="form-fis"></div>
+          <div class="result" id="result-fis"></div>
+          <div class="steps" id="steps-fis"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== DISEÑO GRÁFICO ===== -->
+    <div class="mode-section" id="mode-diseno">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Diseño y Multimedia</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📐 Proporciones y Escalas</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('diseno','aureo',event)">Proporción Áurea</button>
+            <button class="chip" onclick="setFormula('diseno','escala_grafica',event)">Escala Gráfica</button>
+            <button class="chip" onclick="setFormula('diseno','regla_tercios',event)">Regla de Tercios</button>
+            <button class="chip" onclick="setFormula('diseno','tipometria',event)">Tipometría</button>
+            <button class="chip" onclick="setFormula('diseno','legibilidad',event)">Legibilidad</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🎨 Color y Composición</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('diseno','gama_cromatica',event)">Gama Cromática</button>
+            <button class="chip" onclick="setFormula('diseno','peso_visual',event)">Peso Visual</button>
+            <button class="chip" onclick="setFormula('diseno','reticula',event)">Retícula</button>
+            <button class="chip active" onclick="setFormula('diseno','conv',event)">Conversor Px/Cm</button>
+            <button class="chip" onclick="setFormula('diseno','aspectRatio',event)">Relación Aspecto</button>
+            <button class="chip" onclick="setFormula('diseno','rgb_hex',event)">RGB ↔ HEX</button>
+            <button class="chip" onclick="setFormula('diseno','rgb_cmyk',event)">RGB ↔ CMYK</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🔤 Tipografía</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('diseno','typeScale',event)">Escala Tipográfica</button>
+            <button class="chip" onclick="setFormula('diseno','kerning_tracking',event)">Kerning/Tracking</button>
+            <button class="chip" onclick="setFormula('diseno','sangria_margenes',event)">Sangrías/Márgenes</button>
+            <button class="chip" onclick="setFormula('diseno','color',event)">Contraste WCAG</button>
+            <button class="chip" onclick="setFormula('diseno','resolucion',event)">Resolución Impresión</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent3);font-weight:700;font-size:0.8rem">🖼️ Imagen y Video</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('diseno','dpi_ppi',event)">DPI / PPI</button>
+            <button class="chip" onclick="setFormula('diseno','tamano_imagen',event)">Tamaño Imagen</button>
+            <button class="chip" onclick="setFormula('diseno','bitrate_video',event)">Bitrate Video</button>
+          </div>
+          <div id="form-diseno"></div>
+          <div class="result" id="result-diseno"></div>
+          <div class="steps" id="steps-diseno"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== NUTRICIÓN ===== -->
+    <div class="mode-section" id="mode-nutri">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Nutrición y Dietética</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🔥 Calorías y Macros</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('nutri','macros',event)">Macronutrientes</button>
+            <button class="chip" onclick="setFormula('nutri','calorias_alimento',event)">Calorías Alimento</button>
+            <button class="chip" onclick="setFormula('nutri','proteina_peso',event)">Proteína x Peso</button>
+            <button class="chip" onclick="setFormula('nutri','deficit_calorico',event)">Déficit Calórico</button>
+            <button class="chip" onclick="setFormula('nutri','balance',event)">Balance Energético</button>
+            <button class="chip" onclick="setFormula('nutri','tdee',event)">TDEE</button>
+            <button class="chip" onclick="setFormula('nutri','calorias_receta',event)">Calorías Receta</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">⚖️ Composición Corporal</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('nutri','imc',event)">IMC / Peso Ideal</button>
+            <button class="chip" onclick="setFormula('nutri','grasa_corporal',event)">% Grasa Corporal</button>
+            <button class="chip" onclick="setFormula('nutri','cintura_cadera',event)">ICC Cintura/Cadera</button>
+            <button class="chip" onclick="setFormula('nutri','cintura_altura',event)">ICT Cintura/Altura</button>
+            <button class="chip" onclick="setFormula('nutri','peso_ideal_nutri',event)">Peso Ideal Simple</button>
+            <button class="chip" onclick="setFormula('nutri','imc_infantil',event)">IMC Infantil</button>
+            <button class="chip" onclick="setFormula('nutri','ffmi',event)">FFMI</button>
+            <button class="chip" onclick="setFormula('nutri','bai',event)">BAI</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">💧 Hidratación y Actividad</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('nutri','agua_diaria',event)">Agua Diaria</button>
+            <button class="chip" onclick="setFormula('nutri','frecuencia_cardiaca',event)">Frec. Cardíaca</button>
+            <button class="chip" onclick="setFormula('nutri','met_actividad',event)">Gasto MET</button>
+            <button class="chip" onclick="setFormula('nutri','mifflin',event)">GET (Gasto Total)</button>
+            <button class="chip" onclick="setFormula('nutri','carga_g',event)">Carga Glucémica</button>
+          </div>
+          <div id="form-nutri"></div>
+          <div class="result" id="result-nutri"></div>
+          <div class="steps" id="steps-nutri"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ACÚSTICA ===== -->
+    <div class="mode-section" id="mode-acust">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Sonido y Acústica</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">👋 Ondas y Frecuencia</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('acust','onda',event)">λ = v/f</button>
+            <button class="chip" onclick="setFormula('acust','v_aire',event)">v aire</button>
+            <button class="chip" onclick="setFormula('acust','periodo_sonido',event)">Período</button>
+            <button class="chip" onclick="setFormula('acust','resonancia',event)">Resonancia Tubos</button>
+            <button class="chip" onclick="setFormula('acust','armonicos',event)">Serie Armónica</button>
+            <button class="chip" onclick="setFormula('acust','batidos',event)">Batidos</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📊 Niveles y Potencia</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('acust','spl',event)">Nivel dB SPL</button>
+            <button class="chip" onclick="setFormula('acust','potencia_sonora',event)">Potencia Sonora</button>
+            <button class="chip" onclick="setFormula('acust','sonoridad',event)">Sonoridad</button>
+            <button class="chip" onclick="setFormula('acust','ruido_fondo',event)">Ruido Fondo</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🏢 Acústica Arquitectónica</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('acust','rt60',event)">RT60 (Reverberación)</button>
+            <button class="chip" onclick="setFormula('acust','absorcion',event)">Absorción</button>
+            <button class="chip" onclick="setFormula('acust','aislacion',event)">Aislamiento</button>
+            <button class="chip" onclick="setFormula('acust','dist',event)">Caída Distancia</button>
+            <button class="chip" onclick="setFormula('acust','doppler',event)">Efecto Doppler</button>
+          </div>
+          <div id="form-acust"></div>
+          <div class="result" id="result-acust"></div>
+          <div class="steps" id="steps-acust"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PROGRAMACIÓN ===== -->
+    <div class="mode-section" id="mode-prog">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Informática / Programación</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🔢 Números y Algoritmos</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('prog','bases',event)">Bases Numéricas</button>
+            <button class="chip" onclick="setFormula('prog','bitwise',event)">Bits (Bitwise)</button>
+            <button class="chip" onclick="setFormula('prog','factorial',event)">Factorial</button>
+            <button class="chip" onclick="setFormula('prog','fibonacci',event)">Fibonacci</button>
+            <button class="chip" onclick="setFormula('prog','mcd_mcm',event)">MCD / MCM</button>
+            <button class="chip" onclick="setFormula('prog','primos',event)">Números Primos</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🔐 Códigos y Cifrado</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('prog','ascii',event)">Código ASCII</button>
+            <button class="chip" onclick="setFormula('prog','hash_djb2',event)">Hash DJB2</button>
+            <button class="chip" onclick="setFormula('prog','cesar',event)">Cifrado César</button>
+            <button class="chip" onclick="setFormula('prog','distancia_hamming',event)">Dist. Hamming</button>
+            <button class="chip" onclick="setFormula('prog','base64',event)">Base64</button>
+            <button class="chip" onclick="setFormula('prog','sha256',event)">SHA-256</button>
+            <button class="chip" onclick="setFormula('prog','md5',event)">MD5</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent3);font-weight:700;font-size:0.8rem">📐 Algoritmos y Métricas</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('prog','bigO',event)">Big O (Complejidad)</button>
+            <button class="chip" onclick="setFormula('prog','cpu',event)">Tiempo CPU</button>
+            <button class="chip" onclick="setFormula('prog','cocomo',event)">COCOMO (Estimación)</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🧰 Utilidades</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('prog','uuid',event)">UUID v4</button>
+            <button class="chip" onclick="setFormula('prog','json_tool',event)">JSON Formatter</button>
+          </div>
+          <div id="form-prog"></div>
+          <div class="result" id="result-prog"></div>
+          <div class="steps" id="steps-prog"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ESTADÍSTICA ===== -->
+    <div class="mode-section" id="mode-estad">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Estadística Aplicada</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📊 Descriptiva</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('estad','basica',event)">Descriptiva</button>
+            <button class="chip" onclick="setFormula('estad','percentiles',event)">Percentiles</button>
+            <button class="chip" onclick="setFormula('estad','cuartiles',event)">Cuartiles</button>
+            <button class="chip" onclick="setFormula('estad','desviacion_media',event)">Desv. Media</button>
+            <button class="chip" onclick="setFormula('estad','media_geo',event)">Media Geo</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🎲 Probabilidad</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('estad','probabilidad',event)">Probabilidad</button>
+            <button class="chip" onclick="setFormula('estad','prob_condicional',event)">Prob Cond.</button>
+            <button class="chip" onclick="setFormula('estad','teorema_bayes',event)">Bayes</button>
+            <button class="chip" onclick="setFormula('estad','binomial',event)">Binomial</button>
+            <button class="chip" onclick="setFormula('estad','poisson',event)">Poisson</button>
+          </div>
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📈 Inferencia</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('estad','normal',event)">Dist. Normal</button>
+            <button class="chip" onclick="setFormula('estad','confianza',event)">Intervalo Confianza</button>
+            <button class="chip" onclick="setFormula('estad','chi_cuadrado',event)">Chi²</button>
+            <button class="chip" onclick="setFormula('estad','regresion',event)">Regresión Lineal</button>
+            <button class="chip" onclick="setFormula('estad','combinatoria',event)">Combinatoria</button>
+          </div>
+          <div id="form-estad"></div>
+          <div class="result" id="result-estad"></div>
+          <div class="steps" id="steps-estad"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== REDES ===== -->
+    <div class="mode-section" id="mode-redes">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Redes y Conectividad</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🌐 Subneteo</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('redes','subred',event)">Subred IPv4</button>
+            <button class="chip" onclick="setFormula('redes','hosts',event)">Hosts/Subred</button>
+            <button class="chip" onclick="setFormula('redes','cidr',event)">Máscara ↔ CIDR</button>
+            <button class="chip" onclick="setFormula('redes','broadcast',event)">Broadcast</button>
+            <button class="chip" onclick="setFormula('redes','network',event)">Dir. de Red</button>
+            <button class="chip" onclick="setFormula('redes','vlsm',event)">VLSM</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent3);font-weight:700;font-size:0.8rem">🔢 Conversiones</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('redes','ipv6',event)">IPv6 Básico</button>
+            <button class="chip" onclick="setFormula('redes','wildcard',event)">Wildcard Mask</button>
+            <button class="chip" onclick="setFormula('redes','transfer',event)">Transf. Archivos</button>
+            <button class="chip" onclick="setFormula('redes','mbps',event)">Mbps ↔ MB/s</button>
+            <button class="chip" onclick="setFormula('redes','dns',event)">DNS Lookup</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📊 Rendimiento</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('redes','ancho',event)">Ancho Banda</button>
+            <button class="chip" onclick="setFormula('redes','utilizacion',event)">Uso Enlace</button>
+            <button class="chip" onclick="setFormula('redes','rtt',event)">RTT/Latencia</button>
+            <button class="chip" onclick="setFormula('redes','throughput',event)">Throughput Real</button>
+            <button class="chip" onclick="setFormula('redes','overhead_tcp',event)">Overhead TCP/IP</button>
+            <button class="chip" onclick="setFormula('redes','poe',event)">PoE</button>
+            <button class="chip" onclick="setFormula('redes','fragmentacion',event)">MTU/Fragmentación</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent3);font-weight:700;font-size:0.8rem">📋 Administración</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('redes','vlan',event)">VLAN Capacity</button>
+            <button class="chip" onclick="setFormula('redes','dhcp',event)">DHCP Scope</button>
+          </div>
+          <div id="form-redes"></div>
+          <div class="result" id="result-redes"></div>
+          <div class="steps" id="steps-redes"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="sidebar">
+
+    <!-- DB rápida -->
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">Base de datos</span></div>
+      <div class="panel-body" id="db-panel">
+        <div class="db-grid" id="db-items"></div>
+      </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">Historial</span></div>
+      <div class="panel-body">
+        <div class="history-list" id="history-list">
+          <div style="font-size:11px;color:var(--text3);padding:10px 0">Sin cálculos aún</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="statusbar">
+  <div class="status-item"><span class="status-dot"></span>Motor activo</div>
+  <div class="status-item" id="status-mode">Modo: General</div>
+  <div class="status-item">SumaMente v1.1</div>
+    </div>
+
+<script src="js/data.js"></script>
+<!-- Visualizaciones interactivas (js/modulos/visuales/) -->
+<script src="js/modulos/visuales/redes_visual.js"></script>
+<script src="js/modulos/visuales/acustica_visual.js"></script>
+<script src="js/modulos/visuales/civil_visual.js"></script>
+<script src="js/modulos/visuales/diseno_visual.js"></script>
+<script src="js/modulos/visuales/electro_visual.js"></script>
+<script src="js/modulos/visuales/estadistica_visual.js"></script>
+<script src="js/modulos/visuales/finanzas_visual.js"></script>
+<script src="js/modulos/visuales/fisica_visual.js"></script>
+<script src="js/modulos/visuales/geometria_visual.js"></script>
+<script src="js/modulos/visuales/mecanica_visual.js"></script>
+<script src="js/modulos/visuales/medicina_visual.js"></script>
+<script src="js/modulos/visuales/nutricion_visual.js"></script>
+<script src="js/modulos/visuales/programacion_visual.js"></script>
+<script src="js/modulos/visuales/quimica_visual.js"></script>
+<script src="js/modulos/visuales/unidades_visual.js"></script>
+<!-- Módulos de fórmulas -->
+<script src="js/modulos/electro.js"></script>
+<script src="js/modulos/medicina.js"></script>
+<script src="js/modulos/finanzas.js"></script>
+<script src="js/modulos/quimica.js"></script>
+<script src="js/modulos/civil.js"></script>
+<script src="js/modulos/mecanica.js"></script>
+<script src="js/modulos/geometria.js"></script>
+<script src="js/modulos/unidades.js"></script>
+<script src="js/modulos/fisica.js"></script>
+<script src="js/modulos/diseno.js"></script>
+<script src="js/modulos/nutricion.js"></script>
+<script src="js/modulos/acustica.js"></script>
+<script src="js/modulos/programacion.js"></script>
+<script src="js/modulos/estadistica.js"></script>
+<script src="js/modulos/redes.js"></script>
+<script src="js/app.js"></script>
+<!-- <script src="js/admob.js"></script> -->
+</body>
+</html>
+

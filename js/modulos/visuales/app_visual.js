@@ -12,8 +12,8 @@ function genPlotFunc(expr, preserveView) {
         return;
     }
     const ctx = canvas.getContext('2d');
-    const containerWidth = canvas.parentElement.clientWidth - 28; // padding
-    const w = containerWidth;
+    var pw = (canvas.parentElement && canvas.parentElement.clientWidth) || window.innerWidth || 320;
+    const w = Math.max(pw - 28, 200);
     const h = 250;
     const margin = 40;
     const plotW = w - margin * 2;
@@ -149,8 +149,6 @@ function genPlotFunc(expr, preserveView) {
     // Dibujar la función
     ctx.strokeStyle = '#4f9cf9';
     ctx.lineWidth = 2.5;
-    ctx.shadowColor = '#4f9cf9';
-    ctx.shadowBlur = 10;
     ctx.beginPath();
     let started = false;
     for (const p of points) {
@@ -160,7 +158,6 @@ function genPlotFunc(expr, preserveView) {
         else ctx.lineTo(cx, cy);
     }
     ctx.stroke();
-    ctx.shadowBlur = 0;
     
     // Setup event listeners for zoom and pan
     currentPlotExpr = expr;
@@ -385,7 +382,8 @@ function genPlotSystem2x2(eq1, eq2) {
     const canvas = document.getElementById('chart-canvas-general');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const w = canvas.parentElement.clientWidth - 28;
+    var pw = (canvas.parentElement && canvas.parentElement.clientWidth) || window.innerWidth || 320;
+    const w = Math.max(pw - 28, 200);
     const h = 250;
     const margin = 40;
     const plotW = w - margin * 2;
@@ -571,8 +569,8 @@ function genPlotEquation(equation) {
     }
     
     const ctx = canvas.getContext('2d');
-    const containerWidth = canvas.parentElement.clientWidth - 28;
-    const w = containerWidth;
+    var pw = (canvas.parentElement && canvas.parentElement.clientWidth) || window.innerWidth || 320;
+    const w = Math.max(pw - 28, 200);
     const h = 250;
     const margin = 40;
     const plotW = w - margin * 2;
@@ -706,8 +704,6 @@ function genPlotEquation(equation) {
     // Graficar función izquierda (azul)
     ctx.strokeStyle = '#4f9cf9';
     ctx.lineWidth = 2.5;
-    ctx.shadowColor = '#4f9cf9';
-    ctx.shadowBlur = 10;
     ctx.beginPath();
     let started = false;
     for (const p of leftPoints) {
@@ -720,7 +716,6 @@ function genPlotEquation(equation) {
     
     // Graficar función derecha (naranja)
     ctx.strokeStyle = '#f97b4f';
-    ctx.shadowColor = '#f97b4f';
     ctx.beginPath();
     started = false;
     for (const p of rightPoints) {
@@ -730,7 +725,6 @@ function genPlotEquation(equation) {
         else ctx.lineTo(cx, cy);
     }
     ctx.stroke();
-    ctx.shadowBlur = 0;
     
     // Encontrar intersección
     let intersection = null;
@@ -758,14 +752,11 @@ function genPlotEquation(equation) {
         const cx = toCanvasX(intersection.x);
         const cy = toCanvasY(intersection.y);
         
-        // Círculo con glow
+        // Círculo
         ctx.fillStyle = '#4ff97b';
-        ctx.shadowColor = '#4ff97b';
-        ctx.shadowBlur = 15;
         ctx.beginPath();
         ctx.arc(cx, cy, 8, 0, Math.PI * 2);
         ctx.fill();
-        ctx.shadowBlur = 0;
         
         // Etiqueta de coordenadas
         ctx.fillStyle = '#4ff97b';

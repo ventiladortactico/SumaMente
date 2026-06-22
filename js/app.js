@@ -1389,7 +1389,7 @@ function safeMathEval(expr, vars) {
     return evalStack[0];
 }
 
-function genPlotFunc(expr) {
+function genPlotFunc(expr, preserveView) {
     const canvas = document.getElementById('chart-canvas-general');
     if (!canvas) {
         return;
@@ -1418,7 +1418,11 @@ function genPlotFunc(expr) {
     
     // Ajustar rango Y basado en los puntos (con recorte de outliers)
     let allY = points.filter(p => p.y !== null).map(p => p.y);
-    if (allY.length > 0) {
+    if (preserveView) {
+        // Usar el rango Y predefinido (para parábolas)
+        minY = plotMinY;
+        maxY = plotMaxY;
+    } else if (allY.length > 0) {
         if (allY.length > 10) {
             const sorted = [...allY].sort((a, b) => a - b);
             const lo = sorted[Math.floor(sorted.length * 0.02)];
@@ -2485,10 +2489,18 @@ function genEval() {
                     sp.innerHTML = '<details open style="cursor:pointer"><summary style="color:var(--accent);font-weight:700;font-size:12px;padding:4px 0">📐 Análisis de la parábola</summary>' +
                         analysis.steps.map(s => `<div class="step">${s}</div>`).join('') + '</details>';
                     sp.classList.add('show');
-                    // Centrar gráfico en el vértice
+                    // Centrar gráfico en el vértice con rango Y adecuado
                     plotMinX = analysis.h - 6;
                     plotMaxX = analysis.h + 6;
-                    genPlotFunc(expr);
+                    const yPad = Math.max(4, Math.abs(analysis.k) * 0.5);
+                    if (analysis.a > 0) {
+                        plotMinY = analysis.k - yPad;
+                        plotMaxY = analysis.k + yPad * 3;
+                    } else {
+                        plotMinY = analysis.k - yPad * 3;
+                        plotMaxY = analysis.k + yPad;
+                    }
+                    genPlotFunc(expr, true);
                     genResult = `Vértice (${parseFloat(analysis.h.toFixed(3))}, ${parseFloat(analysis.k.toFixed(3))})`;
                     document.getElementById('gen-result').textContent = genResult;
                     document.getElementById('gen-expr').textContent = 'f(x) = ' + genExpr;

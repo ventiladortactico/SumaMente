@@ -6,13 +6,6 @@ let genResult = '0';
 let genLastResult = null;
 let genMemory = 0;
 
-// Plotting state
-let plotMinX = -10, plotMaxX = 10;
-let plotMinY = -10, plotMaxY = 10;
-let plotDragging = false;
-let plotLastX = 0, plotLastY = 0;
-let currentPlotExpr = '';
-let currentPlotType = ''; // 'function' or 'equation'
 let activeFormula = { 
     electro: 'ohm', med: 'goteo', fin: 'prestamo', quim: 'molar', civil: 'hormigon', mec: 'torque', geom: 'circulo', 
     unit: 'longitud', fis: 'velocidad', diseno: 'conv', nutri: 'macros', acust: 'spl', prog: 'bases', estad: 'basica', redes: 'subredes'
@@ -23,11 +16,10 @@ let angleMode = 'deg'; // 'deg' | 'rad'
 // ── Gestor de publicidad AdMob (Banner discreto) ──
 const AdManager = {
     isInitialized: false,
-    bannerId: 'ca-app-pub-3940256099942544/6300978111', // Test banner ID
+    bannerId: 'ca-app-pub-3940256099942544/6300978111',
 
     async init() {
         if (this.isInitialized) return;
-
         try {
             const { AdMob } = await import('@capacitor-community/admob');
             await AdMob.initialize();
@@ -39,18 +31,10 @@ const AdManager = {
     },
 
     async showBanner() {
-        if (!this.isInitialized || LicenseManager.isPro || LicenseManager.isCollaborator) {
-            return;
-        }
-
+        if (!this.isInitialized || LicenseManager.isPro || LicenseManager.isCollaborator) return;
         try {
             const { AdMob } = await import('@capacitor-community/admob');
-            await AdMob.showBanner({
-                adId: this.bannerId,
-                position: 'bottom',
-                margin: 0,
-                isTesting: true // Usar true en desarrollo, false en producción
-            });
+            await AdMob.showBanner({ adId: this.bannerId, position: 'bottom', margin: 0, isTesting: true });
             console.log('Banner AdMob mostrado');
         } catch (error) {
             console.log('Error al mostrar banner:', error.message);
@@ -68,7 +52,7 @@ const AdManager = {
     }
 };
 
-// ── Gestor de licencias (PREPARACIÓN — sin UI, sin billing) ──
+// ── Gestor de licencias ──
 const LicenseManager = {
     _data: null,
 
@@ -81,9 +65,7 @@ const LicenseManager = {
         return this;
     },
 
-    save() {
-        localStorage.setItem('SumaMente_license', JSON.stringify(this._data));
-    },
+    save() { localStorage.setItem('SumaMente_license', JSON.stringify(this._data)); },
 
     get tier() { return this._data.tier; },
     get isPro() { return this._data.tier === 'pro' || this._data.tier === 'collaborator'; },
@@ -98,14 +80,12 @@ const LicenseManager = {
     },
 
     redeemCode(code) {
-        // Validación de códigos de regalo para colaboradores
         const validCodes = [
             'SUMAMENTE-HELPER-2026',
             'SUMAMENTE-COLAB-001',
             'SUMAMENTE-BETA-001',
             'SUMAMENTE-TEST-2026'
         ];
-
         if (validCodes.includes(code)) {
             this.activate('collaborator', 'gift', code);
             return true;
@@ -118,17 +98,14 @@ const LicenseManager = {
         this.save();
     },
 
-    export() {
-        return JSON.parse(JSON.stringify(this._data));
-    }
+    export() { return JSON.parse(JSON.stringify(this._data)); }
 };
 
 // ── Gestor de temas visuales ──
 const ThemeManager = {
     themes: {
         dark: {
-            name: 'Dark',
-            icon: '🌙',
+            name: 'Dark', icon: '🌙',
             vars: {
                 '--bg': '#0a0b0e', '--surface': '#111318', '--surface2': '#181c24',
                 '--surface3': '#1e232f', '--border': '#2a3040', '--border2': '#3a4558',
@@ -137,8 +114,7 @@ const ThemeManager = {
             }
         },
         ocean: {
-            name: 'Océano',
-            icon: '🌊',
+            name: 'Océano', icon: '🌊',
             vars: {
                 '--bg': '#0a0e1a', '--surface': '#0f1a2e', '--surface2': '#142240',
                 '--surface3': '#1a2d52', '--border': '#1e3a6e', '--border2': '#2a5090',
@@ -147,8 +123,7 @@ const ThemeManager = {
             }
         },
         forest: {
-            name: 'Bosque',
-            icon: '🌿',
+            name: 'Bosque', icon: '🌿',
             vars: {
                 '--bg': '#0a1008', '--surface': '#111a10', '--surface2': '#1a2a18',
                 '--surface3': '#243a20', '--border': '#2a4a28', '--border2': '#3a6a38',
@@ -157,8 +132,7 @@ const ThemeManager = {
             }
         },
         midnight: {
-            name: 'Midnight',
-            icon: '🌃',
+            name: 'Midnight', icon: '🌃',
             vars: {
                 '--bg': '#0d0d1a', '--surface': '#151528', '--surface2': '#1e1e3a',
                 '--surface3': '#2a2a4a', '--border': '#3a3a5a', '--border2': '#4a4a7a',
@@ -197,19 +171,15 @@ const ThemeManager = {
     }
 };
 
-// ── Gestor de métricas de uso (Analytics) ──
+// ── Gestor de métricas ──
 const AnalyticsManager = {
     _data: null,
 
     load() {
-        try {
-            this._data = JSON.parse(localStorage.getItem('SumaMente_analytics'));
-        } catch(e) {}
+        try { this._data = JSON.parse(localStorage.getItem('SumaMente_analytics')); } catch(e) {}
         if (!this._data) {
             this._data = {
-                modules: {},
-                formulas: {},
-                searches: {},
+                modules: {}, formulas: {}, searches: {},
                 firstOpen: new Date().toISOString(),
                 lastOpen: new Date().toISOString(),
                 sessionCount: 0
@@ -219,82 +189,32 @@ const AnalyticsManager = {
         return this;
     },
 
-    save() {
-        localStorage.setItem('SumaMente_analytics', JSON.stringify(this._data));
-    },
-
-    trackModule(module) {
-        if (!this._data.modules[module]) {
-            this._data.modules[module] = 0;
-        }
-        this._data.modules[module]++;
-        this.save();
-    },
-
-    trackFormula(module, formula) {
-        const key = `${module}:${formula}`;
-        if (!this._data.formulas[key]) {
-            this._data.formulas[key] = 0;
-        }
-        this._data.formulas[key]++;
-        this.save();
-    },
-
+    save() { localStorage.setItem('SumaMente_analytics', JSON.stringify(this._data)); },
+    trackModule(module) { this._data.modules[module] = (this._data.modules[module] || 0) + 1; this.save(); },
+    trackFormula(module, formula) { const k = `${module}:${formula}`; this._data.formulas[k] = (this._data.formulas[k] || 0) + 1; this.save(); },
     trackSearch(query) {
         if (!query || query.length < 2) return;
-        const normalized = query.toLowerCase().trim();
-        if (!this._data.searches[normalized]) {
-            this._data.searches[normalized] = 0;
-        }
-        this._data.searches[normalized]++;
+        const n = query.toLowerCase().trim();
+        this._data.searches[n] = (this._data.searches[n] || 0) + 1;
         this.save();
     },
-
-    recordSession() {
-        this._data.lastOpen = new Date().toISOString();
-        this._data.sessionCount++;
-        this.save();
-    },
-
-    getTopModules(limit = 5) {
-        return Object.entries(this._data.modules)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, limit);
-    },
-
-    getTopFormulas(limit = 5) {
-        return Object.entries(this._data.formulas)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, limit);
-    },
-
-    getTopSearches(limit = 5) {
-        return Object.entries(this._data.searches)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, limit);
-    },
-
-    export() {
-        return JSON.parse(JSON.stringify(this._data));
-    }
+    recordSession() { this._data.lastOpen = new Date().toISOString(); this._data.sessionCount++; this.save(); },
+    getTopModules(limit = 5) { return Object.entries(this._data.modules).sort((a, b) => b[1] - a[1]).slice(0, limit); },
+    getTopFormulas(limit = 5) { return Object.entries(this._data.formulas).sort((a, b) => b[1] - a[1]).slice(0, limit); },
+    getTopSearches(limit = 5) { return Object.entries(this._data.searches).sort((a, b) => b[1] - a[1]).slice(0, limit); },
+    export() { return JSON.parse(JSON.stringify(this._data)); }
 };
 
 // ── Gestor de compras Google Play Billing ──
 const BillingManager = {
     isInitialized: false,
-    productId: 'sumamente_pro_lifetime', // ID del producto en Google Play Console
+    productId: 'sumamente_pro_lifetime',
 
     async init() {
         if (this.isInitialized) return;
-
         try {
             const { CdvPurchase } = await import('capacitor-plugin-cdv-purchase');
-            await CdvPurchase.initialize([
-                {
-                    id: this.productId,
-                    type: CdvPurchase.ProductType.NON_CONSUMABLE
-                }
-            ]);
+            await CdvPurchase.initialize([{ id: this.productId, type: CdvPurchase.ProductType.NON_CONSUMABLE }]);
             this.isInitialized = true;
             console.log('Billing inicializado');
         } catch (error) {
@@ -303,30 +223,13 @@ const BillingManager = {
     },
 
     async purchasePro() {
-        if (!this.isInitialized) {
-            console.log('Billing no inicializado');
-            return false;
-        }
-
+        if (!this.isInitialized) { console.log('Billing no inicializado'); return false; }
         try {
             const { CdvPurchase } = await import('capacitor-plugin-cdv-purchase');
             const offer = await CdvPurchase.getOffers([this.productId]);
-
-            if (offer.length === 0) {
-                console.log('No se encontraron ofertas para el producto');
-                return false;
-            }
-
+            if (offer.length === 0) { console.log('No se encontraron ofertas'); return false; }
             const result = await CdvPurchase.purchase(offer[0]);
-
-            if (result) {
-                // Compra exitosa, activar PRO
-                LicenseManager.activate('pro', 'playstore');
-                AdManager.hideBanner();
-                console.log('Compra PRO exitosa');
-                return true;
-            }
-
+            if (result) { LicenseManager.activate('pro', 'playstore'); AdManager.hideBanner(); return true; }
             return false;
         } catch (error) {
             console.log('Error en compra PRO:', error.message);
@@ -335,26 +238,13 @@ const BillingManager = {
     },
 
     async restorePurchases() {
-        if (!this.isInitialized) {
-            console.log('Billing no inicializado');
-            return false;
-        }
-
+        if (!this.isInitialized) { console.log('Billing no inicializado'); return false; }
         try {
             const { CdvPurchase } = await import('capacitor-plugin-cdv-purchase');
             await CdvPurchase.restorePurchases();
-
-            // Verificar si el usuario tiene PRO
             const purchases = await CdvPurchase.getLatestPurchases();
             const hasPro = purchases.some(p => p.productId === this.productId);
-
-            if (hasPro) {
-                LicenseManager.activate('pro', 'playstore');
-                AdManager.hideBanner();
-                console.log('PRO restaurado');
-                return true;
-            }
-
+            if (hasPro) { LicenseManager.activate('pro', 'playstore'); AdManager.hideBanner(); return true; }
             return false;
         } catch (error) {
             console.log('Error al restaurar compras:', error.message);
@@ -375,16 +265,30 @@ function exportGenPDF() {
     if (!LicenseManager.isPro) { alert('Exportar PDF es exclusivo de PRO'); return; }
     showPDFChoice((mode) => {
         if (mode === 'last') {
-            const expr = document.getElementById('gen-expr').textContent;
-            const result = document.getElementById('gen-result').textContent;
+            let expr = document.getElementById('gen-expr').textContent;
+            let result = document.getElementById('gen-result').textContent;
             const stepsEl = document.getElementById('gen-steps');
             let steps = [];
             if (stepsEl) {
                 const stepDivs = stepsEl.querySelectorAll('.step');
                 steps = Array.from(stepDivs).map(d => d.innerHTML);
             }
+            if (!expr && result === '0' && history.length > 0) {
+                const last = history[0];
+                expr = last.expr || '';
+                result = last.val;
+                steps = last.steps || [];
+            }
             if (!expr && result === '0') return;
-            const chartImg = getCanvasImage('general');
+            let chartImg = getCanvasImage('general');
+            if (!chartImg && expr && /[x]/.test(expr)) {
+                const _v = (ThemeManager.themes[ThemeManager.current || 'dark'] || ThemeManager.themes.dark).vars;
+                let clean = expr;
+                if (clean.includes('=')) clean = clean.split('=')[0].trim();
+                clean = clean.replace(/²/g, '^2').replace(/π/g, 'pi');
+                const svg = renderFunctionToSVG(clean, 500, 250, _v);
+                if (svg) chartImg = 'data:image/svg+xml,' + encodeURIComponent(svg);
+            }
             exportResultPDF('General', expr || 'resultado', result, expr ? `Resultado: ${expr}` : 'Resultado', steps, chartImg);
         } else {
             exportHistoryPDF();
@@ -423,70 +327,230 @@ function exportModulePDF(module, key, val, label, stepsData) {
     exportResultPDF(module, key, val, label, steps, chartImg);
 }
 
+// ── renderFunctionToSVG: gráfico como SVG inline ──
+// ── renderFunctionToSVG: genera gráfico como SVG inline (sin canvas, sin dataURL) ──
+function renderFunctionToSVG(exprStr, w, h, themeVars) {
+    if (!exprStr || !/[x]/.test(exprStr)) return '';
+    exprStr = exprStr.replace(/²/g, '^2').replace(/π/g, 'pi');
+    w = w || 500; h = h || 250;
+    const margin = 40;
+    const plotW = w - margin * 2;
+    const plotH = h - margin * 2;
+    const minX = -6, maxX = 6;
+
+    const pts = [];
+    const steps = 400;
+    for (let i = 0; i <= steps; i++) {
+        const x = minX + (maxX - minX) * i / steps;
+        try {
+            const y = safeMathEval(exprStr, { x });
+            if (isFinite(y)) pts.push({ x, y });
+        } catch(e) {}
+    }
+
+    const allY = pts.filter(p => p.y !== null).map(p => p.y);
+    let minY, maxY;
+    if (allY.length > 10) {
+        const sorted = [...allY].sort((a, b) => a - b);
+        const t0 = Math.floor(sorted.length * 0.02);
+        const t1 = Math.ceil(sorted.length * 0.98);
+        minY = sorted[t0]; maxY = sorted[t1 - 1];
+    } else if (allY.length > 0) {
+        minY = Math.min(...allY); maxY = Math.max(...allY);
+    } else { return ''; }
+    const yRange = maxY - minY || 1;
+    minY -= yRange * 0.12; maxY += yRange * 0.12;
+
+    const toX = (x) => margin + (x - minX) / (maxX - minX) * plotW;
+    const toY = (y) => margin + (maxY - y) / (maxY - minY) * plotH;
+
+    // Theme colors (for PDF export)
+    const v = themeVars || {};
+    const bg = v['--bg'] || '#0a0b0e';
+    const border = v['--border'] || '#2a3040';
+    const accent = v['--accent'] || '#4f9cf9';
+    const text2 = v['--text2'] || '#8a97b0';
+    const text3 = v['--text3'] || '#4a5570';
+
+    // Grid lines
+    const xStep = Math.pow(10, Math.floor(Math.log10((maxX - minX) / 5)));
+    const yStep = Math.pow(10, Math.floor(Math.log10((maxY - minY) / 5)));
+    let gridLines = '';
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep / 2) {
+        const cx = toX(x).toFixed(1);
+        gridLines += `<line x1="${cx}" y1="${margin}" x2="${cx}" y2="${margin + plotH}" stroke="${text3}" stroke-opacity="0.3" stroke-width="0.5"/>`;
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep / 2) {
+        const cy = toY(y).toFixed(1);
+        gridLines += `<line x1="${margin}" y1="${cy}" x2="${margin + plotW}" y2="${cy}" stroke="${text3}" stroke-opacity="0.3" stroke-width="0.5"/>`;
+    }
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
+        const cx = toX(x).toFixed(1);
+        gridLines += `<line x1="${cx}" y1="${margin}" x2="${cx}" y2="${margin + plotH}" stroke="${text3}" stroke-opacity="0.6" stroke-width="1"/>`;
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
+        const cy = toY(y).toFixed(1);
+        gridLines += `<line x1="${margin}" y1="${cy}" x2="${margin + plotW}" y2="${cy}" stroke="${text3}" stroke-opacity="0.6" stroke-width="1"/>`;
+    }
+
+    // Axes
+    let axes = '';
+    if (minY <= 0 && maxY >= 0) {
+        const cy = toY(0).toFixed(1);
+        axes += `<line x1="${margin}" y1="${cy}" x2="${margin + plotW}" y2="${cy}" stroke="${text2}" stroke-width="2"/>`;
+    }
+    if (minX <= 0 && maxX >= 0) {
+        const cx = toX(0).toFixed(1);
+        axes += `<line x1="${cx}" y1="${margin}" x2="${cx}" y2="${margin + plotH}" stroke="${text2}" stroke-width="2"/>`;
+    }
+
+    // Labels
+    let labels = '';
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
+        if (Math.abs(x) < 0.001) continue;
+        const cx = toX(x).toFixed(1);
+        const ly = (minY <= 0 && maxY >= 0) ? toY(0) : margin + plotH;
+        labels += `<text x="${cx}" y="${ly + 12}" fill="${text2}" font-size="9" font-family="monospace" text-anchor="middle">${parseFloat(x.toPrecision(3))}</text>`;
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
+        if (Math.abs(y) < 0.001) continue;
+        const cy = toY(y).toFixed(1);
+        const lx = (minX <= 0 && maxX >= 0) ? toX(0) : margin;
+        labels += `<text x="${lx - 5}" y="${cy + 3}" fill="${text2}" font-size="9" font-family="monospace" text-anchor="end">${parseFloat(y.toPrecision(3))}</text>`;
+    }
+
+    // Function curve
+    let pathD = '';
+    let started = false;
+    for (const p of pts) {
+        if (p.y === null) { started = false; continue; }
+        const cx = toX(p.x).toFixed(2);
+        const cy = toY(p.y).toFixed(2);
+        if (!started) { pathD += `M${cx},${cy}`; started = true; } else pathD += `L${cx},${cy}`;
+    }
+
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="background:${bg};border-radius:6px;border:1px solid ${border}">
+        ${gridLines}
+        ${axes}
+        <path d="${pathD}" fill="none" stroke="${accent}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        ${labels}
+    </svg>`;
+}
+
+// ── FIX: descarga directa como .html (no print dialog) ──
+function _downloadHTMLasPDF(htmlContent, filename) {
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+// ── exportHistoryPDF: descarga HTML con gráficos SVG inline ──
 function exportHistoryPDF() {
     if (!LicenseManager.isPro) { alert('Exportar PDF es exclusivo de PRO'); return; }
     if (history.length === 0) { alert('No hay cálculos en el historial'); return; }
+
+    const _v = (ThemeManager.themes[ThemeManager.current || 'dark'] || ThemeManager.themes.dark).vars;
+    const _css = `*{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-sizing:border-box;margin:0;padding:0}
+body{background:${_v['--bg']};color:${_v['--text']};font-family:'JetBrains Mono',monospace;padding:30px;max-width:800px;margin:0 auto}
+h1{font-family:'Syne',sans-serif;font-size:22px;color:${_v['--accent']};margin-bottom:5px}
+.sub{font-size:11px;color:${_v['--text3']};margin-bottom:25px}
+.entry{border-bottom:1px solid ${_v['--border']};padding-bottom:18px;margin-bottom:22px}
+.entry:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.label{font-size:12px;color:${_v['--text2']};text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.value{font-size:28px;font-weight:700;color:${_v['--text']};margin-bottom:20px;word-break:break-all}
+.step{background:${_v['--surface']};border:1px solid ${_v['--border']};border-radius:6px;padding:8px 12px;margin-bottom:4px;font-size:12px;color:${_v['--text']}}
+.steps-title{font-size:12px;color:${_v['--text3']};margin-bottom:8px;margin-top:20px;text-transform:uppercase;letter-spacing:1px}
+.footer{margin-top:30px;padding-top:15px;border-top:1px solid ${_v['--border']};font-size:10px;color:${_v['--text3']};text-align:center}
+.badge{display:inline-block;background:${_v['--accent2']};color:${_v['--bg']};font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;margin-left:8px}`;
+
     let html = '';
     history.forEach((h, idx) => {
-        html += `<div style="margin-bottom:20px;padding-bottom:15px;${idx < history.length - 1 ? 'border-bottom:1px solid #2a3040' : ''}">
-            <div style="font-size:11px;color:#4a5570;margin-bottom:2px">${h.module} · ${h.key} · ${h.time}</div>
-            <div style="font-size:13px;color:#8a97b0;margin-bottom:4px">${h.label || ''}</div>
-            <div style="font-size:22px;font-weight:700;color:#e8edf5">${h.val}</div>
+        const canPlot = h.key === 'func' || h.key === 'quadratic' || (h.key === 'eq' && h.expr && /x/.test(h.expr));
+        let chartImg = null;
+        if (canPlot) {
+            let plotExpr = h.expr || (h.label ? h.label.replace('f(x) = ', '') : '');
+            if (h.key === 'eq' && plotExpr.includes('=')) {
+                plotExpr = plotExpr.split('=')[0].trim();
+            }
+            plotExpr = plotExpr.replace(/²/g, '^2').replace(/π/g, 'pi');
+            if (plotExpr && /x/.test(plotExpr)) {
+                chartImg = renderFunctionToSVG(plotExpr, 500, 250, _v);
+            }
+        }
+        const chartHtml = chartImg
+            ? `<div style="margin:20px 0;text-align:center">${chartImg}</div>`
+            : '';
+        let stepsHtml = '';
+        if (h.steps && h.steps.length) {
+            stepsHtml = `<div class="steps-title">Pasos de resolución</div>`;
+            h.steps.forEach(s => stepsHtml += `<div class="step">${s}</div>`);
+        }
+        html += `<div class="entry">
+            <div class="label">${h.module} · ${h.key} · ${h.time}</div>
+            <div style="font-size:13px;color:${_v['--text2']};margin-bottom:4px">${h.label || ''}</div>
+            <div class="value">${h.val}</div>
+            ${chartHtml}${stepsHtml}
         </div>`;
     });
-    const isPro = LicenseManager.isPro;
-    const w = window.open('', '_blank');
-    if (!w) { alert('Permite ventanas emergentes para exportar PDF'); return; }
-    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SumaMente - Historial</title><style>
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{background:#0a0b0e;color:#e8edf5;font-family:'JetBrains Mono',monospace;padding:30px;max-width:800px;margin:0 auto}
-        h1{font-family:'Syne',sans-serif;font-size:22px;color:#4f9cf9;margin-bottom:5px}
-        .sub{font-size:11px;color:#4a5570;margin-bottom:25px}
-        .footer{margin-top:30px;padding-top:15px;border-top:1px solid #2a3040;font-size:10px;color:#4a5570;text-align:center}
-        .badge{display:inline-block;background:#38e8c8;color:#0a0b0e;font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;margin-left:8px}
-        @media print{body{padding:15px}@page{margin:1.5cm}}
-    </style></head><body>
-    <h1>SumaMente${isPro ? ' <span class="badge">PRO</span>' : ''}</h1>
+
+    const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SumaMente - Historial</title><style>${_css}</style></head><body style="background:${_v['--bg']};color:${_v['--text']};padding:30px;font-family:'JetBrains Mono',monospace">
+    <h1 style="font-family:'Syne',sans-serif;font-size:22px;color:${_v['--accent']};margin-bottom:5px">SumaMente${LicenseManager.isPro ? ' <span class="badge">PRO</span>' : ''}</h1>
     <div class="sub">Historial completo · ${history.length} cálculos · ${new Date().toLocaleString('es-AR')}</div>
     ${html}
-    <div class="footer">Generado por SumaMente Cientifica</div></body></html>`);
+    <div class="footer">Generado por SumaMente Cientifica</div></body></html>`;
+
+    const w = window.open('', '_blank');
+    if (!w) { alert('Permite ventanas emergentes para exportar PDF'); return; }
+    w.document.write(fullHTML);
     w.document.close();
     setTimeout(() => { w.focus(); w.print(); }, 500);
 }
 
+// ── exportResultPDF: descarga directa ──
 function exportResultPDF(module, key, val, label, steps, chartImg) {
     if (typeof steps === 'string' && steps.startsWith('%')) {
         try { steps = JSON.parse(decodeURIComponent(steps)); } catch(e) { steps = []; }
     }
     if (!Array.isArray(steps)) steps = [];
-    const w = window.open('', '_blank');
-    if (!w) { alert('Permite ventanas emergentes para exportar PDF'); return; }
-    const isPro = LicenseManager.isPro;
+
     const date = new Date().toLocaleString('es-AR');
-    const chartHtml = chartImg ? `<div style="margin:20px 0;text-align:center"><img src="${chartImg}" style="max-width:100%;border-radius:8px;border:1px solid #2a3040"></div>` : '';
-    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SumaMente - ${label}</title><style>
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{background:#0a0b0e;color:#e8edf5;font-family:'JetBrains Mono',monospace;padding:30px;max-width:800px;margin:0 auto}
-        h1{font-family:'Syne',sans-serif;font-size:22px;color:#4f9cf9;margin-bottom:5px}
-        .sub{font-size:11px;color:#4a5570;margin-bottom:25px}
-        .label{font-size:12px;color:#8a97b0;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
-        .value{font-size:28px;font-weight:700;color:#e8edf5;margin-bottom:20px;word-break:break-all}
-        .step{background:#111318;border:1px solid #2a3040;border-radius:6px;padding:8px 12px;margin-bottom:4px;font-size:12px;color:#e8edf5}
-        .steps-title{font-size:12px;color:#4a5570;margin-bottom:8px;margin-top:20px;text-transform:uppercase;letter-spacing:1px}
-        .footer{margin-top:30px;padding-top:15px;border-top:1px solid #2a3040;font-size:10px;color:#4a5570;text-align:center}
-        .badge{display:inline-block;background:#38e8c8;color:#0a0b0e;font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;margin-left:8px}
-        @media print{body{padding:15px}@page{margin:1.5cm}}
-    </style></head><body>
-    <h1>SumaMente${isPro ? ' <span class="badge">PRO</span>' : ''}</h1>
+    const _v = (ThemeManager.themes[ThemeManager.current || 'dark'] || ThemeManager.themes.dark).vars;
+    const _css = `*{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-sizing:border-box;margin:0;padding:0}
+body{background:${_v['--bg']};color:${_v['--text']};font-family:'JetBrains Mono',monospace;padding:30px;max-width:800px;margin:0 auto}
+h1{font-family:'Syne',sans-serif;font-size:22px;color:${_v['--accent']};margin-bottom:5px}
+.sub{font-size:11px;color:${_v['--text3']};margin-bottom:25px}
+.label{font-size:12px;color:${_v['--text2']};text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.value{font-size:28px;font-weight:700;color:${_v['--text']};margin-bottom:20px;word-break:break-all}
+.step{background:${_v['--surface']};border:1px solid ${_v['--border']};border-radius:6px;padding:8px 12px;margin-bottom:4px;font-size:12px;color:${_v['--text']}}
+.steps-title{font-size:12px;color:${_v['--text3']};margin-bottom:8px;margin-top:20px;text-transform:uppercase;letter-spacing:1px}
+.footer{margin-top:30px;padding-top:15px;border-top:1px solid ${_v['--border']};font-size:10px;color:${_v['--text3']};text-align:center}
+.badge{display:inline-block;background:${_v['--accent2']};color:${_v['--bg']};font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;margin-left:8px}`;
+    const chartHtml = chartImg
+        ? `<div style="margin:20px 0;text-align:center"><img src="${chartImg}" style="max-width:100%;border-radius:8px;border:1px solid ${_v['--border']}"></div>`
+        : '';
+    let stepsHtml = '';
+    if (steps.length) {
+        stepsHtml = `<div class="steps-title">Pasos de resolución</div>`;
+        steps.forEach(s => stepsHtml += `<div class="step">${s}</div>`);
+    }
+
+    const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SumaMente - ${label}</title><style>${_css}</style></head><body style="background:${_v['--bg']};color:${_v['--text']};padding:30px;font-family:'JetBrains Mono',monospace">
+    <h1 style="font-family:'Syne',sans-serif;font-size:22px;color:${_v['--accent']};margin-bottom:5px">SumaMente${LicenseManager.isPro ? ' <span class="badge">PRO</span>' : ''}</h1>
     <div class="sub">${module} · ${key} · ${date}</div>
     <div class="label">${label}</div>
     <div class="value">${val}</div>
-    ${chartHtml}`);
-    if (steps && steps.length) {
-        w.document.write(`<div class="steps-title">Pasos de resolución</div>`);
-        steps.forEach(s => w.document.write(`<div class="step">${s}</div>`));
-    }
-    w.document.write(`<div class="footer">Generado por SumaMente Cientifica</div></body></html>`);
+    ${chartHtml}${stepsHtml}
+    <div class="footer">Generado por SumaMente Cientifica</div></body></html>`;
+
+    const w = window.open('', '_blank');
+    if (!w) { alert('Permite ventanas emergentes para exportar PDF'); return; }
+    w.document.write(fullHTML);
     w.document.close();
     setTimeout(() => { w.focus(); w.print(); }, 500);
 }
@@ -797,12 +861,12 @@ function calculate(module, key) {
         document.getElementById('steps-' + module).innerHTML = (res.steps || []).map(s => `<div class="step">${s}</div>`).join('');
         if (showSteps) document.getElementById('steps-' + module).classList.add('show');
         renderChart(module, res);
-        addHistory(module, key, formattedMain, res.label);
+        addHistory(module, key, formattedMain, res.label, '', res.steps || []);
 }
 
-function addHistory(module, key, val, label) {
+function addHistory(module, key, val, label, expr, steps) {
     const maxHistory = LicenseManager.isPro ? 500 : 10;
-    history.unshift({ module, key, val, label, time: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) });
+    history.unshift({ module, key, val, label, expr: expr || '', steps: steps || [], time: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) });
     if (history.length > maxHistory) history.pop();
     localStorage.setItem('sumamente_history', JSON.stringify(history));
     renderHistory();
@@ -817,7 +881,94 @@ function renderHistory() {
     if (!history.length) { el.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:10px 0">Sin cálculos aún</div>'; return; }
     const maxHistory = LicenseManager.isPro ? 500 : 10;
     const counter = LicenseManager.isPro ? `${history.length}` : `${history.length}/${maxHistory}`;
-    el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:10px;color:var(--text3)"><span>${counter} cálculos</span>${LicenseManager.isPro ? '<span style="color:var(--accent2)">PRO</span>' : ''}</div>` + history.map(h => `<div class="history-item" onclick="injectHistory('${h.val}')"><div class="history-label">${h.module} · ${h.key} · ${h.time}</div><div class="history-val">${h.val}</div></div>`).join('');
+    el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:10px;color:var(--text3)"><span>${counter} cálculos</span>${LicenseManager.isPro ? '<span style="color:var(--accent2)">PRO</span>' : ''}</div>` + history.map((h, idx) => `<div class="history-item" onclick="showHistoryDetail(${idx})"><div class="history-label">${h.module} · ${h.key} · ${h.time}</div><div class="history-val">${h.val}</div></div>`).join('');
+}
+
+// ── Modal: detalle del historial (PRO) ──
+function showHistoryDetail(idx) {
+    const h = history[idx];
+    if (!h) return;
+    if (!LicenseManager.isPro) {
+        if (currentMode === 'general') {
+            genResult = h.val;
+            document.getElementById('gen-result').textContent = h.val;
+            genExpr = h.expr || '';
+            document.getElementById('gen-expr').textContent = genExpr;
+        }
+        return;
+    }
+
+    let chartSvg = '';
+    const canPlot = h.key === 'func' || h.key === 'quadratic' || (h.key === 'eq' && h.expr && /x/.test(h.expr));
+    if (canPlot) {
+        let plotExpr = h.expr || (h.label ? h.label.replace('f(x) = ', '') : '');
+        if (h.key === 'eq' && plotExpr.includes('=')) plotExpr = plotExpr.split('=')[0].trim();
+        plotExpr = plotExpr.replace(/²/g, '^2').replace(/π/g, 'pi');
+        if (plotExpr && /x/.test(plotExpr)) {
+            const svg = renderFunctionToSVG(plotExpr, 480, 240);
+            if (svg) chartSvg = `<div style="margin:14px 0;text-align:center">${svg}</div>`;
+        }
+    }
+
+    let stepsHtml = '';
+    if (h.steps && h.steps.length) {
+        stepsHtml = `<div style="font-size:11px;color:#4a5570;margin:14px 0 6px;text-transform:uppercase;letter-spacing:1px">Pasos de resolución</div>`;
+        h.steps.forEach(s => stepsHtml += `<div style="background:#111318;border:1px solid #2a3040;border-radius:6px;padding:8px 12px;margin-bottom:4px;font-size:12px;color:#e8edf5">${s}</div>`);
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'history-detail-overlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s';
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
+    const content = document.createElement('div');
+    content.style.cssText = 'background:#181c24;border:1px solid #2a3040;border-radius:12px;padding:24px;max-width:600px;width:90%;max-height:85vh;overflow-y:auto;position:relative';
+    content.innerHTML = `
+        <div style="font-size:11px;color:#4a5570;margin-bottom:2px">${h.module} · ${h.key} · ${h.time}</div>
+        ${h.label ? `<div style="font-size:13px;color:#8a97b0;margin-bottom:8px">${h.label}</div>` : ''}
+        <div style="font-size:22px;font-weight:700;color:#e8edf5;margin-bottom:12px">${escHtml(h.val)}</div>
+        ${chartSvg}
+        ${stepsHtml}
+    `;
+
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'margin-top:16px;display:flex;gap:8px';
+
+    const useBtn = document.createElement('button');
+    useBtn.textContent = 'Usar resultado';
+    useBtn.style.cssText = 'flex:1;padding:10px;background:#4f9cf9;color:#0a0b0e;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer';
+    useBtn.onclick = () => {
+        const el = document.getElementById('gen-result');
+        if (el) el.textContent = h.val;
+        const exprEl = document.getElementById('gen-expr');
+        if (exprEl) exprEl.textContent = h.expr || '';
+        genResult = h.val;
+        genExpr = h.expr || '';
+        overlay.remove();
+    };
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Cerrar';
+    closeBtn.style.cssText = 'padding:10px 16px;background:#1e232f;color:#8a97b0;border:1px solid #2a3040;border-radius:8px;font-size:12px;cursor:pointer';
+    closeBtn.onclick = () => overlay.remove();
+
+    const closeX = document.createElement('button');
+    closeX.textContent = '✕';
+    closeX.style.cssText = 'position:absolute;top:12px;right:12px;background:none;border:none;color:#4a5570;font-size:18px;cursor:pointer';
+    closeX.onclick = () => overlay.remove();
+
+    btnRow.appendChild(useBtn);
+    btnRow.appendChild(closeBtn);
+    content.appendChild(btnRow);
+    content.appendChild(closeX);
+    overlay.appendChild(content);
+    document.body.appendChild(overlay);
+}
+
+function escHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
 }
 
 function clearHistory() { history = []; localStorage.removeItem('sumamente_history'); renderHistory(); }
@@ -1204,7 +1355,8 @@ function genKey(k) {
     document.getElementById('gen-expr').textContent = genExpr; 
 }
 
-function genClear() { genExpr = ''; genResult = '0'; genLastResult = null; document.getElementById('gen-expr').textContent = ''; document.getElementById('gen-result').textContent = '0'; const cv = document.getElementById('chart-canvas-general'); if (cv) cv.style.display = 'none'; document.getElementById('graph-controls').style.display = 'none'; const pdfBtn = document.getElementById('gen-pdf-btn'); if (pdfBtn) pdfBtn.style.display = 'none'; }
+function showGenPDFBtn() {}
+function genClear() { genExpr = ''; genResult = '0'; genLastResult = null; document.getElementById('gen-expr').textContent = ''; document.getElementById('gen-result').textContent = '0'; const cv = document.getElementById('chart-canvas-general'); if (cv) cv.style.display = 'none'; document.getElementById('graph-controls').style.display = 'none'; }
 function genBack() { genExpr = genExpr.slice(0, -1); document.getElementById('gen-expr').textContent = genExpr; }
 function genNegate() { genKey('-'); }
 // Evaluador matemático seguro (sin eval/Function)
@@ -1214,11 +1366,11 @@ function safeMathEval(expr, vars) {
         let prepared = expr;
         if (vars.x !== undefined && expr.includes('x')) {
             prepared = prepared.replace(/(\d|\))x/g, '$1*x').replace(/x(\d)/g, 'x*$1');
-            prepared = prepared.replace(/x/g, vars.x);
+            prepared = prepared.replace(/x/g, '(' + vars.x + ')');
         }
         if (vars.y !== undefined && expr.includes('y')) {
             prepared = prepared.replace(/(\d|\))y/g, '$1*y').replace(/y(\d)/g, 'y*$1');
-            prepared = prepared.replace(/y/g, vars.y);
+            prepared = prepared.replace(/y/g, '(' + vars.y + ')');
         }
         prepared = prepared.replace(/\^/g, '**');
         if (prepared !== expr && !(angleMode === 'deg' && /(sin|cos|tan)\(/.test(expr))) {
@@ -1389,377 +1541,9 @@ function safeMathEval(expr, vars) {
     return evalStack[0];
 }
 
-function genPlotFunc(expr, preserveView) {
-    const canvas = document.getElementById('chart-canvas-general');
-    if (!canvas) {
-        return;
-    }
-    const ctx = canvas.getContext('2d');
-    const containerWidth = canvas.parentElement.clientWidth - 28; // padding
-    const w = containerWidth;
-    const h = 250;
-    const margin = 40;
-    const plotW = w - margin * 2;
-    const plotH = h - margin * 2;
-    let minX = plotMinX, maxX = plotMaxX;
-    let minY = plotMinY, maxY = plotMaxY;
-    
-    // Calcular puntos de la función
-    const points = [];
-    const steps = 400;
-    for (let i = 0; i <= steps; i++) {
-        const x = minX + (maxX - minX) * i / steps;
-        try {
-            const y = safeMathEval(expr, { x });
-            if (isFinite(y)) points.push({ x, y });
-            else points.push({ x, y: null });
-        } catch(e) { points.push({ x, y: null }); }
-    }
-    
-    // Ajustar rango Y basado en los puntos (con recorte de outliers)
-    let allY = points.filter(p => p.y !== null).map(p => p.y);
-    if (preserveView) {
-        // Usar el rango Y predefinido (para parábolas)
-        minY = plotMinY;
-        maxY = plotMaxY;
-    } else if (allY.length > 0) {
-        if (allY.length > 10) {
-            const sorted = [...allY].sort((a, b) => a - b);
-            const lo = sorted[Math.floor(sorted.length * 0.02)];
-            const hi = sorted[Math.ceil(sorted.length * 0.98)];
-            minY = Math.min(lo, ...sorted.slice(Math.floor(sorted.length * 0.1), Math.ceil(sorted.length * 0.9)));
-            maxY = Math.max(hi, ...sorted.slice(Math.floor(sorted.length * 0.1), Math.ceil(sorted.length * 0.9)));
-        } else {
-            minY = Math.min(...allY);
-            maxY = Math.max(...allY);
-        }
-        const range = maxY - minY || 1;
-        minY -= range * 0.1;
-        maxY += range * 0.1;
-    }
-    
-    canvas.style.display = 'block';
-    canvas.width = w * (window.devicePixelRatio || 1);
-    canvas.height = h * (window.devicePixelRatio || 1);
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
-    ctx.clearRect(0, 0, w, h);
-    
-    // Funciones de conversión
-    const toCanvasX = (x) => margin + (x - minX) / (maxX - minX) * plotW;
-    const toCanvasY = (y) => margin + (maxY - y) / (maxY - minY) * plotH;
-    
-    // Dibujar fondo
-    ctx.fillStyle = 'rgba(30, 32, 40, 0.8)';
-    ctx.fillRect(0, 0, w, h);
-    
-    // Calcular paso para la grilla (1, 2, 5, 10, etc.)
-    const xRange = maxX - minX;
-    const yRange = maxY - minY;
-    const xStep = Math.pow(10, Math.floor(Math.log10(xRange / 5)));
-    const yStep = Math.pow(10, Math.floor(Math.log10(yRange / 5)));
-    
-    // Dibujar grilla menor
-    ctx.strokeStyle = 'rgba(74, 85, 112, 0.3)';
-    ctx.lineWidth = 0.5;
-    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep / 2) {
-        const cx = toCanvasX(x);
-        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
-    }
-    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep / 2) {
-        const cy = toCanvasY(y);
-        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
-    }
-    
-    // Dibujar grilla principal
-    ctx.strokeStyle = 'rgba(74, 85, 112, 0.6)';
-    ctx.lineWidth = 1;
-    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
-        const cx = toCanvasX(x);
-        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
-    }
-    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
-        const cy = toCanvasY(y);
-        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
-    }
-    
-    // Dibujar ejes principales
-    ctx.strokeStyle = '#8a97b0';
-    ctx.lineWidth = 2;
-    // Eje X (en y=0)
-    if (minY <= 0 && maxY >= 0) {
-        const cy = toCanvasY(0);
-        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
-    }
-    // Eje Y (en x=0)
-    if (minX <= 0 && maxX >= 0) {
-        const cx = toCanvasX(0);
-        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
-    }
-    
-    // Dibujar números en los ejes
-    ctx.fillStyle = '#8a97b0';
-    ctx.font = '10px JetBrains Mono';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
-        if (Math.abs(x) < 0.001) continue; // Saltar el origen
-        const cx = toCanvasX(x);
-        const cy = minY <= 0 && maxY >= 0 ? toCanvasY(0) : margin + plotH;
-        ctx.fillText(parseFloat(x.toPrecision(3)).toString(), cx, cy + 5);
-    }
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
-        if (Math.abs(y) < 0.001) continue; // Saltar el origen
-        const cy = toCanvasY(y);
-        const cx = minX <= 0 && maxX >= 0 ? toCanvasX(0) : margin;
-        ctx.fillText(parseFloat(y.toPrecision(3)).toString(), cx - 5, cy);
-    }
-    
-    // Dibujar origen
-    if (minX <= 0 && maxX >= 0 && minY <= 0 && maxY >= 0) {
-        ctx.fillText('0', toCanvasX(0) - 5, toCanvasY(0) + 5);
-    }
-    
-    // Dibujar etiquetas de ejes
-    ctx.fillStyle = '#4f9cf9';
-    ctx.font = 'bold 12px JetBrains Mono';
-    ctx.textAlign = 'right';
-    ctx.fillText('x', w - margin, toCanvasY(0) - 10);
-    ctx.textAlign = 'left';
-    ctx.fillText('y', toCanvasX(0) + 10, margin + 10);
-    
-    // Dibujar la función
-    ctx.strokeStyle = '#4f9cf9';
-    ctx.lineWidth = 2.5;
-    ctx.shadowColor = '#4f9cf9';
-    ctx.shadowBlur = 10;
-    ctx.beginPath();
-    let started = false;
-    for (const p of points) {
-        if (p.y === null) { started = false; continue; }
-        const cx = toCanvasX(p.x), cy = toCanvasY(p.y);
-        if (!started) { ctx.moveTo(cx, cy); started = true; }
-        else ctx.lineTo(cx, cy);
-    }
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-    
-    // Setup event listeners for zoom and pan
-    currentPlotExpr = expr;
-    currentPlotType = 'function';
-    setupCanvasInteractivity(canvas, expr);
-    
-    // Mostrar controles
-    document.getElementById('graph-controls').style.display = 'flex';
-}
 
-function setupCanvasInteractivity(canvas, expr) {
-    // Remove existing listeners to avoid duplicates
-    canvas.onwheel = null;
-    canvas.onmousedown = null;
-    canvas.onmousemove = null;
-    canvas.onmouseup = null;
-    canvas.onmouseleave = null;
-    
-    // Zoom with mouse wheel
-    canvas.onwheel = (e) => {
-        e.preventDefault();
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        
-        const w = canvas.width / (window.devicePixelRatio || 1);
-        const h = canvas.height / (window.devicePixelRatio || 1);
-        const margin = 40;
-        const plotW = w - margin * 2;
-        const plotH = h - margin * 2;
-        
-        // Convert mouse position to graph coordinates
-        const graphX = plotMinX + (mouseX - margin) / plotW * (plotMaxX - plotMinX);
-        const graphY = plotMaxY - (mouseY - margin) / plotH * (plotMaxY - plotMinY);
-        
-        // Zoom factor
-        const zoomFactor = e.deltaY > 0 ? 1.1 : 0.9;
-        
-        // Calculate new ranges keeping mouse point fixed
-        const newRangeX = (plotMaxX - plotMinX) * zoomFactor;
-        const newRangeY = (plotMaxY - plotMinY) * zoomFactor;
-        
-        plotMinX = graphX - (graphX - plotMinX) * zoomFactor;
-        plotMaxX = plotMinX + newRangeX;
-        plotMinY = graphY - (graphY - plotMinY) * zoomFactor;
-        plotMaxY = plotMinY + newRangeY;
-        
-        // Redibujar según el tipo de gráfico actual
-        if (currentPlotType === 'equation') {
-            genPlotEquation(currentPlotExpr);
-        } else if (currentPlotType === 'system') {
-            const eqs = currentPlotExpr.split(',').map(s => s.trim());
-            if (eqs.length === 2) genPlotSystem2x2(eqs[0], eqs[1]);
-        } else {
-            genPlotFunc(currentPlotExpr);
-        }
-    };
-    
-    // Pan with mouse drag
-    canvas.onmousedown = (e) => {
-        plotDragging = true;
-        plotLastX = e.clientX;
-        plotLastY = e.clientY;
-        canvas.style.cursor = 'grabbing';
-    };
-    
-    canvas.onmousemove = (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        
-        const w = canvas.width / (window.devicePixelRatio || 1);
-        const h = canvas.height / (window.devicePixelRatio || 1);
-        const margin = 40;
-        const plotW = w - margin * 2;
-        const plotH = h - margin * 2;
-        
-        // Update coordinates display
-        if (mouseX >= margin && mouseX <= w - margin && mouseY >= margin && mouseY <= h - margin) {
-            const graphX = plotMinX + (mouseX - margin) / plotW * (plotMaxX - plotMinX);
-            const graphY = plotMaxY - (mouseY - margin) / plotH * (plotMaxY - plotMinY);
-            document.getElementById('graph-coords').textContent = 
-                `x: ${graphX.toFixed(2)}, y: ${graphY.toFixed(2)}`;
-        }
-        
-        if (!plotDragging) return;
-        
-        const dx = e.clientX - plotLastX;
-        const dy = e.clientY - plotLastY;
-        
-        // Convert pixel movement to graph coordinates
-        const graphDx = -dx / plotW * (plotMaxX - plotMinX);
-        const graphDy = dy / plotH * (plotMaxY - plotMinY);
-        
-        plotMinX += graphDx;
-        plotMaxX += graphDx;
-        plotMinY += graphDy;
-        plotMaxY += graphDy;
-        
-        plotLastX = e.clientX;
-        plotLastY = e.clientY;
-        
-        // Redibujar según el tipo de gráfico actual
-        if (currentPlotType === 'equation') {
-            genPlotEquation(currentPlotExpr);
-        } else if (currentPlotType === 'system') {
-            const eqs = currentPlotExpr.split(',').map(s => s.trim());
-            if (eqs.length === 2) genPlotSystem2x2(eqs[0], eqs[1]);
-        } else {
-            genPlotFunc(currentPlotExpr);
-        }
-    };
-    
-    canvas.onmouseup = () => {
-        plotDragging = false;
-        canvas.style.cursor = 'default';
-    };
-    
-    canvas.onmouseleave = () => {
-        plotDragging = false;
-        canvas.style.cursor = 'default';
-    };
-    
-    // Touch support for mobile
-    canvas.ontouchstart = (e) => {
-        if (e.touches.length === 1) {
-            plotDragging = true;
-            plotLastX = e.touches[0].clientX;
-            plotLastY = e.touches[0].clientY;
-        }
-    };
-    
-    canvas.ontouchmove = (e) => {
-        if (!plotDragging || e.touches.length !== 1) return;
-        e.preventDefault();
-        
-        const dx = e.touches[0].clientX - plotLastX;
-        const dy = e.touches[0].clientY - plotLastY;
-        
-        const w = canvas.width / (window.devicePixelRatio || 1);
-        const h = canvas.height / (window.devicePixelRatio || 1);
-        const margin = 40;
-        const plotW = w - margin * 2;
-        const plotH = h - margin * 2;
-        
-        const graphDx = -dx / plotW * (plotMaxX - plotMinX);
-        const graphDy = dy / plotH * (plotMaxY - plotMinY);
-        
-        plotMinX += graphDx;
-        plotMaxX += graphDx;
-        plotMinY += graphDy;
-        plotMaxY += graphDy;
-        
-        plotLastX = e.touches[0].clientX;
-        plotLastY = e.touches[0].clientY;
-        
-        // Redibujar según el tipo de gráfico actual
-        if (currentPlotType === 'equation') {
-            genPlotEquation(currentPlotExpr);
-        } else {
-            genPlotFunc(currentPlotExpr);
-        }
-    };
-    
-    canvas.ontouchend = () => {
-        plotDragging = false;
-    };
-    
-    // Pinch zoom for mobile
-    let lastPinchDist = 0;
-    canvas.ontouchstart = (e) => {
-        if (e.touches.length === 2) {
-            lastPinchDist = Math.hypot(
-                e.touches[0].clientX - e.touches[1].clientX,
-                e.touches[0].clientY - e.touches[1].clientY
-            );
-        }
-    };
-    
-    canvas.ontouchmove = (e) => {
-        if (e.touches.length !== 2) return;
-        e.preventDefault();
-        
-        const dist = Math.hypot(
-            e.touches[0].clientX - e.touches[1].clientX,
-            e.touches[0].clientY - e.touches[1].clientY
-        );
-        
-        if (lastPinchDist > 0) {
-            const zoomFactor = lastPinchDist / dist;
-            const centerX = (plotMinX + plotMaxX) / 2;
-            const centerY = (plotMinY + plotMaxY) / 2;
-            
-            const newRangeX = (plotMaxX - plotMinX) * zoomFactor;
-            const newRangeY = (plotMaxY - plotMinY) * zoomFactor;
-            
-            plotMinX = centerX - newRangeX / 2;
-            plotMaxX = centerX + newRangeX / 2;
-            plotMinY = centerY - newRangeY / 2;
-            plotMaxY = centerY + newRangeY / 2;
-            
-        // Redibujar según el tipo de gráfico actual
-        if (currentPlotType === 'equation') {
-            genPlotEquation(currentPlotExpr);
-        } else if (currentPlotType === 'system') {
-            const eqs = currentPlotExpr.split(',').map(s => s.trim());
-            if (eqs.length === 2) genPlotSystem2x2(eqs[0], eqs[1]);
-        } else {
-            genPlotFunc(currentPlotExpr);
-        }
-        }
-        
-        lastPinchDist = dist;
-    };
-}
+
+
 
 // ── Sistema de ecuaciones 2×2 ──
 
@@ -1879,439 +1663,11 @@ function solveSystem2x2(eq1, eq2) {
     return steps;
 }
 
-function genPlotSystem2x2(eq1, eq2) {
-    const p1 = parseLinearEq(eq1);
-    const p2 = parseLinearEq(eq2);
-    if (!p1 || !p2) return;
-    
-    const canvas = document.getElementById('chart-canvas-general');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const w = canvas.parentElement.clientWidth - 28;
-    const h = 250;
-    const margin = 40;
-    const plotW = w - margin * 2;
-    const plotH = h - margin * 2;
-    
-    // Compute points: y = (c - a*x) / b for each equation
-    const points1 = [], points2 = [];
-    const steps = 400;
-    for (let i = 0; i <= steps; i++) {
-        const x = plotMinX + (plotMaxX - plotMinX) * i / steps;
-        const y1 = p1.b !== 0 ? (p1.c - p1.a * x) / p1.b : NaN;
-        const y2 = p2.b !== 0 ? (p2.c - p2.a * x) / p2.b : NaN;
-        if (isFinite(y1)) points1.push({ x, y: y1 });
-        if (isFinite(y2)) points2.push({ x, y: y2 });
-    }
-    
-    const allY = [...points1, ...points2].filter(p => isFinite(p.y)).map(p => p.y);
-    if (allY.length === 0) return;
-    let minY = Math.min(...allY), maxY = Math.max(...allY);
-    const range = maxY - minY || 1;
-    minY -= range * 0.1; maxY += range * 0.1;
-    plotMinY = minY; plotMaxY = maxY;
-    
-    canvas.style.display = 'block';
-    canvas.width = w * (window.devicePixelRatio || 1);
-    canvas.height = h * (window.devicePixelRatio || 1);
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
-    ctx.clearRect(0, 0, w, h);
-    
-    const toX = (x) => margin + (x - plotMinX) / (plotMaxX - plotMinX) * plotW;
-    const toY = (y) => margin + (plotMaxY - y) / (plotMaxY - plotMinY) * plotH;
-    
-    ctx.fillStyle = 'rgba(30, 32, 40, 0.8)';
-    ctx.fillRect(0, 0, w, h);
-    
-    // Calcular paso para la grilla
-    const xRange = plotMaxX - plotMinX;
-    const yRange = plotMaxY - plotMinY;
-    const xStep = Math.pow(10, Math.floor(Math.log10(xRange / 5)));
-    const yStep = Math.pow(10, Math.floor(Math.log10(yRange / 5)));
-    
-    // Grilla menor
-    ctx.strokeStyle = 'rgba(74, 85, 112, 0.3)';
-    ctx.lineWidth = 0.5;
-    for (let x = Math.ceil(plotMinX / xStep) * xStep; x <= plotMaxX; x += xStep / 2) {
-        const cx = toX(x);
-        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
-    }
-    for (let y = Math.ceil(plotMinY / yStep) * yStep; y <= plotMaxY; y += yStep / 2) {
-        const cy = toY(y);
-        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
-    }
-    
-    // Grilla principal
-    ctx.strokeStyle = 'rgba(74, 85, 112, 0.6)';
-    ctx.lineWidth = 1;
-    for (let x = Math.ceil(plotMinX / xStep) * xStep; x <= plotMaxX; x += xStep) {
-        const cx = toX(x);
-        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
-    }
-    for (let y = Math.ceil(plotMinY / yStep) * yStep; y <= plotMaxY; y += yStep) {
-        const cy = toY(y);
-        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
-    }
-    
-    // Ejes principales
-    ctx.strokeStyle = '#8a97b0';
-    ctx.lineWidth = 2;
-    if (plotMinY <= 0 && plotMaxY >= 0) {
-        const cy = toY(0);
-        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
-    }
-    if (plotMinX <= 0 && plotMaxX >= 0) {
-        const cx = toX(0);
-        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
-    }
-    
-    // Números en los ejes
-    ctx.fillStyle = '#8a97b0';
-    ctx.font = '10px JetBrains Mono';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    for (let x = Math.ceil(plotMinX / xStep) * xStep; x <= plotMaxX; x += xStep) {
-        if (Math.abs(x) < 0.001) continue;
-        ctx.fillText(parseFloat(x.toPrecision(3)).toString(), toX(x), (plotMinY <= 0 && plotMaxY >= 0 ? toY(0) : margin + plotH) + 5);
-    }
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    for (let y = Math.ceil(plotMinY / yStep) * yStep; y <= plotMaxY; y += yStep) {
-        if (Math.abs(y) < 0.001) continue;
-        ctx.fillText(parseFloat(y.toPrecision(3)).toString(), (plotMinX <= 0 && plotMaxX >= 0 ? toX(0) : margin) - 5, toY(y));
-    }
-    if (plotMinX <= 0 && plotMaxX >= 0 && plotMinY <= 0 && plotMaxY >= 0) {
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'top';
-        ctx.fillText('0', toX(0) - 5, toY(0) + 5);
-    }
-    
-    // Etiquetas de ejes
-    ctx.fillStyle = '#4f9cf9';
-    ctx.font = 'bold 12px JetBrains Mono';
-    ctx.textAlign = 'right';
-    ctx.fillText('x', margin + plotW, (plotMinY <= 0 && plotMaxY >= 0 ? toY(0) : margin + plotH) - 10);
-    ctx.textAlign = 'left';
-    ctx.fillText('y', (plotMinX <= 0 && plotMaxX >= 0 ? toX(0) : margin) + 10, margin + 10);
-    
-    // Plot line 1
-    if (points1.length > 1) {
-        ctx.strokeStyle = '#4f9cf9';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        let started = false;
-        for (const p of points1) {
-            if (!started) { ctx.moveTo(toX(p.x), toY(p.y)); started = true; }
-            else ctx.lineTo(toX(p.x), toY(p.y));
-        }
-        ctx.stroke();
-        ctx.fillStyle = '#4f9cf9';
-        ctx.font = '11px monospace';
-        ctx.fillText('①', toX(0) + 30, toY(1)+2);
-    }
-    
-    // Plot line 2
-    if (points2.length > 1) {
-        ctx.strokeStyle = '#f9c74f';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        let started = false;
-        for (const p of points2) {
-            if (!started) { ctx.moveTo(toX(p.x), toY(p.y)); started = true; }
-            else ctx.lineTo(toX(p.x), toY(p.y));
-        }
-        ctx.stroke();
-        ctx.fillStyle = '#f9c74f';
-        ctx.font = '11px monospace';
-        ctx.fillText('②', toX(0) + 30, toY(-1)+18);
-    }
-    
-    // Mark intersection
-    const det = p1.a * p2.b - p2.a * p1.b;
-    if (Math.abs(det) >= 1e-12) {
-        const xS = (p1.c * p2.b - p2.c * p1.b) / det;
-        const yS = (p1.a * p2.c - p2.a * p1.c) / det;
-        const cx = toX(xS), cy = toY(yS);
-        ctx.beginPath();
-        ctx.arc(cx, cy, 6, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(79, 252, 124, 0.5)';
-        ctx.fill();
-        ctx.strokeStyle = '#4ffc7c';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        ctx.fillStyle = '#4ffc7c';
-        ctx.font = 'bold 11px monospace';
-        ctx.fillText(`(${xS.toFixed(2)}, ${yS.toFixed(2)})`, cx + 10, cy - 5);
-    }
-    
-    // Setup interactivity
-    currentPlotExpr = eq1 + ', ' + eq2;
-    currentPlotType = 'system';
-    setupCanvasInteractivity(canvas, currentPlotExpr);
-    
-    // Mostrar controles
-    document.getElementById('graph-controls').style.display = 'flex';
-}
 
-function genPlotEquation(equation) {
-    // Separar la ecuación en izquierda y derecha
-    const parts = equation.split('=');
-    if (parts.length !== 2) {
-        return;
-    }
-    
-    const leftExpr = parts[0].trim();
-    const rightExpr = parts[1].trim();
-    
-    const canvas = document.getElementById('chart-canvas-general');
-    if (!canvas) {
-        return;
-    }
-    
-    const ctx = canvas.getContext('2d');
-    const containerWidth = canvas.parentElement.clientWidth - 28;
-    const w = containerWidth;
-    const h = 250;
-    const margin = 40;
-    const plotW = w - margin * 2;
-    const plotH = h - margin * 2;
-    let minX = plotMinX, maxX = plotMaxX;
-    let minY = plotMinY, maxY = plotMaxY;
-    
-    // Calcular puntos para ambas funciones
-    const leftPoints = [];
-    const rightPoints = [];
-    const steps = 400;
-    
-    for (let i = 0; i <= steps; i++) {
-        const x = parseFloat((minX + (maxX - minX) * i / steps).toPrecision(10));
-        try {
-            const y1 = safeMathEval(leftExpr, { x });
-            const y2 = safeMathEval(rightExpr, { x });
-            if (isFinite(y1)) leftPoints.push({ x, y: y1 });
-            else leftPoints.push({ x, y: null });
-            if (isFinite(y2)) rightPoints.push({ x, y: y2 });
-            else rightPoints.push({ x, y: null });
-        } catch(e) {
-            leftPoints.push({ x, y: null });
-            rightPoints.push({ x, y: null });
-        }
-    }
-    
-    // Ajustar rango Y basado en todos los puntos
-    const allY = [...leftPoints, ...rightPoints].filter(p => p.y !== null).map(p => p.y);
-    if (allY.length > 0) {
-        minY = Math.min(...allY);
-        maxY = Math.max(...allY);
-        const range = maxY - minY || 1;
-        minY -= range * 0.1;
-        maxY += range * 0.1;
-    }
-    
-    canvas.style.display = 'block';
-    canvas.width = w * (window.devicePixelRatio || 1);
-    canvas.height = h * (window.devicePixelRatio || 1);
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
-    ctx.clearRect(0, 0, w, h);
-    
-    const toCanvasX = (x) => margin + (x - minX) / (maxX - minX) * plotW;
-    const toCanvasY = (y) => margin + (maxY - y) / (maxY - minY) * plotH;
-    
-    // Fondo
-    ctx.fillStyle = 'rgba(30, 32, 40, 0.8)';
-    ctx.fillRect(0, 0, w, h);
-    
-    // Grilla
-    const xRange = maxX - minX;
-    const yRange = maxY - minY;
-    const xStep = Math.pow(10, Math.floor(Math.log10(xRange / 5)));
-    const yStep = Math.pow(10, Math.floor(Math.log10(yRange / 5)));
-    
-    ctx.strokeStyle = 'rgba(74, 85, 112, 0.3)';
-    ctx.lineWidth = 0.5;
-    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep / 2) {
-        const cx = toCanvasX(x);
-        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
-    }
-    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep / 2) {
-        const cy = toCanvasY(y);
-        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
-    }
-    
-    ctx.strokeStyle = 'rgba(74, 85, 112, 0.6)';
-    ctx.lineWidth = 1;
-    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
-        const cx = toCanvasX(x);
-        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
-    }
-    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
-        const cy = toCanvasY(y);
-        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
-    }
-    
-    // Ejes
-    ctx.strokeStyle = '#8a97b0';
-    ctx.lineWidth = 2;
-    if (minY <= 0 && maxY >= 0) {
-        const cy = toCanvasY(0);
-        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
-    }
-    if (minX <= 0 && maxX >= 0) {
-        const cx = toCanvasX(0);
-        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
-    }
-    
-    // Números
-    ctx.fillStyle = '#8a97b0';
-    ctx.font = '10px JetBrains Mono';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
-        if (Math.abs(x) < 0.001) continue;
-        const cx = toCanvasX(x);
-        const cy = minY <= 0 && maxY >= 0 ? toCanvasY(0) : margin + plotH;
-        ctx.fillText(parseFloat(x.toPrecision(3)).toString(), cx, cy + 5);
-    }
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
-        if (Math.abs(y) < 0.001) continue;
-        const cy = toCanvasY(y);
-        const cx = minX <= 0 && maxX >= 0 ? toCanvasX(0) : margin;
-        ctx.fillText(parseFloat(y.toPrecision(3)).toString(), cx - 5, cy);
-    }
-    
-    // Etiquetas
-    ctx.fillStyle = '#4f9cf9';
-    ctx.font = 'bold 12px JetBrains Mono';
-    ctx.textAlign = 'right';
-    ctx.fillText('x', w - margin, toCanvasY(0) - 10);
-    ctx.textAlign = 'left';
-    ctx.fillText('y', toCanvasX(0) + 10, margin + 10);
-    
-    // Graficar función izquierda (azul)
-    ctx.strokeStyle = '#4f9cf9';
-    ctx.lineWidth = 2.5;
-    ctx.shadowColor = '#4f9cf9';
-    ctx.shadowBlur = 10;
-    ctx.beginPath();
-    let started = false;
-    for (const p of leftPoints) {
-        if (p.y === null) { started = false; continue; }
-        const cx = toCanvasX(p.x), cy = toCanvasY(p.y);
-        if (!started) { ctx.moveTo(cx, cy); started = true; }
-        else ctx.lineTo(cx, cy);
-    }
-    ctx.stroke();
-    
-    // Graficar función derecha (naranja)
-    ctx.strokeStyle = '#f97b4f';
-    ctx.shadowColor = '#f97b4f';
-    ctx.beginPath();
-    started = false;
-    for (const p of rightPoints) {
-        if (p.y === null) { started = false; continue; }
-        const cx = toCanvasX(p.x), cy = toCanvasY(p.y);
-        if (!started) { ctx.moveTo(cx, cy); started = true; }
-        else ctx.lineTo(cx, cy);
-    }
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-    
-    // Encontrar intersección
-    let intersection = null;
-    for (let i = 0; i < leftPoints.length - 1; i++) {
-        const p1 = leftPoints[i];
-        const p2 = leftPoints[i + 1];
-        const q1 = rightPoints[i];
-        const q2 = rightPoints[i + 1];
-        
-        if (p1.y !== null && p2.y !== null && q1.y !== null && q2.y !== null) {
-            // Verificar si hay cruce
-            if ((p1.y - q1.y) * (p2.y - q2.y) <= 0) {
-                // Interpolación lineal para encontrar el punto exacto
-                const t = (q1.y - p1.y) / ((p2.y - p1.y) - (q2.y - q1.y));
-                const interX = p1.x + t * (p2.x - p1.x);
-                const interY = p1.y + t * (p2.y - p1.y);
-                intersection = { x: interX, y: interY };
-                break;
-            }
-        }
-    }
-    
-    // Dibujar punto de intersección
-    if (intersection) {
-        const cx = toCanvasX(intersection.x);
-        const cy = toCanvasY(intersection.y);
-        
-        // Círculo con glow
-        ctx.fillStyle = '#4ff97b';
-        ctx.shadowColor = '#4ff97b';
-        ctx.shadowBlur = 15;
-        ctx.beginPath();
-        ctx.arc(cx, cy, 8, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        
-        // Etiqueta de coordenadas
-        ctx.fillStyle = '#4ff97b';
-        ctx.font = 'bold 11px JetBrains Mono';
-        ctx.textAlign = 'left';
-        ctx.fillText(`(${intersection.x.toFixed(2)}, ${intersection.y.toFixed(2)})`, cx + 12, cy - 5);
-        
-        // Agregar al resultado
-        genResult = `x = ${intersection.x.toFixed(3)} | Ecuación graficada`;
-        document.getElementById('gen-result').textContent = genResult;
-    } else {
-        // Si no hay intersección, mostrar mensaje
-        genResult = 'Ecuación graficada';
-        document.getElementById('gen-result').textContent = genResult;
-    }
-    
-    // Leyenda
-    ctx.fillStyle = '#4f9cf9';
-    ctx.fillRect(margin, margin - 25, 15, 15);
-    ctx.fillStyle = '#8a97b0';
-    ctx.font = '10px JetBrains Mono';
-    ctx.textAlign = 'left';
-    ctx.fillText(leftExpr, margin + 20, margin - 15);
-    
-    ctx.fillStyle = '#f97b4f';
-    ctx.fillRect(margin + 150, margin - 25, 15, 15);
-    ctx.fillStyle = '#8a97b0';
-    ctx.fillText(rightExpr, margin + 170, margin - 15);
-    
-    // Setup interactivity
-    currentPlotExpr = equation;
-    currentPlotType = 'equation';
-    setupCanvasInteractivity(canvas, equation);
-    
-    // Mostrar controles
-    document.getElementById('graph-controls').style.display = 'flex';
-}
 
-function resetGraphView() {
-    plotMinX = -10;
-    plotMaxX = 10;
-    plotMinY = -10;
-    plotMaxY = 10;
-    
-    // Re-graficar la última expresión
-    const canvas = document.getElementById('chart-canvas-general');
-    if (canvas.style.display !== 'none') {
-        const expr = currentPlotExpr || document.getElementById('gen-expr').textContent.replace('f(x) = ', '').replace(' =', '');
-        if (expr.includes(',') && expr.includes('=')) {
-            const eqs = expr.split(',').map(s => s.trim());
-            if (eqs.length === 2) genPlotSystem2x2(eqs[0], eqs[1]);
-        } else if (expr.includes('=')) {
-            genPlotEquation(expr);
-        } else if (expr.includes('x')) {
-            genPlotFunc(expr);
-        }
-    }
-}
+
+
+
 
 function parseQuadraticCoefs(expr) {
     let s = expr.replace(/\s+/g, '').replace(/π/g, 'pi');
@@ -2386,10 +1742,7 @@ function analyzeQuadratic(expr) {
     return { steps, h, k, a };
 }
 
-function showGenPDFBtn() {
-    const btn = document.getElementById('gen-pdf-btn');
-    if (btn) btn.style.display = LicenseManager.isPro ? 'block' : 'none';
-}
+
 
 function genEval() {
     try {
@@ -2427,8 +1780,7 @@ function genEval() {
                 sp.classList.add('show');
                 document.getElementById('gen-expr').textContent = genExpr;
                 document.getElementById('gen-result').textContent = genResult || 'Sistema resuelto';
-                addHistory('general', 'system', genResult || 'Sistema resuelto', genExpr);
-                showGenPDFBtn();
+                addHistory('general', 'system', genResult || 'Sistema resuelto', genExpr, genExpr);
                 genExpr = '';
                 genLastResult = null;
                 return;
@@ -2454,8 +1806,7 @@ function genEval() {
                     genResult = `y = (${p.c} - ${p.a}x) / ${p.b}`;
                     document.getElementById('gen-result').textContent = 'y despejada';
                     document.getElementById('gen-expr').textContent = genExpr;
-                    addHistory('general', 'linear2var', genResult, genExpr);
-                    showGenPDFBtn();
+                    addHistory('general', 'linear2var', genResult, genExpr, genExpr);
                     genExpr = '';
                     genLastResult = null;
                     return;
@@ -2474,8 +1825,8 @@ function genEval() {
                 if (sp) sp.classList.add('show');
                 document.getElementById('gen-expr').textContent = genExpr;
                 document.getElementById('gen-result').textContent = genResult || 'Ecuación graficada';
-                addHistory('general', 'eq', genResult || 'Ecuación graficada', genExpr);
-                showGenPDFBtn();
+                const eqSteps = Array.from(sp.querySelectorAll('.step')).map(d => d.innerHTML);
+                addHistory('general', 'eq', genResult || 'Ecuación graficada', genExpr, genExpr, eqSteps);
                 genExpr = '';
                 genLastResult = null;
                 return;
@@ -2489,22 +1840,22 @@ function genEval() {
                     sp.innerHTML = '<details open style="cursor:pointer"><summary style="color:var(--accent);font-weight:700;font-size:12px;padding:4px 0">📐 Análisis de la parábola</summary>' +
                         analysis.steps.map(s => `<div class="step">${s}</div>`).join('') + '</details>';
                     sp.classList.add('show');
-                    // Centrar gráfico en el vértice con rango Y adecuado
+                    // Centrar gráfico en el vértice con rango Y que muestre toda la parábola
                     plotMinX = analysis.h - 6;
                     plotMaxX = analysis.h + 6;
-                    const yPad = Math.max(4, Math.abs(analysis.k) * 0.5);
-                    if (analysis.a > 0) {
-                        plotMinY = analysis.k - yPad;
-                        plotMaxY = analysis.k + yPad * 3;
-                    } else {
-                        plotMinY = analysis.k - yPad * 3;
-                        plotMaxY = analysis.k + yPad;
-                    }
+                    // Calcular Y en los bordes del rango X para que la parábola se vea completa
+                    const yEdge1 = safeMathEval(expr, { x: plotMinX });
+                    const yEdge2 = safeMathEval(expr, { x: plotMaxX });
+                    const yMinActual = Math.min(analysis.k, yEdge1, yEdge2);
+                    const yMaxActual = Math.max(analysis.k, yEdge1, yEdge2);
+                    const yRange = yMaxActual - yMinActual || 1;
+                    plotMinY = yMinActual - yRange * 0.08;
+                    plotMaxY = yMaxActual + yRange * 0.08;
                     genPlotFunc(expr, true);
                     genResult = `Vértice (${parseFloat(analysis.h.toFixed(3))}, ${parseFloat(analysis.k.toFixed(3))})`;
                     document.getElementById('gen-result').textContent = genResult;
                     document.getElementById('gen-expr').textContent = 'f(x) = ' + genExpr;
-                    addHistory('general', 'quadratic', genResult, 'f(x) = ' + genExpr);
+                    addHistory('general', 'quadratic', genResult, 'f(x) = ' + genExpr, genExpr);
                     showGenPDFBtn();
                     genExpr = '';
                     genLastResult = null;
@@ -2518,7 +1869,7 @@ function genEval() {
             genResult = 'f(x) graficada';
             document.getElementById('gen-result').textContent = genResult;
             document.getElementById('gen-expr').textContent = 'f(x) = ' + genExpr;
-            addHistory('general', 'func', 'f(x) graficada', 'f(x) = ' + genExpr);
+            addHistory('general', 'func', 'f(x) graficada', 'f(x) = ' + genExpr, genExpr);
             showGenPDFBtn();
             genExpr = '';
             genLastResult = null;
@@ -2531,7 +1882,7 @@ function genEval() {
         genLastResult = genResult;
         document.getElementById('gen-result').textContent = genResult;
         document.getElementById('gen-expr').textContent = genExpr + ' =';
-        addHistory('general', 'expr', genResult, genExpr);
+        addHistory('general', 'expr', genResult, genExpr, genExpr);
         showGenPDFBtn();
 
         // Ocultar canvas de función si estaba visible

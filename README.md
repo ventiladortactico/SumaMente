@@ -12,12 +12,13 @@ calculadora_cientifica/
 ├── manifest.json           # PWA manifest
 ├── service-worker.js       # Cache offline
 ├── js/
-│   ├── app.js              # Motor principal: calculadora, formularios, graficos, historial, busqueda, favoritos
+│   ├── app.js              # Motor principal: calculadora, formularios, graficos SVG, historial, busqueda, favoritos, PDF export
 │   ├── data.js             # Constantes de referencia por modulo
 │   └── modulos/
 │       ├── {nombre}.js          # Formulas (FORMS.{key} = { ... })
 │       └── visuales/
-│           └── {nombre}_visual.js  # Canvas animations ({Nombre}Visual = { ... })
+│           ├── {nombre}_visual.js  # Canvas animations ({Nombre}Visual = { ... })
+│           └── app_visual.js       # Visuales globales (acústica, etc.)
 ```
 
 ### Convenciones
@@ -316,6 +317,16 @@ Banner publicitario discreto implementado con plugin `@capacitor-community/admob
 - Solo se muestra a usuarios FREE
 - Se oculta automáticamente al activar PRO o COLLABORADOR
 - Test Banner ID: `ca-app-pub-3940256099942544/6300978111`
+
+### Exportación PDF
+
+El exportador PDF (PRO) genera documentos con estilo del tema activo:
+
+- **SVG inline**: los gráficos se renderizan como SVG con los colores del tema, no como Canvas dataURL
+- **print-color-adjust: exact**: fuerza al navegador a mantener colores de fondo en el diálogo de impresión
+- **Tema activo**: usa las variables CSS del tema actual (dark, ocean, forest, midnight)
+- **Dos modos**: "Último cálculo" (resultado actual + gráfico) e "Historial completo" (todos los cálculos)
+- **Historial con gráficos**: cada entrada del historial incluye su gráfico SVG regenerado desde la expresión
 
 ### UI Premium
 

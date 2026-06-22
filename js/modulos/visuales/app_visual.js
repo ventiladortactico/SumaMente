@@ -66,7 +66,6 @@ function genPlotFunc(expr, preserveView) {
         plotMaxY = maxY;
     }
     
-    var dpr = window.devicePixelRatio || 1;
     canvas.style.display = 'block';
     canvas.style.width = w + 'px';
     canvas.style.height = h + 'px';

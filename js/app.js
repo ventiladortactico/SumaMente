@@ -1624,23 +1624,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Locale decimal
     const dec = document.getElementById('btn-decimal');
     if (dec && /^es/.test(navigator.language)) dec.textContent = ',';
-    // Backspace long-press → genClear
+    // Backspace long-press → genClear (onclick genBack se encarga del tap normal)
     const bs = document.getElementById('btn-backspace');
     if (bs) {
-        let timer = null, long = false;
-        function start() { long = false; timer = setTimeout(() => { long = true; genClear(); }, 600); }
-        function end() {
-            if (timer) clearTimeout(timer); timer = null;
-            if (!long) genBack();
-            long = false;
-        }
-        function cancel() { if (timer) clearTimeout(timer); timer = null; long = false; }
-        bs.addEventListener('mousedown', start);
-        bs.addEventListener('mouseup', end);
-        bs.addEventListener('mouseleave', cancel);
-        bs.addEventListener('touchstart', start, {passive: true});
-        bs.addEventListener('touchend', end);
-        bs.addEventListener('touchcancel', cancel);
+        let holdTimer = null;
+        function startHold() { holdTimer = setTimeout(genClear, 600); }
+        function endHold() { if (holdTimer) clearTimeout(holdTimer); holdTimer = null; }
+        bs.addEventListener('mousedown', startHold);
+        bs.addEventListener('mouseup', endHold);
+        bs.addEventListener('mouseleave', endHold);
+        bs.addEventListener('touchstart', startHold, {passive: true});
+        bs.addEventListener('touchend', endHold);
+        bs.addEventListener('touchcancel', endHold);
     }
 });
 // Evaluador matemático seguro (sin eval/Function)

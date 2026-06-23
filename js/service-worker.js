@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sumamente-v22-visuales';
+const CACHE_NAME = 'sumamente-v23-visuales';
 const ASSETS = [
   './',
   './index.html',

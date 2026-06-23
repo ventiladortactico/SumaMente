@@ -287,14 +287,18 @@ function exportGenPDF() {
                 if (isModule) {
                     chartImg = last.chartDataUrl || getCanvasImage(moduleName);
                 } else {
-                    chartImg = getCanvasImage('general');
-                    if (!chartImg && expr && /[x]/.test(expr)) {
-                        const _v = (ThemeManager.themes[ThemeManager.current || 'dark'] || ThemeManager.themes.dark).vars;
-                        let clean = expr;
-                        if (clean.includes('=')) clean = clean.split('=')[0].trim();
-                        clean = clean.replace(/²/g, '^2').replace(/π/g, 'pi');
-                        const svg = renderFunctionToSVG(clean, 500, 250, _v);
-                        if (svg) chartImg = 'data:image/svg+xml,' + encodeURIComponent(svg);
+                    // Solo incluir gráfico si el tipo de cálculo puede tenerlo
+                    const canPlot = last.key === 'func' || last.key === 'quadratic' || last.key === 'system' || last.key === 'linear2var' || (last.key === 'eq' && expr && /x/.test(expr));
+                    if (canPlot) {
+                        chartImg = getCanvasImage('general');
+                        if (!chartImg && expr && /[x]/.test(expr)) {
+                            const _v = (ThemeManager.themes[ThemeManager.current || 'dark'] || ThemeManager.themes.dark).vars;
+                            let clean = expr;
+                            if (clean.includes('=')) clean = clean.split('=')[0].trim();
+                            clean = clean.replace(/²/g, '^2').replace(/π/g, 'pi');
+                            const svg = renderFunctionToSVG(clean, 500, 250, _v);
+                            if (svg) chartImg = 'data:image/svg+xml,' + encodeURIComponent(svg);
+                        }
                     }
                 }
             }
@@ -476,7 +480,7 @@ h1{font-family:'Syne',sans-serif;font-size:22px;color:${_v['--accent']};margin-b
 
     let html = '';
     history.forEach((h, idx) => {
-        const canPlot = h.key === 'func' || h.key === 'quadratic' || (h.key === 'eq' && h.expr && /x/.test(h.expr));
+    const canPlot = h.key === 'func' || h.key === 'quadratic' || h.key === 'system' || h.key === 'linear2var' || (h.key === 'eq' && h.expr && /x/.test(h.expr));
         let chartImg = null;
         if (canPlot) {
             let plotExpr = h.expr || (h.label ? h.label.replace('f(x) = ', '') : '');
@@ -565,14 +569,11 @@ h1{font-family:'Syne',sans-serif;font-size:22px;color:${_v['--accent']};margin-b
 }
 
 // Formato inteligente: muestra enteros sin decimales, decimales con precisión necesaria
-function formatNumber(num, decimals = 3) {
-    if (isNaN(num)) return num;
-    // Verificar si es entero
-    if (Number.isInteger(Number(num))) {
-        return num.toString();
-    }
-    // Si es decimal, redondear y quitar ceros innecesarios
-    return parseFloat(num).toFixed(decimals).replace(/\.?0+$/, '');
+function formatNumber(num, decimals = 4) {
+    if (num === null || num === undefined || isNaN(num)) return num;
+    const n = Number(num);
+    if (Number.isInteger(n)) return n.toString();
+    return parseFloat(n.toFixed(decimals)).toString();
 }
 
 function setMode(mode) {
@@ -602,8 +603,7 @@ function setMode(mode) {
     document.getElementById('current-name').textContent = modeNames[mode];
     document.getElementById('current-dot').style.background = modeColors[mode];
     document.getElementById('status-mode').textContent = 'Modo: ' + modeNames[mode];
-    renderDB(mode);
-    renderGeneralDB();
+    renderUnifiedDB(mode);
     if (mode !== 'general') {
         let f = activeFormula[mode];
         if (f) {
@@ -903,7 +903,7 @@ function showHistoryDetail(idx) {
     }
 
     let chartSvg = '';
-    const canPlot = h.key === 'func' || h.key === 'quadratic' || (h.key === 'eq' && h.expr && /x/.test(h.expr));
+        const canPlot = h.key === 'func' || h.key === 'quadratic' || h.key === 'system' || h.key === 'linear2var' || (h.key === 'eq' && h.expr && /x/.test(h.expr));
     if (canPlot) {
         let plotExpr = h.expr || (h.label ? h.label.replace('f(x) = ', '') : '');
         if (h.key === 'eq' && plotExpr.includes('=')) plotExpr = plotExpr.split('=')[0].trim();
@@ -1016,8 +1016,30 @@ function toggleSteps() {
     }
 }
 
+function normalizeInput(str) {
+    const subscripts = { '₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9' };
+    const superscripts = { '²':'^2','³':'^3','¹':'^1' };
+    let result = str.replace(/[₀₁₂₃₄₅₆₇₈₉]/g, c => subscripts[c] || c);
+    result = result.replace(/[²³¹]/g, c => superscripts[c] || c);
+    // Also handle general Unicode superscript digits (U+2070-U+2079)
+    result = result.replace(/[\u2070-\u2079]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x2050));
+    return result;
+}
+
+function friendlyError(msg) {
+    if (!msg) return 'Ocurrió un error inesperado.';
+    if (/caracter.*inv|lido/.test(msg)) return 'No entendí ese formato. Intentá escribirlo de otra forma (ej. "log base 2" en lugar de "log₂").';
+    if (/división por cero|division by zero|infinito/.test(msg)) return 'La operación da una división por cero. Revisá los valores.';
+    if (/identificador.*inv|lido/.test(msg)) return 'No reconozco ese símbolo. Usá solo letras, números y operadores básicos.';
+    if (/par.*ntesis.*desbal/.test(msg)) return 'Falta cerrar un paréntesis. Revisá la expresión.';
+    if (/faltan.*arg|faltan.*oper/.test(msg)) return 'Faltan números o argumentos en la expresión.';
+    if (/factorial/.test(msg)) return 'El factorial necesita un número entero entre 0 y 170.';
+    return msg;
+}
+
 function generateAlgebraicSteps(equation) {
     try {
+        equation = normalizeInput(equation);
         const parts = equation.split('=');
         if (parts.length !== 2) return;
         
@@ -1054,13 +1076,23 @@ function generateAlgebraicSteps(equation) {
             const finalRight = rightConst - leftConst;
             steps.push(`${newLeftCoef}x = ${finalRight}`);
             
-            steps.push(`<strong>Paso 4:</strong> Despejar x dividiendo por ${newLeftCoef}`);
-            const result = finalRight / newLeftCoef;
-            steps.push(`x = ${finalRight} / ${newLeftCoef}`);
-            steps.push(`x = ${result.toFixed(4)}`);
-            
-            steps.push(`<strong>Verificación:</strong>`);
-            steps.push(`Sustituir x = ${result.toFixed(4)} en la ecuación original`);
+            if (newLeftCoef === 0) {
+                if (finalRight === 0) {
+                    steps.push(`<strong>Conclusión:</strong> ${finalRight} = ${finalRight} → la ecuación es una identidad.`);
+                    steps.push(`<strong>Infinitas soluciones.</strong> Cualquier valor de x cumple la igualdad.`);
+                } else {
+                    steps.push(`<strong>Conclusión:</strong> 0 = ${finalRight} → contradicción.`);
+                    steps.push(`<strong>No existe</strong> un valor de x que cumpla esta ecuación.`);
+                }
+            } else {
+                steps.push(`<strong>Paso 4:</strong> Despejar x dividiendo por ${newLeftCoef}`);
+                const result = finalRight / newLeftCoef;
+                steps.push(`x = ${finalRight} / ${newLeftCoef}`);
+                steps.push(`x = ${formatNumber(result, 4)}`);
+                
+                steps.push(`<strong>Verificación:</strong>`);
+                steps.push(`Sustituir x = ${formatNumber(result, 4)} en la ecuación original`);
+            }
             
         } else if (left.includes('x^2') || right.includes('x^2')) {
             // Ecuación cuadrática real
@@ -1093,16 +1125,16 @@ function generateAlgebraicSteps(equation) {
                 steps.push(`Δ > 0 → dos soluciones reales`);
                 steps.push(`<strong>Paso 5:</strong> Aplicar fórmula cuadrática`);
                 steps.push(`x = (-b ± √Δ) / 2a`);
-                steps.push(`x₁ = (${-b} + ${sqrtDisc.toFixed(4)}) / ${2*a} = ${x1.toFixed(4)}`);
-                steps.push(`x₂ = (${-b} - ${sqrtDisc.toFixed(4)}) / ${2*a} = ${x2.toFixed(4)}`);
-                steps.push(`<strong>Solución:</strong> x₁ = ${x1.toFixed(4)}, x₂ = ${x2.toFixed(4)}`);
+                steps.push(`x₁ = (${-b} + ${formatNumber(sqrtDisc, 4)}) / ${2*a} = ${formatNumber(x1, 4)}`);
+                steps.push(`x₂ = (${-b} - ${formatNumber(sqrtDisc, 4)}) / ${2*a} = ${formatNumber(x2, 4)}`);
+                steps.push(`<strong>Solución:</strong> x₁ = ${formatNumber(x1, 4)}, x₂ = ${formatNumber(x2, 4)}`);
             } else if (disc === 0) {
                 const x = -b / (2 * a);
                 steps.push(`Δ = 0 → una solución real (doble)`);
-                steps.push(`x = -b / 2a = ${-b} / ${2*a} = ${x.toFixed(4)}`);
+                steps.push(`x = -b / 2a = ${-b} / ${2*a} = ${formatNumber(x, 4)}`);
             } else {
-                const real = (-b / (2 * a)).toFixed(4);
-                const imag = (Math.sqrt(-disc) / (2 * a)).toFixed(4);
+                const real = formatNumber((-b / (2 * a)), 4);
+                const imag = formatNumber((Math.sqrt(-disc) / (2 * a)), 4);
                 steps.push(`Δ < 0 → dos soluciones complejas conjugadas`);
                 steps.push(`x₁ = ${real} + ${imag}i`);
                 steps.push(`x₂ = ${real} - ${imag}i`);
@@ -1232,36 +1264,36 @@ function generateAlgebraicSteps(equation) {
                     steps.push(`<strong>Paso ${stepNum}:</strong> Dividir por ${coef}`);
                     steps.push(`x = ${newRight} / ${coef}`);
                 }
-                steps.push(`<strong>Solución:</strong> x = ${(newRight / coef).toFixed(4)}`);
-
-            } else {
-                const coef = extractCoefficient(right, 'x');
-                if (coef === 0) return;
-                const constVal = extractConstant(right);
-                const coefStr = coef === 1 ? 'x' : coef === -1 ? '-x' : coef + 'x';
-
-                steps.push(`<strong>Ecuación:</strong> ${left} = ${formatExpr(coef, constVal, 'x')}`);
-                steps.push(`<strong>Paso 1:</strong> Identificar términos`);
-                steps.push(`Término con x: ${coefStr}`);
-                if (constVal !== 0) {
-                    steps.push(`Constante: ${constVal > 0 ? '+ ' + constVal : '- ' + Math.abs(constVal)}`);
-                }
-
-                let stepNum = 2;
-                if (constVal !== 0) {
-                    const op = constVal > 0 ? 'Restar' : 'Sumar';
-                    const val = Math.abs(constVal);
-                    steps.push(`<strong>Paso ${stepNum}:</strong> ${op} ${val} a ambos lados`);
-                    stepNum++;
-                }
-                const newLeft = left - constVal;
-                steps.push(`${newLeft} = ${coefStr}`);
-
-                if (coef !== 1 && coef !== -1) {
-                    steps.push(`<strong>Paso ${stepNum}:</strong> Dividir por ${coef}`);
-                    steps.push(`x = ${newLeft} / ${coef}`);
-                }
-                steps.push(`<strong>Solución:</strong> x = ${(newLeft / coef).toFixed(4)}`);
+                steps.push(`<strong>Solución:</strong> x = ${formatNumber(newRight / coef, 4)}`);
+ 
+             } else {
+                 const coef = extractCoefficient(right, 'x');
+                 if (coef === 0) return;
+                 const constVal = extractConstant(right);
+                 const coefStr = coef === 1 ? 'x' : coef === -1 ? '-x' : coef + 'x';
+ 
+                 steps.push(`<strong>Ecuación:</strong> ${left} = ${formatExpr(coef, constVal, 'x')}`);
+                 steps.push(`<strong>Paso 1:</strong> Identificar términos`);
+                 steps.push(`Término con x: ${coefStr}`);
+                 if (constVal !== 0) {
+                     steps.push(`Constante: ${constVal > 0 ? '+ ' + constVal : '- ' + Math.abs(constVal)}`);
+                 }
+ 
+                 let stepNum = 2;
+                 if (constVal !== 0) {
+                     const op = constVal > 0 ? 'Restar' : 'Sumar';
+                     const val = Math.abs(constVal);
+                     steps.push(`<strong>Paso ${stepNum}:</strong> ${op} ${val} a ambos lados`);
+                     stepNum++;
+                 }
+                 const newLeft = left - constVal;
+                 steps.push(`${newLeft} = ${coefStr}`);
+ 
+                 if (coef !== 1 && coef !== -1) {
+                     steps.push(`<strong>Paso ${stepNum}:</strong> Dividir por ${coef}`);
+                     steps.push(`x = ${newLeft} / ${coef}`);
+                 }
+                 steps.push(`<strong>Solución:</strong> x = ${formatNumber(newLeft / coef, 4)}`);
             }
             
         } else {
@@ -1277,6 +1309,7 @@ function generateAlgebraicSteps(equation) {
             steps.map(s => `<div class="step">${s}</div>`).join('') + '</details>';
         stepsPanel.classList.add('show');
     } catch (e) {
+        console.error('generateAlgebraicSteps error:', e);
     }
 }
 
@@ -1316,6 +1349,99 @@ function extractConstant(expr) {
         return 0;
     } catch (e) {
         return 0;
+    }
+}
+
+function generateNumericSteps(expr) {
+    try {
+        if (/[a-zA-Z]/.test(expr)) return null;
+        const ops = ['^', { '/':'/', '*':'*' }, { '+':'+', '-':'-' }];
+        const steps = [];
+        let current = expr;
+        steps.push(`<strong>Expresión original:</strong> ${current}`);
+        let stepNum = 1;
+        while (true) {
+            current = current.replace(/\s/g, '');
+            if (/^-?\d+\.?\d*$/.test(current)) break;
+
+            let bestMatch = null;
+
+            // 1) Resolver paréntesis primero (el más interno)
+            const parenRe = /\(([^()]+)\)/;
+            let parenM = current.match(parenRe);
+            if (parenM) {
+                let inner = parenM[1];
+                let innerResult = inner;
+                while (true) {
+                    innerResult = innerResult.replace(/\s/g, '');
+                    if (/^-?\d+\.?\d*$/.test(innerResult)) break;
+                    let ibest = null;
+                    for (let prec of ops) {
+                        if (typeof prec === 'string') {
+                            let m = innerResult.match(/(\d+\.?\d*)\s*\^\s*(\d+\.?\d*)/);
+                            if (m) { ibest = { op: '^', a: parseFloat(m[1]), b: parseFloat(m[2]), idx: m.index, len: m[0].length }; break; }
+                        } else {
+                            for (let op of Object.keys(prec)) {
+                                const escapedOp = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                const re = new RegExp('(-?\\d+\\.?\\d*)\\s*' + escapedOp + '\\s*(-?\\d+\\.?\\d*)');
+                                let m = innerResult.match(re);
+                                if (m && (!ibest || m.index < ibest.idx)) {
+                                    ibest = { op, a: parseFloat(m[1]), b: parseFloat(m[2]), idx: m.index, len: m[0].length };
+                                }
+                            }
+                            if (ibest) break;
+                        }
+                    }
+                    if (!ibest) break;
+                    let r;
+                    switch (ibest.op) {
+                        case '^': r = Math.pow(ibest.a, ibest.b); break;
+                        case '*': r = ibest.a * ibest.b; break;
+                        case '/': r = ibest.a / ibest.b; break;
+                        case '+': r = ibest.a + ibest.b; break;
+                        case '-': r = ibest.a - ibest.b; break;
+                    }
+                    innerResult = innerResult.slice(0, ibest.idx) + formatNumber(r, 4) + innerResult.slice(ibest.idx + ibest.len);
+                }
+                steps.push(`<strong>Paso ${stepNum++}:</strong> Resolver (${inner}) = ${innerResult}`);
+                current = current.slice(0, parenM.index) + innerResult + current.slice(parenM.index + parenM[0].length);
+                steps.push(`<strong>→</strong> ${current}`);
+                continue;
+            }
+
+            for (let prec of ops) {
+                if (typeof prec === 'string') {
+                    const re = /(\d+\.?\d*)\s*\^\s*(\d+\.?\d*)/;
+                    let m = current.match(re);
+                    if (m) { bestMatch = { op: '^', a: parseFloat(m[1]), b: parseFloat(m[2]), idx: m.index, len: m[0].length }; break; }
+                } else {
+                    for (let op of Object.keys(prec)) {
+                        const escapedOp = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const re = new RegExp('(-?\\d+\\.?\\d*)\\s*' + escapedOp + '\\s*(-?\\d+\\.?\\d*)');
+                        let m = current.match(re);
+                        if (m && (!bestMatch || m.index < bestMatch.idx)) {
+                            bestMatch = { op, a: parseFloat(m[1]), b: parseFloat(m[2]), idx: m.index, len: m[0].length };
+                        }
+                    }
+                    if (bestMatch) break;
+                }
+            }
+            if (!bestMatch) break;
+            let result;
+            switch (bestMatch.op) {
+                case '^': result = Math.pow(bestMatch.a, bestMatch.b); break;
+                case '*': result = bestMatch.a * bestMatch.b; break;
+                case '/': result = bestMatch.a / bestMatch.b; break;
+                case '+': result = bestMatch.a + bestMatch.b; break;
+                case '-': result = bestMatch.a - bestMatch.b; break;
+            }
+            steps.push(`<strong>Paso ${stepNum++}:</strong> ${bestMatch.a} ${bestMatch.op} ${bestMatch.b} = ${formatNumber(result, 4)}`);
+            current = current.slice(0, bestMatch.idx) + formatNumber(result, 4) + current.slice(bestMatch.idx + bestMatch.len);
+            steps.push(`<strong>→</strong> ${current}`);
+        }
+        return steps;
+    } catch (e) {
+        return null;
     }
 }
 
@@ -1362,11 +1488,13 @@ function createStepsPanel() {
     return panel;
 }
 
-function renderDB(mode) {
-    let items = DB[mode] || [];
-    let el = document.getElementById('db-items');
-    if (!items.length) { el.innerHTML = '<div style="font-size:11px;color:var(--text3)">Sin datos</div>'; return; }
-    el.innerHTML = items.map(i => `<div class="db-item"><div class="db-name">${i.name}</div><div class="db-val">${i.val}</div></div>`).join('');
+let dbPanelOpen = false;
+function toggleDBPanel() {
+    dbPanelOpen = !dbPanelOpen;
+    const body = document.getElementById('unified-db-panel');
+    const arrow = document.getElementById('db-toggle-arrow');
+    if (body) body.style.display = dbPanelOpen ? 'block' : 'none';
+    if (arrow) arrow.style.transform = dbPanelOpen ? 'rotate(90deg)' : 'rotate(0deg)';
 }
 
 const GENERAL_FORMULAS = [
@@ -1407,10 +1535,15 @@ const GENERAL_FORMULAS = [
     ]}
 ];
 
-function renderGeneralDB() {
-    const el = document.getElementById('gen-db-content');
+function renderUnifiedDB(mode) {
+    const el = document.getElementById('unified-db-content');
     if (!el) return;
-    el.innerHTML = GENERAL_FORMULAS.map(g => `
+    const modeItems = DB[mode] || [];
+    let html = '';
+    if (modeItems.length) {
+        html += `<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--accent);font-weight:700;margin-bottom:4px">⚡ Constantes rápidas</div><div class="db-grid">${modeItems.map(i => `<div class="db-item"><div class="dbi-name">${i.name}</div><div class="dbi-formula">${i.val}</div></div>`).join('')}</div></div>`;
+    }
+    html += GENERAL_FORMULAS.map(g => `
         <div style="margin-bottom:10px">
             <div style="font-size:11px;color:var(--accent);font-weight:700;margin-bottom:4px">${g.cat}</div>
             <div class="db-grid">
@@ -1423,6 +1556,7 @@ function renderGeneralDB() {
             </div>
         </div>
     `).join('');
+    el.innerHTML = html;
 }
 
 function genKey(k) { 
@@ -1445,6 +1579,70 @@ function showGenPDFBtn() {}
 function genClear() { genExpr = ''; genResult = '0'; genLastResult = null; document.getElementById('gen-expr').textContent = ''; document.getElementById('gen-result').textContent = '0'; const cv = document.getElementById('chart-canvas-general'); if (cv) cv.style.display = 'none'; document.getElementById('graph-controls').style.display = 'none'; }
 function genBack() { genExpr = genExpr.slice(0, -1); document.getElementById('gen-expr').textContent = genExpr; }
 function genNegate() { genKey('-'); }
+
+// 2nd mode toggle
+let is2nd = false;
+function toggle2ndMode() {
+    is2nd = !is2nd;
+    document.getElementById('btn-2nd').classList.toggle('active', is2nd);
+    document.querySelectorAll('.keypad [data-lbl]').forEach(btn => {
+        if (is2nd && btn.dataset.lbl2) {
+            btn.textContent = btn.dataset.lbl2;
+        } else {
+            btn.textContent = btn.dataset.lbl;
+        }
+    });
+}
+function pressKey(normal, alt) {
+    if (is2nd && alt) {
+        genKey(alt);
+        is2nd = false;
+        document.getElementById('btn-2nd').classList.remove('active');
+        document.querySelectorAll('.keypad [data-lbl]').forEach(btn => {
+            btn.textContent = btn.dataset.lbl;
+        });
+    } else {
+        genKey(normal);
+    }
+}
+// Ripple effect, locale decimal, backspace long-press
+document.addEventListener('DOMContentLoaded', () => {
+    // Ripple
+    document.querySelector('.keypad')?.addEventListener('click', e => {
+        const btn = e.target.closest('.key');
+        if (!btn) return;
+        const rect = btn.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple-el';
+        const d = Math.max(rect.width, rect.height) * 1.2;
+        ripple.style.width = ripple.style.height = d + 'px';
+        ripple.style.left = (e.clientX - rect.left - d / 2) + 'px';
+        ripple.style.top = (e.clientY - rect.top - d / 2) + 'px';
+        btn.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 500);
+    });
+    // Locale decimal
+    const dec = document.getElementById('btn-decimal');
+    if (dec && /^es/.test(navigator.language)) dec.textContent = ',';
+    // Backspace long-press → genClear
+    const bs = document.getElementById('btn-backspace');
+    if (bs) {
+        let timer = null, long = false;
+        function start() { long = false; timer = setTimeout(() => { long = true; genClear(); }, 600); }
+        function end() {
+            if (timer) clearTimeout(timer); timer = null;
+            if (!long) genBack();
+            long = false;
+        }
+        function cancel() { if (timer) clearTimeout(timer); timer = null; long = false; }
+        bs.addEventListener('mousedown', start);
+        bs.addEventListener('mouseup', end);
+        bs.addEventListener('mouseleave', cancel);
+        bs.addEventListener('touchstart', start, {passive: true});
+        bs.addEventListener('touchend', end);
+        bs.addEventListener('touchcancel', cancel);
+    }
+});
 // Evaluador matemático seguro (sin eval/Function)
 function safeMathEval(expr, vars) {
     // Si es una expresión simple con variable x o y, evaluar directamente
@@ -1500,6 +1698,21 @@ function safeMathEval(expr, vars) {
         
         // Operadores y paréntesis
         if ('+-*/()^'.includes(char)) {
+            // Unary minus: si '-' está al inicio o después de operador/paréntesis
+            if (char === '-' && (tokens.length === 0 || 
+                (tokens[tokens.length-1].type === 'operator' && tokens[tokens.length-1].value !== ')') ||
+                (tokens[tokens.length-1].type === 'postfix'))) {
+                // Mirar si le sigue un número → token negativo
+                let j = i + 1;
+                while (j < len && /\s/.test(expr[j])) j++;
+                if (j < len && /\d/.test(expr[j])) {
+                    let num = '-';
+                    i = j;
+                    while (i < len && /[\d.]/.test(expr[i])) { num += expr[i]; i++; }
+                    tokens.push({ type: 'number', value: parseFloat(num) });
+                    continue;
+                }
+            }
             tokens.push({ type: 'operator', value: char });
             i++;
             continue;
@@ -1528,7 +1741,7 @@ function safeMathEval(expr, vars) {
     const stack = [];
     const precedence = { '+': 1, '-': 1, '*': 2, '/': 2, '^': 3 };
     const rightAssoc = { '^': true };
-    const funcs = ['sin', 'cos', 'tan', 'sqrt', 'log', 'ln'];
+    const funcs = ['sin', 'cos', 'tan', 'sqrt', 'log', 'ln', 'log2', 'cot', 'cbrt', 'abs'];
     const consts = { 'pi': Math.PI, 'e': Math.E };
     
     for (const token of tokens) {
@@ -1594,6 +1807,10 @@ function safeMathEval(expr, vars) {
                 case 'sqrt': res = Math.sqrt(a); break;
                 case 'log': res = Math.log10(a); break;
                 case 'ln': res = Math.log(a); break;
+                case 'log2': res = Math.log2(a); break;
+                case 'cot': res = 1 / Math.tan(angleMode === 'deg' ? a * Math.PI / 180 : a); break;
+                case 'cbrt': res = Math.cbrt(a); break;
+                case 'abs': res = Math.abs(a); break;
             }
             evalStack.push(res);
             continue;
@@ -1685,7 +1902,7 @@ function solveSystem2x2(eq1, eq2) {
     }
     
     const f = (n) => n < 0 ? `(${n})` : `${n}`;
-    const t = (n) => parseFloat(n.toFixed(4)).toString();
+    const t = (n) => formatNumber(n, 4);
     
     steps.push(`<strong>Paso 1:</strong> Identificar coeficientes (Regla de Cramer)`);
     steps.push(`① ${t(p1.a)}x + ${t(p1.b)}y = ${t(p1.c)}`);
@@ -1782,7 +1999,7 @@ function analyzeQuadratic(expr) {
     const { a, b, c } = parseQuadraticCoefs(expr);
     if (a === 0) return null;
     const steps = [];
-    const nf = v => parseFloat(v.toFixed(4)).toString();
+    const nf = v => formatNumber(v, 4);
     const t = v => v < 0 ? `(${v})` : `${v}`;
     steps.push(`<strong>Función cuadrática: f(x) = ${expr}</strong>`);
     steps.push(`<strong>Paso 1:</strong> Identificar coeficientes`);
@@ -1832,10 +2049,14 @@ function analyzeQuadratic(expr) {
 
 function genEval() {
     try {
+        // Ocultar debug info de gráficos anteriores
+        const dbg = document.getElementById('graph-debug');
+        if (dbg) dbg.style.display = 'none';
+
         if (!genExpr) {
             return;
         }
-        let expr = genExpr.replace(/π/g, 'pi');
+        let expr = normalizeInput(genExpr).replace(/π/g, 'pi');
 
         // Encadenar con último resultado si empieza con operador
         if (/^[+\-*/^]/.test(expr.trim()) && genLastResult !== null && genLastResult !== 'Error') {
@@ -1877,6 +2098,24 @@ function genEval() {
         if (expr.includes('=') && /x/.test(expr) && /y/.test(expr) && !expr.includes(',')) {
             const parts = expr.split('=');
             if (parts.length === 2) {
+                const left = parts[0].trim(), right = parts[1].trim();
+                // Si ya está despejada: y = mx + b
+                if (/^y$/i.test(left) && /x/.test(right)) {
+                    genPlotFunc(right);
+                    const steps = document.getElementById('gen-steps') || createStepsPanel();
+                    steps.innerHTML = '<details style="cursor:pointer"><summary style="color:var(--accent);font-weight:700;font-size:12px;padding:4px 0">Mostrar pasos</summary>' +
+                        '<div class="step"><strong>Ecuación:</strong> ' + expr + '</div>' +
+                        '<div class="step">Pendiente (m) y ordenada al origen (b) extraídas directamente.</div>' +
+                        '<div class="step" style="color:var(--text3)">La gráfica muestra la recta correspondiente.</div></details>';
+                    steps.classList.add('show');
+                    genResult = `y = ${right}`;
+                    document.getElementById('gen-result').textContent = 'y = ' + right;
+                    document.getElementById('gen-expr').textContent = genExpr;
+                    addHistory('general', 'linear2var', genResult, genExpr, genExpr);
+                    genExpr = '';
+                    genLastResult = null;
+                    return;
+                }
                 const p = parseLinearEq(expr);
                 if (p && p.b !== 0) {
                     // y = (c - a*x) / b
@@ -1906,13 +2145,44 @@ function genEval() {
             // Detectar si es ecuación (contiene =)
             if (expr.includes('=')) {
                 genPlotEquation(expr);
+                // Determinar resultado antes de generar pasos (independiente del panel)
+                let resultText = 'Ecuación graficada';
+                const eqParts = expr.split('=');
+                if (eqParts.length === 2) {
+                    const eqLeft = eqParts[0].trim();
+                    const eqRight = eqParts[1].trim();
+                    if (eqLeft.includes('x') && eqRight.includes('x')) {
+                        const lc = extractCoefficient(eqLeft, 'x');
+                        const rc = extractCoefficient(eqRight, 'x');
+                        const lk = extractConstant(eqLeft);
+                        const rk = extractConstant(eqRight);
+                        const newCoef = lc - rc;
+                        const newConst = rk - lk;
+                        if (newCoef === 0 && newConst === 0) resultText = 'Infinitas soluciones';
+                        else if (newCoef === 0) resultText = 'No tiene solución';
+                        else resultText = 'x = ' + formatNumber(newConst / newCoef, 4);
+                    } else if (eqLeft.includes('x') && !eqRight.includes('x')) {
+                        const lc = extractCoefficient(eqLeft, 'x');
+                        const lk = extractConstant(eqLeft);
+                        if (lc !== 0) resultText = 'x = ' + formatNumber((parseFloat(eqRight) - lk) / lc, 4);
+                    } else if (!eqLeft.includes('x') && eqRight.includes('x')) {
+                        const rc = extractCoefficient(eqRight, 'x');
+                        const rk = extractConstant(eqRight);
+                        if (rc !== 0) resultText = 'x = ' + formatNumber((parseFloat(eqLeft) - rk) / rc, 4);
+                    }
+                }
                 generateAlgebraicSteps(expr);
                 const sp = document.getElementById('gen-steps') || createStepsPanel();
                 if (sp) sp.classList.add('show');
+                // Extraer pasos del DOM para guardar en historial/PDF
+                let eqSteps = [];
+                if (sp) {
+                    try { eqSteps = Array.from(sp.querySelectorAll('.step')).map(d => d.innerHTML); } catch(e) {}
+                }
+                genResult = resultText;
                 document.getElementById('gen-expr').textContent = genExpr;
-                document.getElementById('gen-result').textContent = genResult || 'Ecuación graficada';
-                const eqSteps = Array.from(sp.querySelectorAll('.step')).map(d => d.innerHTML);
-                addHistory('general', 'eq', genResult || 'Ecuación graficada', genExpr, genExpr, eqSteps);
+                document.getElementById('gen-result').textContent = resultText;
+                addHistory('general', 'eq', resultText, genExpr, genExpr, eqSteps);
                 genExpr = '';
                 genLastResult = null;
                 return;
@@ -1968,7 +2238,17 @@ function genEval() {
         genLastResult = genResult;
         document.getElementById('gen-result').textContent = genResult;
         document.getElementById('gen-expr').textContent = genExpr + ' =';
-        addHistory('general', 'expr', genResult, genExpr, genExpr);
+        
+        // Generar pasos para expresiones numéricas
+        const numericSteps = generateNumericSteps(expr);
+        if (numericSteps && numericSteps.length > 0) {
+            const sp = document.getElementById('gen-steps') || createStepsPanel();
+            sp.innerHTML = '<details style="cursor:pointer"><summary style="color:var(--accent);font-weight:700;font-size:12px;padding:4px 0">Mostrar pasos</summary>' +
+                numericSteps.map(s => `<div class="step">${s}</div>`).join('') + '</details>';
+            sp.classList.add('show');
+        }
+        
+        addHistory('general', 'expr', genResult, genExpr, genExpr, numericSteps || []);
         showGenPDFBtn();
 
         // Ocultar canvas de función si estaba visible
@@ -1977,7 +2257,7 @@ function genEval() {
 
         genExpr = '';
     } catch (e) { 
-        var errMsg = (e && e.message) || String(e) || 'Error';
+        var errMsg = friendlyError((e && e.message) || String(e) || 'Error');
         document.getElementById('gen-result').textContent = 'Error'; 
         document.getElementById('gen-expr').textContent = errMsg; 
         genResult = 'Error'; 
@@ -2350,8 +2630,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    renderDB('general');
-    renderGeneralDB();
+    renderUnifiedDB('general');
     renderHistory();
 
     // Pegar texto en la calculadora general

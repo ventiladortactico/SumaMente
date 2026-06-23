@@ -29,7 +29,6 @@ function genPlotFunc(expr, preserveView) {
     const w = Math.max(pw - 28, 200);
     const h = 250;
     const dpr = window.devicePixelRatio || 1;
-    setDebugInfo('pw=' + pw + ' w=' + w + ' dpr=' + dpr + ' cw=' + Math.round(w * dpr) + ' ch=' + Math.round(250 * dpr));
     const margin = 40;
     const plotW = w - margin * 2;
     const plotH = h - margin * 2;
@@ -577,6 +576,11 @@ function genPlotEquation(equation) {
     const leftExpr = parts[0].trim();
     const rightExpr = parts[1].trim();
     
+    // Wrap negative-only expressions so safeMathEval's tokenizer doesn't choke on unary minus
+    const wrap = (s) => /^-\d+(\.\d+)?$/.test(s) ? '(' + s + ')' : s;
+    const leftWrapped = wrap(leftExpr);
+    const rightWrapped = wrap(rightExpr);
+    
     const canvas = document.getElementById('chart-canvas-general');
     if (!canvas) {
         return;
@@ -600,8 +604,8 @@ function genPlotEquation(equation) {
     for (let i = 0; i <= steps; i++) {
         const x = parseFloat((minX + (maxX - minX) * i / steps).toPrecision(10));
         try {
-            const y1 = safeMathEval(leftExpr, { x });
-            const y2 = safeMathEval(rightExpr, { x });
+            const y1 = safeMathEval(leftWrapped, { x });
+            const y2 = safeMathEval(rightWrapped, { x });
             if (isFinite(y1)) leftPoints.push({ x, y: y1 });
             else leftPoints.push({ x, y: null });
             if (isFinite(y2)) rightPoints.push({ x, y: y2 });

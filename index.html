@@ -179,16 +179,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 .result-extra.info{border-left-color:var(--accent);color:var(--accent)}
 
 /* KEYPAD */
-.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.key{padding:9px 4px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-family:var(--mono);font-size:12px;cursor:pointer;text-align:center;transition:all 0.12s;user-select:none}
+.keypad{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.key{position:relative;overflow:hidden;padding:9px 4px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-family:var(--mono);font-size:12px;cursor:pointer;text-align:center;transition:all 0.12s;user-select:none;-webkit-tap-highlight-color:transparent}
 .key:hover{background:var(--surface3);color:var(--text);border-color:var(--border2)}
 .key:active{transform:scale(0.94)}
 .key.op{color:var(--accent)}
 .key.fn{color:var(--accent4);font-size:10px}
-.key.eq{background:var(--accent);color:#0a0b0e;font-weight:700;border-color:var(--accent)}
+.key.gold{background:#c9a84c;color:#1a1a1a;font-weight:700;border-color:#e8c84a;font-size:11px}
+.key.gold.active{box-shadow:0 0 10px #e8c84a;border-color:#f0d860}
+.key.eq{background:#2a7d8f;color:#0a0b0e;font-weight:700;font-size:16px;border-color:#2a7d8f}
 .key.eq:hover{opacity:0.85}
-.key.spec{color:var(--accent2);font-size:10px}
 .key.wide{grid-column:span 2}
+.ripple-el{position:absolute;border-radius:50%;background:rgba(255,255,255,0.35);transform:scale(0);animation:rippleAnim 0.5s ease-out;pointer-events:none}
+@keyframes rippleAnim{to{transform:scale(4);opacity:0}}
 
 /* SIDEBAR */
 .sidebar{display:flex;flex-direction:column;gap:12px}
@@ -468,16 +471,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
           <span style="color:var(--accent2)">✓</span> Sin publicidad
         </div>
         <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text)">
+          <span style="color:var(--accent2)">✓</span> Exportación PDF
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text)">
           <span style="color:var(--accent2)">✓</span> Historial ilimitado
         </div>
         <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text)">
-          <span style="color:var(--accent2)">✓</span> Exportación PDF
+          <span style="color:var(--accent2)">✓</span> Historial interactivo
         </div>
         <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text)">
           <span style="color:var(--accent2)">✓</span> Temas visuales
         </div>
         <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text)">
-          <span style="color:var(--accent2)">✓</span> Herramientas premium futuras
+          <span style="color:var(--accent2)">✓</span> Favoritos ilimitados
         </div>
       </div>
     </div>
@@ -512,49 +518,46 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
             <div class="gen-result" id="gen-result">0</div>
           </div>
           <div class="keypad">
-            <button class="key fn" onclick="genKey('sin(')">sin</button>
-            <button class="key fn" onclick="genKey('cos(')">cos</button>
-            <button class="key fn" onclick="genKey('tan(')">tan</button>
-            <button class="key fn" onclick="genKey('log(')">log</button>
+            <button class="key gold" onclick="toggle2ndMode()" id="btn-2nd">2nd</button>
+            <button class="key fn" onclick="pressKey('sin(','π')" data-lbl="sin" data-lbl2="π">sin</button>
+            <button class="key fn" onclick="pressKey('cos(','e')" data-lbl="cos" data-lbl2="e">cos</button>
+            <button class="key fn" onclick="pressKey('tan(','cot(')" data-lbl="tan" data-lbl2="cot">tan</button>
+            <button class="key op" id="btn-backspace">⌫</button>
 
-            <button class="key fn" onclick="genKey('ln(')">ln</button>
-            <button class="key fn" onclick="genKey('sqrt(')">√</button>
-            <button class="key fn" onclick="genKey('^')">x^y</button>
-            <button class="key fn" onclick="genKey('π')">π</button>
-
-            <button class="key fn" onclick="genKey('e')">e</button>
-            <button class="key fn" onclick="genFactorial()">x!</button>
+            <button class="key fn" onclick="pressKey('^2','sqrt(')" data-lbl="x²" data-lbl2="√">x²</button>
+            <button class="key fn" onclick="genKey('^(-1)')">1/x</button>
+            <button class="key fn" onclick="genKey('abs(')">|x|</button>
             <button class="key fn" onclick="genKey('x')">x</button>
             <button class="key fn" onclick="genKey('y')">y</button>
 
-            <button class="key fn" onclick="genKey('=')">=</button>
-            <button class="key fn" onclick="genNegate()">(−)</button>
-            <button class="key fn" onclick="genKey('^2')">x²</button>
-            <button class="key fn" onclick="genKey(',')">,</button>
-
+            <button class="key fn" onclick="genKey('cbrt(')">³√x</button>
             <button class="key op" onclick="genKey('(')">(</button>
             <button class="key op" onclick="genKey(')')">)</button>
-            <button class="key op" onclick="genClear()">AC</button>
-            <button class="key op" onclick="genBack()">⌫</button>
+            <button class="key fn" onclick="genKey('=')">=</button>
+            <button class="key op" onclick="genKey('/')">÷</button>
 
+            <button class="key fn" onclick="genKey('^')" id="btn-x-pow-y">x^y</button>
             <button class="key" onclick="genKey('7')">7</button>
             <button class="key" onclick="genKey('8')">8</button>
             <button class="key" onclick="genKey('9')">9</button>
             <button class="key op" onclick="genKey('*')">×</button>
 
+            <button class="key fn" onclick="pressKey('10^(','log(')" data-lbl="10^x" data-lbl2="log">10^x</button>
             <button class="key" onclick="genKey('4')">4</button>
             <button class="key" onclick="genKey('5')">5</button>
             <button class="key" onclick="genKey('6')">6</button>
-            <button class="key op" onclick="genKey('-')">-</button>
+            <button class="key op" onclick="genKey('-')">−</button>
 
+            <button class="key fn" onclick="pressKey('log(','10^(')" data-lbl="log" data-lbl2="10^x">log</button>
             <button class="key" onclick="genKey('1')">1</button>
             <button class="key" onclick="genKey('2')">2</button>
             <button class="key" onclick="genKey('3')">3</button>
             <button class="key op" onclick="genKey('+')">+</button>
 
+            <button class="key fn" onclick="pressKey('ln(','e^(')" data-lbl="ln" data-lbl2="e^x">ln</button>
+            <button class="key fn" onclick="genNegate()">(−)</button>
             <button class="key" onclick="genKey('0')">0</button>
-            <button class="key" onclick="genKey('.')">.</button>
-            <button class="key" onclick="genKey('=')">=</button>
+            <button class="key" id="btn-decimal">.</button>
             <button class="key eq" onclick="genEval()">↵</button>
           </div>
             <div id="graph-controls" style="display:none;gap:8px;margin-top:8px;justify-content:center;align-items:center;">
@@ -565,10 +568,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
               <button class="btn-secondary" id="angle-btn" onclick="toggleAngleMode()" style="font-size:11px;padding:3px 10px;min-width:48px;font-weight:700">DEG</button>
             </div>
           <canvas id="chart-canvas-general" style="display:none;width:100%;height:250px;border-radius:8px;margin-top:12px;background:linear-gradient(135deg, rgba(46,49,73,0.3) 0%, rgba(30,32,40,0.8) 100%);"></canvas>
-          <details class="db-panel" id="gen-db-panel" style="margin-top:16px">
-            <summary style="cursor:pointer;color:var(--accent);font-size:13px;font-weight:700;padding:8px 0;user-select:none">📚 Base de datos de constantes y fórmulas</summary>
-            <div id="gen-db-content" style="margin-top:8px"></div>
-          </details>
         </div>
       </div>
     </div>
@@ -1207,11 +1206,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
   </div>
   <div class="sidebar">
 
-    <!-- DB rápida -->
+    <!-- Base de datos unificada -->
     <div class="panel">
-      <div class="panel-header"><span class="panel-title">Base de datos</span></div>
-      <div class="panel-body" id="db-panel">
-        <div class="db-grid" id="db-items"></div>
+      <div class="panel-header" style="cursor:pointer;user-select:none" onclick="toggleDBPanel()">
+        <span class="panel-title">Base de datos</span>
+        <span id="db-toggle-arrow" style="margin-left:auto;font-size:10px;transition:transform 0.2s">▶</span>
+      </div>
+      <div class="panel-body" id="unified-db-panel" style="display:none">
+        <div id="unified-db-content"></div>
       </div>
     </div>
 

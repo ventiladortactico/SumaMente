@@ -255,7 +255,7 @@ const BillingManager = {
 
 function getCanvasImage(module) {
     const canvas = document.getElementById('chart-canvas-' + module);
-    if (canvas && canvas.style.display !== 'none' && canvas.width > 0) {
+    if (canvas && canvas.width > 0) {
         return canvas.toDataURL('image/png');
     }
     return null;
@@ -265,31 +265,44 @@ function exportGenPDF() {
     if (!LicenseManager.isPro) { showProUpgradeModal('Exportar PDF', 'Exportá tus cálculos y gráficos en formato PDF con un solo clic.'); return; }
     showPDFChoice((mode) => {
         if (mode === 'last') {
-            let expr = document.getElementById('gen-expr').textContent;
-            let result = document.getElementById('gen-result').textContent;
-            const stepsEl = document.getElementById('gen-steps');
+            let moduleName = 'General';
+            let resultLabel = '';
+            let resultKey = '';
+            let isModule = false;
             let steps = [];
-            if (stepsEl) {
-                const stepDivs = stepsEl.querySelectorAll('.step');
-                steps = Array.from(stepDivs).map(d => d.innerHTML);
-            }
-            if (!expr && result === '0' && history.length > 0) {
+            let expr = '';
+            let result = '0';
+            let chartImg = null;
+
+            if (history.length > 0) {
                 const last = history[0];
                 expr = last.expr || '';
                 result = last.val;
                 steps = last.steps || [];
+                moduleName = last.module || 'General';
+                resultLabel = last.label || '';
+                resultKey = last.key || '';
+                isModule = !last.expr && last.module !== 'general';
+
+                if (isModule) {
+                    chartImg = last.chartDataUrl || getCanvasImage(moduleName);
+                } else {
+                    chartImg = getCanvasImage('general');
+                    if (!chartImg && expr && /[x]/.test(expr)) {
+                        const _v = (ThemeManager.themes[ThemeManager.current || 'dark'] || ThemeManager.themes.dark).vars;
+                        let clean = expr;
+                        if (clean.includes('=')) clean = clean.split('=')[0].trim();
+                        clean = clean.replace(/²/g, '^2').replace(/π/g, 'pi');
+                        const svg = renderFunctionToSVG(clean, 500, 250, _v);
+                        if (svg) chartImg = 'data:image/svg+xml,' + encodeURIComponent(svg);
+                    }
+                }
             }
             if (!expr && result === '0') return;
-            let chartImg = getCanvasImage('general');
-            if (!chartImg && expr && /[x]/.test(expr)) {
-                const _v = (ThemeManager.themes[ThemeManager.current || 'dark'] || ThemeManager.themes.dark).vars;
-                let clean = expr;
-                if (clean.includes('=')) clean = clean.split('=')[0].trim();
-                clean = clean.replace(/²/g, '^2').replace(/π/g, 'pi');
-                const svg = renderFunctionToSVG(clean, 500, 250, _v);
-                if (svg) chartImg = 'data:image/svg+xml,' + encodeURIComponent(svg);
-            }
-            exportResultPDF('General', expr || 'resultado', result, expr ? `Resultado: ${expr}` : 'Resultado', steps, chartImg);
+
+            const displayLabel = isModule ? resultLabel : (expr ? `Resultado: ${expr}` : 'Resultado');
+            const displayKey = isModule ? resultKey : (expr || 'resultado');
+            exportResultPDF(moduleName, displayKey, result, displayLabel, steps, chartImg);
         } else {
             exportHistoryPDF();
         }
@@ -317,15 +330,7 @@ function showPDFChoice(callback) {
     document.addEventListener('keydown', function handler(e) { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', handler); } });
 }
 
-function exportModulePDF(module, key, val, label, stepsData) {
-    if (!LicenseManager.isPro) { showProUpgradeModal('Exportar PDF del módulo', 'Exportá los resultados detallados de cada módulo en PDF.'); return; }
-    const chartImg = getCanvasImage(module);
-    let steps = [];
-    if (stepsData) {
-        try { steps = JSON.parse(decodeURIComponent(stepsData)); } catch(e) {}
-    }
-    exportResultPDF(module, key, val, label, steps, chartImg);
-}
+
 
 // ── renderFunctionToSVG: gráfico como SVG inline ──
 // ── renderFunctionToSVG: genera gráfico como SVG inline (sin canvas, sin dataURL) ──
@@ -482,9 +487,13 @@ h1{font-family:'Syne',sans-serif;font-size:22px;color:${_v['--accent']};margin-b
             if (plotExpr && /x/.test(plotExpr)) {
                 chartImg = renderFunctionToSVG(plotExpr, 500, 250, _v);
             }
+        } else if (h.chartDataUrl) {
+            chartImg = h.chartDataUrl;
         }
         const chartHtml = chartImg
-            ? `<div style="margin:20px 0;text-align:center">${chartImg}</div>`
+            ? (chartImg.startsWith('data:')
+                ? `<div style="margin:20px 0;text-align:center"><img src="${chartImg}" style="max-width:100%;border-radius:8px;border:1px solid ${_v['--border']}"></div>`
+                : `<div style="margin:20px 0;text-align:center">${chartImg}</div>`)
             : '';
         let stepsHtml = '';
         if (h.steps && h.steps.length) {
@@ -851,22 +860,22 @@ function calculate(module, key) {
         extrasHtml += `<button id="audio-toggle-btn" class="btn-secondary" onclick="toggleAudioContinuous()" style="margin-top:10px;width:100%">${buttonText}</button>`;
     }
 
-    const stepsEl = document.getElementById('steps-' + module);
-    const stepTexts = stepsEl ? Array.from(stepsEl.querySelectorAll('.step')).map(d => d.innerHTML) : [];
-    const stepsData = encodeURIComponent(JSON.stringify(stepTexts));
-    const pdfBtn = LicenseManager.isPro ? `<button class="btn-pdf" onclick="exportModulePDF('${module}','${key}','${formattedMain.replace(/'/g, "\\'")}','${res.label.replace(/'/g, "\\'")}','${stepsData}')" title="Exportar PDF" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;margin-left:8px;transition:all 0.15s" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='var(--accent2)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">📄 PDF</button>` : '';
-    rel.innerHTML = `<div class="result-label" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><span>${res.label}</span>${pdfBtn}</div><div class="result-main">${formattedMain}</div><div class="result-extras">${extrasHtml}</div>`;
+    rel.innerHTML = `<div class="result-label"><span>${res.label}</span></div><div class="result-main">${formattedMain}</div><div class="result-extras">${extrasHtml}</div>`;
     rel.classList.add('show');
 
         document.getElementById('steps-' + module).innerHTML = (res.steps || []).map(s => `<div class="step">${s}</div>`).join('');
         if (showSteps) document.getElementById('steps-' + module).classList.add('show');
         renderChart(module, res);
-        addHistory(module, key, formattedMain, res.label, '', res.steps || []);
+        const chartDataUrl = getCanvasImage(module) || '';
+        const histInputs = {};
+        def.fields.forEach(f => { if (fields[f.id]) histInputs[f.id] = fields[f.id].value; });
+        const histTarget = def.vars ? (document.getElementById(`incognita-${module}`).value || '') : '';
+        addHistory(module, key, formattedMain, res.label, '', res.steps || [], chartDataUrl, histInputs, histTarget);
 }
 
-function addHistory(module, key, val, label, expr, steps) {
+function addHistory(module, key, val, label, expr, steps, chartDataUrl, inputs, targetVar) {
     const maxHistory = LicenseManager.isPro ? 500 : 10;
-    history.unshift({ module, key, val, label, expr: expr || '', steps: steps || [], time: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) });
+    history.unshift({ module, key, val, label, expr: expr || '', steps: steps || [], chartDataUrl: chartDataUrl || '', inputs: inputs || {}, targetVar: targetVar || '', time: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) });
     if (history.length > maxHistory) history.pop();
     localStorage.setItem('sumamente_history', JSON.stringify(history));
     renderHistory();
@@ -903,6 +912,8 @@ function showHistoryDetail(idx) {
             const svg = renderFunctionToSVG(plotExpr, 480, 240);
             if (svg) chartSvg = `<div style="margin:14px 0;text-align:center">${svg}</div>`;
         }
+    } else if (h.chartDataUrl) {
+        chartSvg = `<div style="margin:14px 0;text-align:center"><img src="${h.chartDataUrl}" style="max-width:100%;border-radius:8px;border:1px solid #2a3040"></div>`;
     }
 
     let stepsHtml = '';
@@ -933,13 +944,41 @@ function showHistoryDetail(idx) {
     useBtn.textContent = 'Usar resultado';
     useBtn.style.cssText = 'flex:1;padding:10px;background:#4f9cf9;color:#0a0b0e;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer';
     useBtn.onclick = () => {
-        const el = document.getElementById('gen-result');
-        if (el) el.textContent = h.val;
-        const exprEl = document.getElementById('gen-expr');
-        if (exprEl) exprEl.textContent = h.expr || '';
-        genResult = h.val;
-        genExpr = h.expr || '';
         overlay.remove();
+        if (h.module === 'general') {
+            setMode('general');
+            const el = document.getElementById('gen-result');
+            if (el) el.textContent = h.val;
+            const exprEl = document.getElementById('gen-expr');
+            if (exprEl) exprEl.textContent = h.expr || '';
+            genResult = h.val;
+            genExpr = h.expr || '';
+        } else if (h.module && h.key && FORMS[h.module]?.[h.key]) {
+            setMode(h.module);
+            setFormula(h.module, h.key);
+            // Activar chip correcto
+            const chips = document.querySelectorAll(`#mode-${h.module} .chip`);
+            chips.forEach(c => c.classList.remove('active'));
+            chips.forEach(c => {
+                const onclick = c.getAttribute('onclick') || '';
+                if (onclick.includes(`'${h.key}'`)) c.classList.add('active');
+            });
+            // Poblar campos
+            if (h.inputs) {
+                Object.entries(h.inputs).forEach(([id, val]) => {
+                    const el = document.getElementById(`field-${id}`);
+                    if (el) el.value = val;
+                });
+            }
+            // Setear incógnita objetivo
+            if (h.targetVar) {
+                const sel = document.getElementById(`incognita-${h.module}`);
+                if (sel) sel.value = h.targetVar;
+                updateFieldsVisibility(h.module, h.key);
+            }
+            // Auto-calcular
+            calculate(h.module, h.key);
+        }
     };
 
     const closeBtn = document.createElement('button');
@@ -1166,24 +1205,65 @@ function generateAlgebraicSteps(equation) {
             
         } else if (left.includes('x') || right.includes('x')) {
             // Ecuación simple con x en un solo lado
-            steps.push(`<strong>Paso 1:</strong> Identificar dónde está x`);
             const sideWithX = left.includes('x') ? 'izquierdo' : 'derecho';
-            steps.push(`x está en el lado ${sideWithX}`);
-            
+
             if (sideWithX === 'izquierdo') {
                 const coef = extractCoefficient(left, 'x');
+                if (coef === 0) return;
                 const constVal = extractConstant(left);
-                steps.push(`<strong>Paso 2:</strong> Restar ${constVal} de ambos lados`);
-                steps.push(`${coef}x = ${right - constVal}`);
-                steps.push(`<strong>Paso 3:</strong> Dividir por ${coef}`);
-                steps.push(`x = ${(right - constVal) / coef}`);
+                const coefStr = coef === 1 ? 'x' : coef === -1 ? '-x' : coef + 'x';
+
+                steps.push(`<strong>Ecuación:</strong> ${formatExpr(coef, constVal, 'x')} = ${right}`);
+                steps.push(`<strong>Paso 1:</strong> Identificar términos`);
+                steps.push(`Término con x: ${coefStr}`);
+                if (constVal !== 0) {
+                    steps.push(`Constante: ${constVal > 0 ? '+ ' + constVal : '- ' + Math.abs(constVal)}`);
+                }
+
+                let stepNum = 2;
+                if (constVal !== 0) {
+                    const op = constVal > 0 ? 'Restar' : 'Sumar';
+                    const val = Math.abs(constVal);
+                    steps.push(`<strong>Paso ${stepNum}:</strong> ${op} ${val} a ambos lados`);
+                    stepNum++;
+                }
+                const newRight = right - constVal;
+                steps.push(`${coefStr} = ${newRight}`);
+
+                if (coef !== 1 && coef !== -1) {
+                    steps.push(`<strong>Paso ${stepNum}:</strong> Dividir por ${coef}`);
+                    steps.push(`x = ${newRight} / ${coef}`);
+                }
+                steps.push(`<strong>Solución:</strong> x = ${(newRight / coef).toFixed(4)}`);
+
             } else {
                 const coef = extractCoefficient(right, 'x');
+                if (coef === 0) return;
                 const constVal = extractConstant(right);
-                steps.push(`<strong>Paso 2:</strong> Restar ${constVal} de ambos lados`);
-                steps.push(`${left} = ${coef}x`);
-                steps.push(`<strong>Paso 3:</strong> Dividir por ${coef}`);
-                steps.push(`x = ${left / coef}`);
+                const coefStr = coef === 1 ? 'x' : coef === -1 ? '-x' : coef + 'x';
+
+                steps.push(`<strong>Ecuación:</strong> ${left} = ${formatExpr(coef, constVal, 'x')}`);
+                steps.push(`<strong>Paso 1:</strong> Identificar términos`);
+                steps.push(`Término con x: ${coefStr}`);
+                if (constVal !== 0) {
+                    steps.push(`Constante: ${constVal > 0 ? '+ ' + constVal : '- ' + Math.abs(constVal)}`);
+                }
+
+                let stepNum = 2;
+                if (constVal !== 0) {
+                    const op = constVal > 0 ? 'Restar' : 'Sumar';
+                    const val = Math.abs(constVal);
+                    steps.push(`<strong>Paso ${stepNum}:</strong> ${op} ${val} a ambos lados`);
+                    stepNum++;
+                }
+                const newLeft = left - constVal;
+                steps.push(`${newLeft} = ${coefStr}`);
+
+                if (coef !== 1 && coef !== -1) {
+                    steps.push(`<strong>Paso ${stepNum}:</strong> Dividir por ${coef}`);
+                    steps.push(`x = ${newLeft} / ${coef}`);
+                }
+                steps.push(`<strong>Solución:</strong> x = ${(newLeft / coef).toFixed(4)}`);
             }
             
         } else {
@@ -1199,6 +1279,16 @@ function generateAlgebraicSteps(equation) {
         stepsPanel.classList.add('show');
     } catch (e) {
     }
+}
+
+function formatExpr(coef, constVal, variable) {
+    let str = '';
+    if (coef === 1) str = variable;
+    else if (coef === -1) str = '-' + variable;
+    else str = coef + variable;
+    if (constVal > 0) str += ' + ' + constVal;
+    else if (constVal < 0) str += ' - ' + Math.abs(constVal);
+    return str;
 }
 
 function extractCoefficient(expr, variable) {
@@ -2132,6 +2222,12 @@ function selectSearchResult(mod, key) {
     toggleSearch(false);
     setMode(mod);
     setFormula(mod, key);
+    const chips = document.querySelectorAll(`#mode-${mod} .chip`);
+    chips.forEach(c => c.classList.remove('active'));
+    chips.forEach(c => {
+        const onclick = c.getAttribute('onclick') || '';
+        if (onclick.includes(`'${key}'`)) c.classList.add('active');
+    });
 }
 
 // ── Favoritos ──
@@ -2147,7 +2243,13 @@ function toggleFav(mod, key, title) {
     let favs = getFavorites();
     const idx = favs.findIndex(f => f.mod === mod && f.key === key);
     if (idx >= 0) favs.splice(idx, 1);
-    else favs.push({ mod, key, title: title || key });
+    else {
+        if (!LicenseManager.isPro && favs.length >= 3) {
+            showProUpgradeModal('Más favoritos', 'Podés tener hasta 3 fórmulas favoritas. Actualizá a PRO para favoritos ilimitados.');
+            return;
+        }
+        favs.push({ mod, key, title: title || key });
+    }
     try { localStorage.setItem('SumaMente_favorites', JSON.stringify(favs)); } catch(e) {}
     const q = document.getElementById('search-input');
     if (q) doSearch(q.value);

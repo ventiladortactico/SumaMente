@@ -385,4 +385,12 @@ Abrir `index.html` directamente funciona para calculos pero no registra el Servi
 
 ---
 
-**SumaMente** — Herramienta integral de calculo profesional.
+**SumaMente** — Herramienta integral de cálculo profesional.
+
+## Próximamente en PRO
+
+### 🎯 Vista 2D (Gráficas de Funciones)
+Gráfico interactivo con trazado de funciones (`y = x² - 4`), zoom, puntos de corte, vértice y asíntotas automáticos.
+
+### 🧊 Vista 3D (Superficies y Curvas en el Espacio)
+Representación tridimensional de funciones de dos variables (`z = x² + y²`) con rotación 360°, cambio de perspectiva y mapa de calor por altura.

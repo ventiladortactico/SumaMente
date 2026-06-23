@@ -273,3 +273,27 @@ Monetizar principalmente mediante:
 * Compra única Pro.
 
 Evitar suscripciones mensuales en las primeras versiones.
+
+---
+
+## Funcionalidades PRO a futuro
+
+### 1. Vista 2D (Gráficas de Funciones) 📉
+
+Gráfico interactivo donde se traza la función que el usuario escribe (ej. `y = x² - 4`).
+
+- Zoom y desplazamiento con el dedo
+- Puntos de corte (raíces), vértice y asíntotas marcados automáticamente
+- Opción de cambiar el color de la curva
+
+**Por qué es PRO:** En la versión gratis solo se muestra el resultado numérico, la PRO visualiza la ecuación. Esencial para estudiantes de funciones.
+
+### 2. Vista 3D (Superficies y Curvas en el Espacio) 🧊
+
+Representación tridimensional de funciones de dos variables (ej. `z = x² + y²`).
+
+- Rotación de la figura en 360° con el dedo
+- Cambio de perspectiva (ejes X, Y, Z)
+- Visualización de colores según la altura (mapa de calor)
+
+**Por qué es PRO:** Herramienta potente para cálculo multivariable y geometría analítica, algo que las calculadoras básicas no tienen.

@@ -1025,8 +1025,6 @@ function generateAlgebraicSteps(equation) {
         const right = parts[1].trim();
         const steps = [];
         
-        steps.push(`<strong>Ecuación original:</strong> ${left} = ${right}`);
-        
         // Detectar tipo de ecuación y generar pasos
         if (left.includes('x') && right.includes('x')) {
             // Ecuación lineal: ax + b = cx + d
@@ -1267,6 +1265,7 @@ function generateAlgebraicSteps(equation) {
             }
             
         } else {
+            steps.push(`<strong>Ecuación:</strong> ${left} = ${right}`);
             steps.push(`<strong>Paso 1:</strong> Esta ecuación no contiene variable x`);
             steps.push(`<strong>Paso 2:</strong> Evaluar ambos lados`);
             steps.push(`<strong>Paso 3:</strong> Verificar si la igualdad es verdadera`);
@@ -1293,12 +1292,13 @@ function formatExpr(coef, constVal, variable) {
 
 function extractCoefficient(expr, variable) {
     try {
-        const match = expr.match(/(-?\d*\.?\d*)\*?x/);
+        const cleaned = expr.replace(/\s/g, '');
+        const match = cleaned.match(/(-?\d*\.?\d*)\*?x/);
         if (match) {
             const coef = match[1];
             return coef === '' || coef === '-' ? (coef === '-' ? -1 : 1) : parseFloat(coef);
         }
-        if (expr.includes(variable)) return 1;
+        if (cleaned.includes(variable)) return 1;
         return 0;
     } catch (e) {
         return 0;
@@ -1307,7 +1307,8 @@ function extractCoefficient(expr, variable) {
 
 function extractConstant(expr) {
     try {
-        const withoutX = expr.replace(/(-?\d*\.?\d*)\*?x/g, '').replace(/[+-]/g, ' $&');
+        const cleaned = expr.replace(/\s/g, '');
+        const withoutX = cleaned.replace(/(-?\d*\.?\d*)\*?x/g, '').replace(/[+-]/g, ' $&');
         const matches = withoutX.match(/-?\d+\.?\d*/g);
         if (matches) {
             return matches.reduce((sum, val) => sum + parseFloat(val), 0);

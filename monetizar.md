@@ -187,8 +187,7 @@ Manteniendo una sola base de código. No crear proyectos separados.
 
 * LicenseManager en app.js con schema completo.
 * localStorage como almacenamiento.
-* Sistema de códigos de regalo para colaboradores con validación real.
-* Códigos válidos: `SUMAMENTE-HELPER-2026`, `SUMAMENTE-COLAB-001`, `SUMAMENTE-BETA-001`, `SUMAMENTE-TEST-2026`.
+* Sistema de códigos de regalo preparado para backend futuro (sin códigos hardcodeados en cliente).
 
 ### ✅ Fase 1 - Completado (Después del lanzamiento Android)
 

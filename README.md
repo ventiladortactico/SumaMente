@@ -286,13 +286,9 @@ Propiedades:
 - `LicenseManager.isPro` → boolean (incluye collaborator)
 - `LicenseManager.isCollaborator` → boolean
 
-### Códigos de regalo
+### Códigos de regalo (futuro)
 
-Códigos válidos para activar licencia COLABORADOR:
-- `SUMAMENTE-HELPER-2026`
-- `SUMAMENTE-COLAB-001`
-- `SUMAMENTE-BETA-001`
-- `SUMAMENTE-TEST-2026`
+Sistema preparado para activación mediante códigos. Se habilitará con backend propio para evitar exposición en cliente.
 
 ### AnalyticsManager
 

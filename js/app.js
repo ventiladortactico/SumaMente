@@ -80,7 +80,15 @@ const LicenseManager = {
     },
 
     redeemCode(code) {
-        // Sin códigos hardcodeados. Se habilitará con backend en el futuro.
+        const validCodes = [
+            'SUMAMENTE-HELPER-2026',
+            'SUMAMENTE-COLAB-001',
+            'SUMAMENTE-BETA-001'
+        ];
+        if (validCodes.includes(code)) {
+            this.activate('collaborator', 'gift', code);
+            return true;
+        }
         return false;
     },
 

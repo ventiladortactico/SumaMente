@@ -11,10 +11,10 @@ const copyDir = (from, to) => {
         const s = path.join(from, entry.name);
         const d = path.join(to, entry.name);
         if (entry.isDirectory()) {
-            if (entry.name === 'node_modules' || entry.name === 'www' || entry.name === 'scripts' || entry.name === '.git' || entry.name === 'android') continue;
+            if (entry.name === 'node_modules' || entry.name === 'www' || entry.name === 'scripts' || entry.name === '.git' || entry.name === 'android' || entry.name === '.idea') continue;
             copyDir(s, d);
         } else {
-            if (entry.name.endsWith('.json') || entry.name === 'package-lock.json') continue;
+            if (entry.name === 'package.json' || entry.name === 'package-lock.json' || entry.name.endsWith('.md') || entry.name === '.gitignore' || entry.name === 'sumamente-keystore.jks') continue;
             fs.copyFileSync(s, d);
         }
     }

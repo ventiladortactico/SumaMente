@@ -258,6 +258,29 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 .category-divider{height:1px;background:var(--border);margin:16px 0}
 .module-card.coming-soon{opacity:0.45;cursor:default;pointer-events:none}
 .module-card.coming-soon:hover{transform:none;border-color:var(--border)}
+
+/* ── Welcome Tour ── */
+#tour-root{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.tour-overlay{position:fixed;inset:0;background:rgba(10,11,14,0.45);pointer-events:auto;animation:tourFadeIn 0.3s ease}
+@keyframes tourFadeIn{from{opacity:0}to{opacity:1}}
+.tour-highlight{position:fixed;z-index:100000;border-radius:10px;border:2px solid var(--accent);box-shadow:0 0 0 9999px rgba(10,11,14,0.45),0 0 0 4px rgba(79,156,249,0.15);transition:all 0.35s cubic-bezier(.4,0,.2,1);pointer-events:none}
+.tour-card{position:fixed;z-index:100001;pointer-events:auto;background:var(--surface2);border:1px solid var(--border2);border-radius:16px;padding:24px;max-width:380px;width:90vw;box-shadow:0 8px 40px rgba(0,0,0,0.5);animation:tourCardIn 0.35s cubic-bezier(.4,0,.2,1)}
+@keyframes tourCardIn{from{opacity:0;transform:translateY(12px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.tour-card.tour-center{position:static}
+.tour-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.tour-progress{font-size:12px;color:var(--text2);font-family:'JetBrains Mono',monospace}
+.tour-skip{background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all 0.2s;font-family:inherit}
+.tour-skip:hover{color:var(--text);background:var(--surface3)}
+.tour-title{font-size:18px;font-weight:700;color:var(--text);margin:0 0 8px 0}
+.tour-text{font-size:14px;color:var(--text2);line-height:1.5;margin:0 0 20px 0}
+.tour-footer{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tour-btn{background:var(--surface3);border:1px solid var(--border);color:var(--text);padding:8px 18px;border-radius:8px;cursor:pointer;font-size:14px;font-family:inherit;transition:all 0.2s}
+.tour-btn:hover{background:var(--surface);border-color:var(--accent)}
+.tour-next,.tour-done{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tour-next:hover,.tour-done:hover{background:var(--accent2);border-color:var(--accent2);transform:translateY(-1px)}
+.tour-dots{display:flex;gap:6px;justify-content:center;margin-top:16px}
+.tour-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all 0.3s}
+.tour-dot.active{background:var(--accent);width:24px;border-radius:4px}
 </style>
 </head>
 <body>
@@ -266,7 +289,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 <div class="header">
   <div>
     <div class="logo">SUMA<span>MENTE</span></div>
-    <div class="version">v1.2 © Pro Dynamic</div>
+    <div class="version" id="version-tap" style="cursor:pointer">v1.2 © Pro Dynamic</div>
   </div>
   <div style="display:flex;gap:6px">
     <button class="btn-secondary" onclick="toggleSteps()">◀ pasos</button>
@@ -280,7 +303,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <span class="current-mode-name" id="current-name">General</span>
   </div>
   <div style="display:flex;gap:8px;align-items:center">
-    <button class="btn-secondary" onclick="toggleSearch()" title="Buscar fórmula (Ctrl+K)" style="padding:7px 10px"><span style="font-size:15px">🔍</span></button>
+    <button class="btn-secondary" id="btn-search" onclick="toggleSearch()" title="Buscar fórmula (Ctrl+K)" style="padding:7px 10px"><span style="font-size:15px">🔍</span></button>
     <button class="btn-secondary" id="btn-pro" onclick="toggleProModal()" style="padding:7px 10px;background:var(--accent);color:#0a0b0e;border-color:var(--accent);font-weight:700">⭐ PRO</button>
     <button class="btn-menu" onclick="toggleModal(true)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
@@ -1233,7 +1256,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 <div class="statusbar">
   <div class="status-item"><span class="status-dot"></span>Motor activo</div>
   <div class="status-item" id="status-mode">Modo: General</div>
-  <div class="status-item">SumaMente v1.1</div>
+  <div class="status-item">SumaMente v1.2</div>
     </div>
 
 <script src="js/data.js"></script>
@@ -1271,7 +1294,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 <script src="js/modulos/redes.js"></script>
 <script src="js/app.js"></script>
 <script src="js/modulos/visuales/app_visual.js"></script>
-<!-- <script src="js/admob.js"></script> -->
+
 </body>
 </html>
 

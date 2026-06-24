@@ -1,11 +1,10 @@
-const CACHE_NAME = 'sumamente-v22-visuales';
+const CACHE_NAME = 'sumamente-v24-release';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './logo.png',
   './js/data.js',
-  './js/forms.js',
   './js/app.js',
   './js/modulos/electro.js',
   './js/modulos/medicina.js',
@@ -21,6 +20,7 @@ const ASSETS = [
   './js/modulos/acustica.js',
   './js/modulos/programacion.js',
   './js/modulos/estadistica.js',
+  './js/modulos/redes.js',
   './js/modulos/visuales/acustica_visual.js',
   './js/modulos/visuales/civil_visual.js',
   './js/modulos/visuales/diseno_visual.js',
@@ -32,7 +32,11 @@ const ASSETS = [
   './js/modulos/visuales/mecanica_visual.js',
   './js/modulos/visuales/medicina_visual.js',
   './js/modulos/visuales/nutricion_visual.js',
+  './js/modulos/visuales/programacion_visual.js',
   './js/modulos/visuales/quimica_visual.js',
+  './js/modulos/visuales/redes_visual.js',
+  './js/modulos/visuales/unidades_visual.js',
+  './js/modulos/visuales/app_visual.js',
   'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800&display=swap'
 ];
 

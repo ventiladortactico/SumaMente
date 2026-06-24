@@ -2629,7 +2629,8 @@ const TourManager = {
             el: '#btn-search',
             title: 'Busqueda Universal',
             text: 'Haz clic en la lupa para buscar entre las 340+ formulas al instante. Tambien muestra tus favoritos.',
-            place: 'bottom'
+            place: 'bottom',
+            mobilePlace: 'bottom-screen'
         },
         {
             el: '.sidebar > .panel:first-child .panel-header',
@@ -2642,7 +2643,8 @@ const TourManager = {
             el: '.sidebar > .panel:last-child .panel-header',
             title: 'Historial',
             text: 'Guarda automaticamente todos tus calculos anteriores. Puedes limpiarlo o exportarlo a PDF con la version PRO.',
-            place: 'left'
+            place: 'left',
+            mobilePlace: 'top-screen'
         },
         {
             el: '.btn-menu',
@@ -2751,7 +2753,7 @@ const TourManager = {
         if (pBtn) pBtn.onclick = () => { this._idx--; this._show(); };
         const dBtn = this._card.querySelector('.tour-done');
         if (dBtn) dBtn.onclick = () => this.end();
-        if (!isCenter) this._pos(s.place || 'bottom');
+        if (!isCenter) this._pos(window.innerWidth <= 640 ? (s.mobilePlace || s.place) : (s.place || 'bottom'));
         else { this._card.style.left = ''; this._card.style.top = ''; }
     },
     _pos(place) {
@@ -2763,7 +2765,9 @@ const TourManager = {
         const vw = window.innerWidth, vh = window.innerHeight;
         const gap = 16;
         let l, t;
-        if (place === 'top') { l = h.left + h.width / 2 - cw / 2; t = h.top - ch - gap; }
+        if (place === 'bottom-screen') { l = vw / 2 - cw / 2; t = vh - ch - 12; }
+        else if (place === 'top-screen') { l = vw / 2 - cw / 2; t = 12; }
+        else if (place === 'top') { l = h.left + h.width / 2 - cw / 2; t = h.top - ch - gap; }
         else if (place === 'left') { l = h.left - cw - gap; t = h.top + h.height / 2 - ch / 2; }
         else if (place === 'right') { l = h.right + gap; t = h.top + h.height / 2 - ch / 2; }
         else { l = h.left + h.width / 2 - cw / 2; t = h.bottom + gap; }

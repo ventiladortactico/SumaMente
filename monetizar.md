@@ -141,7 +141,12 @@ PRO
 COLABORADOR ❤️
 ```
 
-No implementar visualmente hasta la fase de UI Premium.
+Se implementó visualmente en la UI. El panel de configuración es obligatorio para que el usuario pueda:
+- Ver su estado de licencia (FREE / PRO / COLABORADOR)
+- Restaurar compras de Google Play
+- Acceder al soporte
+
+Ubicación: menú lateral → ícono de ajustes o botón "Configuración".
 
 ---
 
@@ -213,11 +218,16 @@ Manteniendo una sola base de código. No crear proyectos separados.
   - Funciones: toggleProModal(), purchasePro(), restorePro(), updateProButton()
 * Producto ID: `sumamente_pro_lifetime` (compra única, no consumible).
 
-### ⏳ Pendiente (Acción manual del usuario)
+### ✅ Fase 4 - Completado (Pre-lanzamiento)
+
+* Privacy Policy creada: [`privacy-policy.md`](./privacy-policy.md).
+* README actualizado con nuevo keypad 5×7 y build Android.
+* Panel de configuración implementado con estado de licencia.
+
+### ⏳ Pendiente (Acción manual del usuario en Play Console)
 
 * Configurar producto `sumamente_pro_lifetime` en Google Play Console con precio USD 2.99 - 4.99.
-* Reemplazar AdMob Test Banner ID con ID real de producción.
-* Agregar panel de configuración para mostrar estado de licencia.
+* ✅ Reemplazar AdMob Test Banner ID por ID real de producción (`ca-app-pub-8506144157862831/8793443400`).
 
 ---
 

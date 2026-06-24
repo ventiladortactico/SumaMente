@@ -189,28 +189,38 @@ Dos caminos:
 - Postfijo: `!` (factorial, 0-170)
 - Parentesis automaticos
 
-### Botonera
+### Botonera (5×7)
 
 ```
-sin  cos  tan  log
-ln   √    x^y  π
-e    x!   x    ±
-(    )    AC   ⌫
-7    8    9    ×
-4    5    6    -
-1    2    3    +
-0    .    = (wide)
+2nd (oro)  sin ↦ π   cos ↦ e   tan ↦ cot    ⌫
+x² ↦ √     1/x       |x|        x           y
+³√x        (         )         =           ÷
+x^y        7         8         9           ×
+10^x ↦ log 4         5         6           −
+log ↦ 10^x 1         2         3           +
+ln ↦ e^x   (−)       0         . (o ,)     ↵
 ```
 
-| Tecla | Funcion | Descripcion |
+| Tecla | Función | Descripción |
 |-------|---------|-------------|
-| `AC` | `genClear()` | Reset completo (expresion, resultado, canvas) |
-| `⌫` | `genBack()` | Borra ultimo caracter |
-| `±` | `genNegate()` | Inserta signo menos |
-| `=` | `genEval()` | Evalua expresion o grafica/ecuacion si contiene `x` |
-| `x!` | `genFactorial()` | Factorial del resultado actual |
+| `2nd` | `toggle2ndMode()` | Cambia etiquetas (x²↔√, log↔10^x, ln↔e^x, sin↔π, cos↔e, tan↔cot) |
+| `sin` | `genKey('sin(')` | Seno (2nd → inserta π) |
+| `cos` | `genKey('cos(')` | Coseno (2nd → inserta e) |
+| `tan` | `genKey('tan(')` | Tangente (2nd → cot) |
+| `⌫` | `genBack()` | Borra último carácter; mantener 600ms = `genClear()` |
+| `x²` | `genKey('^2')` | Cuadrado (2nd → √) |
+| `1/x` | `genKey('^(-1)')` | Inverso multiplicativo |
+| `\|x\|` | `genKey('abs(')` | Valor absoluto |
+| `³√x` | `genKey('cbrt(')` | Raíz cúbica |
+| `x^y` | `genKey('^')` | Potencia |
+| `10^x` | `genKey('10^(')` | 10 elevado (2nd ↔ log) |
+| `log` | `genKey('log(')` | Log base 10 (2nd ↔ 10^x) |
+| `ln` | `genKey('ln(')` | Log natural (2nd ↔ e^x) |
+| `(−)` | `genNegate()` | Inserta signo menos |
+| `↵` | `genEval()` | Evalúa expresión o grafica si contiene `x` |
+| `.` | `genKey('.' o ',')` | Separador decimal según locale |
 
-### Ecuaciones (auto-detection)
+### Ecuaciones (auto-detección)
 
 Si la expresion contiene `x`:
 - Si tiene `=`: grafica la ecuacion + pasos algebraicos
@@ -382,6 +392,30 @@ python -m http.server 8765
 ```
 
 Abrir `index.html` directamente funciona para calculos pero no registra el Service Worker.
+
+### Build Android (Capacitor)
+
+```bash
+# 1. Build web
+npm run build
+
+# 2. Sincronizar con Android
+npx cap sync android
+
+# 3. Abrir en Android Studio
+npx cap open android
+
+# 4. Generar AAB (desde Android Studio)
+# Build → Build Bundle(s) / APK(s) → Build Bundle(s)
+```
+
+Requisitos: Node.js, Android Studio, SDK 24+.
+
+---
+
+## Privacy Policy
+
+Ver [`privacy-policy.md`](./privacy-policy.md).
 
 ---
 

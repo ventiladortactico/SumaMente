@@ -16,7 +16,7 @@ let angleMode = 'deg'; // 'deg' | 'rad'
 // ── Gestor de publicidad AdMob (Banner discreto) ──
 const AdManager = {
     isInitialized: false,
-    bannerId: 'ca-app-pub-3940256099942544/6300978111',
+    bannerId: 'ca-app-pub-8506144157862831/8793443400',
 
     async init() {
         if (this.isInitialized) return;
@@ -34,7 +34,7 @@ const AdManager = {
         if (!this.isInitialized || LicenseManager.isPro || LicenseManager.isCollaborator) return;
         try {
             const { AdMob } = await import('@capacitor-community/admob');
-            await AdMob.showBanner({ adId: this.bannerId, position: 'bottom', margin: 0, isTesting: true });
+            await AdMob.showBanner({ adId: this.bannerId, position: 'bottom', margin: 0, isTesting: false });
             console.log('Banner AdMob mostrado');
         } catch (error) {
             console.log('Error al mostrar banner:', error.message);

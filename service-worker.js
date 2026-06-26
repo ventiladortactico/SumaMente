@@ -21,6 +21,8 @@ const ASSETS = [
   './js/modulos/programacion.js',
   './js/modulos/estadistica.js',
   './js/modulos/redes.js',
+  './js/modulos/algebra.js',
+  './js/modulos/visuales/algebra_visual.js',
   './js/modulos/visuales/acustica_visual.js',
   './js/modulos/visuales/civil_visual.js',
   './js/modulos/visuales/diseno_visual.js',

@@ -219,14 +219,7 @@ function setupCanvasInteractivity(canvas, expr) {
         plotMaxY = plotMinY + newRangeY;
         
         // Redibujar según el tipo de gráfico actual
-        if (currentPlotType === 'equation') {
-            genPlotEquation(currentPlotExpr);
-        } else if (currentPlotType === 'system') {
-            const eqs = currentPlotExpr.split(',').map(s => s.trim());
-            if (eqs.length === 2) genPlotSystem2x2(eqs[0], eqs[1]);
-        } else {
-            genPlotFunc(currentPlotExpr);
-        }
+        redrawCurrentPlot(true);
     };
     
     // Pan with mouse drag
@@ -274,14 +267,7 @@ function setupCanvasInteractivity(canvas, expr) {
         plotLastY = e.clientY;
         
         // Redibujar según el tipo de gráfico actual
-        if (currentPlotType === 'equation') {
-            genPlotEquation(currentPlotExpr);
-        } else if (currentPlotType === 'system') {
-            const eqs = currentPlotExpr.split(',').map(s => s.trim());
-            if (eqs.length === 2) genPlotSystem2x2(eqs[0], eqs[1]);
-        } else {
-            genPlotFunc(currentPlotExpr);
-        }
+        redrawCurrentPlot(true);
     };
     
     canvas.onmouseup = () => {
@@ -294,55 +280,17 @@ function setupCanvasInteractivity(canvas, expr) {
         canvas.style.cursor = 'default';
     };
     
-    // Touch support for mobile
+    // Touch support for mobile (merged single-finger pan + two-finger pinch)
+    let lastPinchDist = 0;
+    let touchPanning = false;
     canvas.ontouchstart = (e) => {
         if (e.touches.length === 1) {
+            touchPanning = true;
             plotDragging = true;
             plotLastX = e.touches[0].clientX;
             plotLastY = e.touches[0].clientY;
-        }
-    };
-    
-    canvas.ontouchmove = (e) => {
-        if (!plotDragging || e.touches.length !== 1) return;
-        e.preventDefault();
-        
-        const dx = e.touches[0].clientX - plotLastX;
-        const dy = e.touches[0].clientY - plotLastY;
-        
-        const w = canvas.width / (window.devicePixelRatio || 1);
-        const h = canvas.height / (window.devicePixelRatio || 1);
-        const margin = 40;
-        const plotW = w - margin * 2;
-        const plotH = h - margin * 2;
-        
-        const graphDx = -dx / plotW * (plotMaxX - plotMinX);
-        const graphDy = dy / plotH * (plotMaxY - plotMinY);
-        
-        plotMinX += graphDx;
-        plotMaxX += graphDx;
-        plotMinY += graphDy;
-        plotMaxY += graphDy;
-        
-        plotLastX = e.touches[0].clientX;
-        plotLastY = e.touches[0].clientY;
-        
-        // Redibujar según el tipo de gráfico actual
-        if (currentPlotType === 'equation') {
-            genPlotEquation(currentPlotExpr);
-        } else {
-            genPlotFunc(currentPlotExpr);
-        }
-    };
-    
-    canvas.ontouchend = () => {
-        plotDragging = false;
-    };
-    
-    // Pinch zoom for mobile
-    let lastPinchDist = 0;
-    canvas.ontouchstart = (e) => {
-        if (e.touches.length === 2) {
+        } else if (e.touches.length === 2) {
+            touchPanning = false;
             lastPinchDist = Math.hypot(
                 e.touches[0].clientX - e.touches[1].clientX,
                 e.touches[0].clientY - e.touches[1].clientY
@@ -351,43 +299,85 @@ function setupCanvasInteractivity(canvas, expr) {
     };
     
     canvas.ontouchmove = (e) => {
-        if (e.touches.length !== 2) return;
-        e.preventDefault();
-        
-        const dist = Math.hypot(
-            e.touches[0].clientX - e.touches[1].clientX,
-            e.touches[0].clientY - e.touches[1].clientY
-        );
-        
-        if (lastPinchDist > 0) {
-            const zoomFactor = lastPinchDist / dist;
-            const centerX = (plotMinX + plotMaxX) / 2;
-            const centerY = (plotMinY + plotMaxY) / 2;
+        if (e.touches.length === 1 && touchPanning) {
+            e.preventDefault();
+            const dx = e.touches[0].clientX - plotLastX;
+            const dy = e.touches[0].clientY - plotLastY;
             
-            const newRangeX = (plotMaxX - plotMinX) * zoomFactor;
-            const newRangeY = (plotMaxY - plotMinY) * zoomFactor;
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            const margin = 40;
+            const plotW = w - margin * 2;
+            const plotH = h - margin * 2;
             
-            plotMinX = centerX - newRangeX / 2;
-            plotMaxX = centerX + newRangeX / 2;
-            plotMinY = centerY - newRangeY / 2;
-            plotMaxY = centerY + newRangeY / 2;
+            const graphDx = -dx / plotW * (plotMaxX - plotMinX);
+            const graphDy = dy / plotH * (plotMaxY - plotMinY);
             
-        // Redibujar según el tipo de gráfico actual
-        if (currentPlotType === 'equation') {
-            genPlotEquation(currentPlotExpr);
-        } else if (currentPlotType === 'system') {
-            const eqs = currentPlotExpr.split(',').map(s => s.trim());
-            if (eqs.length === 2) genPlotSystem2x2(eqs[0], eqs[1]);
-        } else {
-            genPlotFunc(currentPlotExpr);
+            plotMinX += graphDx;
+            plotMaxX += graphDx;
+            plotMinY += graphDy;
+            plotMaxY += graphDy;
+            
+            plotLastX = e.touches[0].clientX;
+            plotLastY = e.touches[0].clientY;
+            
+            redrawCurrentPlot(true);
+        } else if (e.touches.length === 2) {
+            e.preventDefault();
+            const dist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            
+            if (lastPinchDist > 0) {
+                const zoomFactor = lastPinchDist / dist;
+                const centerX = (plotMinX + plotMaxX) / 2;
+                const centerY = (plotMinY + plotMaxY) / 2;
+                
+                const newRangeX = (plotMaxX - plotMinX) * zoomFactor;
+                const newRangeY = (plotMaxY - plotMinY) * zoomFactor;
+                
+                plotMinX = centerX - newRangeX / 2;
+                plotMaxX = centerX + newRangeX / 2;
+                plotMinY = centerY - newRangeY / 2;
+                plotMaxY = centerY + newRangeY / 2;
+                
+                redrawCurrentPlot(true);
+            }
+            
+            lastPinchDist = dist;
         }
-        }
-        
-        lastPinchDist = dist;
+    };
+    
+    canvas.ontouchend = () => {
+        plotDragging = false;
+        touchPanning = false;
+        lastPinchDist = 0;
     };
 }
 
-function genPlotSystem2x2(eq1, eq2) {
+function redrawCurrentPlot(preserveView) {
+    if (currentPlotType === 'equation') {
+        genPlotEquation(currentPlotExpr, preserveView);
+    } else if (currentPlotType === 'system') {
+        const eqs = currentPlotExpr.split(',').map(s => s.trim());
+        if (eqs.length === 2) genPlotSystem2x2(eqs[0], eqs[1], preserveView);
+    } else if (currentPlotType === 'inequality') {
+        const ineqMatch = currentPlotExpr.match(/(>=|<=|>|<)/);
+        if (ineqMatch) genPlotInequality(currentPlotExpr, ineqMatch[1], preserveView);
+    } else if (currentPlotType === 'parametric') {
+        const parts = currentPlotExpr.split(',').map(s => s.trim());
+        if (parts.length === 2) {
+            const xE = parts[0].replace(/^x\s*=\s*/, '').trim();
+            const yE = parts[1].replace(/^y\s*=\s*/, '').trim();
+            if (xE && yE) genPlotParametric(xE, yE, preserveView);
+        }
+    } else {
+        genPlotFunc(currentPlotExpr, preserveView);
+    }
+}
+
+function genPlotSystem2x2(eq1, eq2, preserveView) {
     const p1 = parseLinearEq(eq1);
     const p2 = parseLinearEq(eq2);
     if (!p1 || !p2) return;
@@ -413,12 +403,36 @@ function genPlotSystem2x2(eq1, eq2) {
         if (isFinite(y2)) points2.push({ x, y: y2 });
     }
     
-    const allY = [...points1, ...points2].filter(p => isFinite(p.y)).map(p => p.y);
-    if (allY.length === 0) return;
-    let minY = Math.min(...allY), maxY = Math.max(...allY);
-    const range = maxY - minY || 1;
-    minY -= range * 0.1; maxY += range * 0.1;
-    plotMinY = minY; plotMaxY = maxY;
+    // Handle vertical lines (b=0): x = c/a, swap x<->y roles
+    const genVerticalPoints = (p) => {
+        const pts = [];
+        const vx = p.c / p.a;
+        if (!isFinite(vx)) return pts;
+        const yRange = plotMaxY - plotMinY || 1;
+        for (let i = 0; i <= steps; i++) {
+            const y = plotMinY + yRange * i / steps;
+            pts.push({ x: vx, y });
+        }
+        return pts;
+    };
+    if (p1.b === 0 && p1.a !== 0) {
+        points1.length = 0;
+        points1.push(...genVerticalPoints(p1));
+    }
+    if (p2.b === 0 && p2.a !== 0) {
+        points2.length = 0;
+        points2.push(...genVerticalPoints(p2));
+    }
+    
+    if (!preserveView) {
+        const allY = [...points1, ...points2].filter(p => isFinite(p.y)).map(p => p.y);
+        if (allY.length > 0) {
+            let minY = Math.min(...allY), maxY = Math.max(...allY);
+            const range = maxY - minY || 1;
+            minY -= range * 0.1; maxY += range * 0.1;
+            plotMinY = minY; plotMaxY = maxY;
+        }
+    }
     
     var dpr = window.devicePixelRatio || 1;
     canvas.style.display = 'block';
@@ -566,7 +580,7 @@ function genPlotSystem2x2(eq1, eq2) {
     document.getElementById('graph-controls').style.display = 'flex';
 }
 
-function genPlotEquation(equation) {
+function genPlotEquation(equation, preserveView) {
     // Separar la ecuación en izquierda y derecha
     const parts = equation.split('=');
     if (parts.length !== 2) {
@@ -618,21 +632,23 @@ function genPlotEquation(equation) {
     }
     
     // Ajustar rango Y basado en todos los puntos (con recorte de outliers)
-    const allY = [...leftPoints, ...rightPoints].filter(p => p.y !== null).map(p => p.y);
-    if (allY.length > 0) {
-        if (allY.length > 10) {
-            const sorted = [...allY].sort((a, b) => a - b);
-            const trimStart = Math.floor(sorted.length * 0.05);
-            const trimEnd = Math.ceil(sorted.length * 0.95);
-            minY = sorted[trimStart];
-            maxY = sorted[trimEnd - 1];
-        } else {
-            minY = Math.min(...allY);
-            maxY = Math.max(...allY);
+    if (!preserveView) {
+        const allY = [...leftPoints, ...rightPoints].filter(p => p.y !== null).map(p => p.y);
+        if (allY.length > 0) {
+            if (allY.length > 10) {
+                const sorted = [...allY].sort((a, b) => a - b);
+                const trimStart = Math.floor(sorted.length * 0.05);
+                const trimEnd = Math.ceil(sorted.length * 0.95);
+                minY = sorted[trimStart];
+                maxY = sorted[trimEnd - 1];
+            } else {
+                minY = Math.min(...allY);
+                maxY = Math.max(...allY);
+            }
+            const range = maxY - minY || 1;
+            minY -= range * 0.1;
+            maxY += range * 0.1;
         }
-        const range = maxY - minY || 1;
-        minY -= range * 0.1;
-        maxY += range * 0.1;
     }
     
     var dpr = window.devicePixelRatio || 1;
@@ -757,7 +773,9 @@ function genPlotEquation(equation) {
             // Verificar si hay cruce
             if ((p1.y - q1.y) * (p2.y - q2.y) <= 0) {
                 // Interpolación lineal para encontrar el punto exacto
-                const t = (q1.y - p1.y) / ((p2.y - p1.y) - (q2.y - q1.y));
+                const denom = (p2.y - p1.y) - (q2.y - q1.y);
+                if (Math.abs(denom) < 1e-12) continue;
+                const t = (q1.y - p1.y) / denom;
                 const interX = p1.x + t * (p2.x - p1.x);
                 const interY = p1.y + t * (p2.y - p1.y);
                 intersection = { x: interX, y: interY };
@@ -814,6 +832,354 @@ function genPlotEquation(equation) {
     document.getElementById('graph-controls').style.display = 'flex';
 }
 
+function genPlotInequality(equation, op, preserveView) {
+    // Desigualdad: graficar LHS y RHS como curvas, sombrear región
+    const parts = equation.split(op === '<=' ? '<=' : op === '>=' ? '>=' : op);
+    if (parts.length !== 2) return;
+    const leftExpr = parts[0].trim();
+    const rightExpr = parts[1].trim();
+    const canvas = document.getElementById('chart-canvas-general');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    var pw = (canvas.parentElement && canvas.parentElement.clientWidth) || window.innerWidth || 320;
+    const w = Math.max(pw - 28, 200);
+    const h = 250;
+    const margin = 40;
+    const plotW = w - margin * 2;
+    const plotH = h - margin * 2;
+    let minX = plotMinX, maxX = plotMaxX;
+    let minY = plotMinY, maxY = plotMaxY;
+    const steps = 400;
+    const leftPoints = [];
+    const rightPoints = [];
+    for (let i = 0; i <= steps; i++) {
+        const x = parseFloat((minX + (maxX - minX) * i / steps).toPrecision(10));
+        try {
+            const y1 = safeMathEval(leftExpr, { x });
+            const y2 = safeMathEval(rightExpr, { x });
+            leftPoints.push({ x, y: isFinite(y1) ? y1 : null });
+            rightPoints.push({ x, y: isFinite(y2) ? y2 : null });
+        } catch(e) {
+            leftPoints.push({ x, y: null });
+            rightPoints.push({ x, y: null });
+        }
+    }
+    // Auto Y range
+    if (!preserveView) {
+        const allY = [...leftPoints, ...rightPoints].filter(p => p.y !== null).map(p => p.y);
+        if (allY.length > 0) {
+            if (allY.length > 10) {
+                const sorted = [...allY].sort((a, b) => a - b);
+                minY = sorted[Math.floor(sorted.length * 0.02)];
+                maxY = sorted[Math.ceil(sorted.length * 0.98) - 1];
+            } else {
+                minY = Math.min(...allY);
+                maxY = Math.max(...allY);
+            }
+            const range = maxY - minY || 1;
+            minY -= range * 0.12;
+            maxY += range * 0.12;
+        }
+    }
+    var dpr = window.devicePixelRatio || 1;
+    canvas.style.display = 'block';
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+    const toCanvasX = (x) => margin + (x - minX) / (maxX - minX) * plotW;
+    const toCanvasY = (y) => margin + (maxY - y) / (maxY - minY) * plotH;
+    
+    // Background
+    ctx.fillStyle = 'rgba(30, 32, 40, 0.8)';
+    ctx.fillRect(0, 0, w, h);
+    
+    // Grid
+    const xRange = maxX - minX;
+    const yRange = maxY - minY;
+    const xStep = Math.pow(10, Math.floor(Math.log10(xRange / 5)));
+    const yStep = Math.pow(10, Math.floor(Math.log10(yRange / 5)));
+    ctx.strokeStyle = 'rgba(74, 85, 112, 0.3)';
+    ctx.lineWidth = 0.5;
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep / 2) {
+        const cx = toCanvasX(x);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep / 2) {
+        const cy = toCanvasY(y);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    ctx.strokeStyle = 'rgba(74, 85, 112, 0.6)';
+    ctx.lineWidth = 1;
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
+        const cx = toCanvasX(x);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
+        const cy = toCanvasY(y);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    
+    // Axes
+    ctx.strokeStyle = '#8a97b0';
+    ctx.lineWidth = 2;
+    if (minY <= 0 && maxY >= 0) {
+        const cy = toCanvasY(0);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    if (minX <= 0 && maxX >= 0) {
+        const cx = toCanvasX(0);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    
+    // Shade inequality region
+    const diffPoints = [];
+    for (let i = 0; i <= steps; i++) {
+        const pt = leftPoints[i];
+        if (pt.y !== null && rightPoints[i].y !== null) {
+            const diff = pt.y - rightPoints[i].y;
+            const satisfies = op === '>' ? diff > 0 : op === '<' ? diff < 0 : op === '>=' ? diff >= 0 : diff <= 0;
+            diffPoints.push({ x: pt.x, diff, satisfies, y1: pt.y, y2: rightPoints[i].y });
+        } else {
+            diffPoints.push({ x: leftPoints[i] ? leftPoints[i].x : pt.x, diff: null, satisfies: false, y1: null, y2: null });
+        }
+    }
+    
+    // Find satisfies segments and shade them
+    let shading = false;
+    let segStart = 0;
+    ctx.fillStyle = 'rgba(79, 156, 249, 0.15)';
+    ctx.strokeStyle = 'rgba(79, 156, 249, 0.3)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < diffPoints.length; i++) {
+        if (diffPoints[i].satisfies && !shading) {
+            shading = true;
+            segStart = i;
+        } else if (!diffPoints[i].satisfies && shading) {
+            shading = false;
+            // Shade segment segStart to i
+            ctx.beginPath();
+            ctx.moveTo(toCanvasX(diffPoints[segStart].x), toCanvasY(diffPoints[segStart].y1));
+            for (let j = segStart; j <= i; j++) {
+                ctx.lineTo(toCanvasX(diffPoints[j].x), toCanvasY(diffPoints[j].y1));
+            }
+            for (let j = i; j >= segStart; j--) {
+                ctx.lineTo(toCanvasX(diffPoints[j].x), toCanvasY(diffPoints[j].y2));
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+    }
+    if (shading) {
+        ctx.beginPath();
+        ctx.moveTo(toCanvasX(diffPoints[segStart].x), toCanvasY(diffPoints[segStart].y1));
+        for (let j = segStart; j < diffPoints.length; j++) {
+            ctx.lineTo(toCanvasX(diffPoints[j].x), toCanvasY(diffPoints[j].y1));
+        }
+        for (let j = diffPoints.length - 1; j >= segStart; j--) {
+            ctx.lineTo(toCanvasX(diffPoints[j].x), toCanvasY(diffPoints[j].y2));
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+    
+    // Draw LHS curve (solid)
+    ctx.strokeStyle = '#4f9cf9';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    let started = false;
+    for (let i = 0; i < leftPoints.length; i++) {
+        const p = leftPoints[i];
+        if (p.y === null) { started = false; continue; }
+        const cx = toCanvasX(p.x), cy = toCanvasY(p.y);
+        if (!started) { ctx.moveTo(cx, cy); started = true; }
+        else ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+    
+    // Draw RHS curve (dashed)
+    ctx.strokeStyle = '#f97b4f';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    started = false;
+    for (let i = 0; i < rightPoints.length; i++) {
+        const p = rightPoints[i];
+        if (p.y === null) { started = false; continue; }
+        const cx = toCanvasX(p.x), cy = toCanvasY(p.y);
+        if (!started) { ctx.moveTo(cx, cy); started = true; }
+        else ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    // Legend
+    ctx.font = '11px monospace';
+    ctx.fillStyle = '#4f9cf9';
+    ctx.textAlign = 'left';
+    ctx.fillText(leftExpr, margin + 5, margin + 16);
+    ctx.fillStyle = '#f97b4f';
+    ctx.fillText(rightExpr, margin + 5, margin + 32);
+    ctx.fillStyle = 'rgba(79, 156, 249, 0.3)';
+    ctx.fillText('Región: ' + op, margin + 5, margin + 48);
+    
+    currentPlotType = 'inequality';
+    currentPlotExpr = equation;
+    document.getElementById('graph-controls').style.display = 'flex';
+    setupCanvasInteractivity(canvas, equation);
+}
+
+function genPlotParametric(xExpr, yExpr, preserveView) {
+    // Curva paramétrica: x = f(t), y = g(t) para t ∈ [-10, 10]
+    const canvas = document.getElementById('chart-canvas-general');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    var pw = (canvas.parentElement && canvas.parentElement.clientWidth) || window.innerWidth || 320;
+    const w = Math.max(pw - 28, 200);
+    const h = 250;
+    const margin = 40;
+    const plotW = w - margin * 2;
+    const plotH = h - margin * 2;
+    let minX = plotMinX, maxX = plotMaxX;
+    let minY = plotMinY, maxY = plotMaxY;
+    const steps = 400;
+    const tMin = -10, tMax = 10;
+    const points = [];
+    const evalT = (expr, t) => {
+        try { return safeMathEval(expr, { t }); } catch(e) { return NaN; }
+    };
+    for (let i = 0; i <= steps; i++) {
+        const t = tMin + (tMax - tMin) * i / steps;
+        const x = evalT(xExpr, t);
+        const y = evalT(yExpr, t);
+        if (isFinite(x) && isFinite(y)) points.push({ x, y, t });
+    }
+    // Auto range
+    if (!preserveView && points.length > 0) {
+        const xs = points.map(p => p.x), ys = points.map(p => p.y);
+        if (points.length > 10) {
+            const sx = [...xs].sort((a, b) => a - b), sy = [...ys].sort((a, b) => a - b);
+            minX = sx[Math.floor(sx.length * 0.02)];
+            maxX = sx[Math.ceil(sx.length * 0.98) - 1];
+            minY = sy[Math.floor(sy.length * 0.02)];
+            maxY = sy[Math.ceil(sy.length * 0.98) - 1];
+        } else {
+            minX = Math.min(...xs); maxX = Math.max(...xs);
+            minY = Math.min(...ys); maxY = Math.max(...ys);
+        }
+        const rx = maxX - minX || 1, ry = maxY - minY || 1;
+        minX -= rx * 0.1; maxX += rx * 0.1;
+        minY -= ry * 0.1; maxY += ry * 0.1;
+    }
+    var dpr = window.devicePixelRatio || 1;
+    canvas.style.display = 'block';
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+    const toCanvasX = (x) => margin + (x - minX) / (maxX - minX) * plotW;
+    const toCanvasY = (y) => margin + (maxY - y) / (maxY - minY) * plotH;
+    
+    // Background
+    ctx.fillStyle = 'rgba(30, 32, 40, 0.8)';
+    ctx.fillRect(0, 0, w, h);
+    
+    // Grid
+    const xRange = maxX - minX;
+    const yRange = maxY - minY;
+    const xStep = Math.pow(10, Math.floor(Math.log10(xRange / 5)));
+    const yStep = Math.pow(10, Math.floor(Math.log10(yRange / 5)));
+    ctx.strokeStyle = 'rgba(74, 85, 112, 0.3)';
+    ctx.lineWidth = 0.5;
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep / 2) {
+        const cx = toCanvasX(x);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep / 2) {
+        const cy = toCanvasY(y);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    ctx.strokeStyle = 'rgba(74, 85, 112, 0.6)';
+    ctx.lineWidth = 1;
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
+        const cx = toCanvasX(x);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
+        const cy = toCanvasY(y);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    
+    // Axes
+    ctx.strokeStyle = '#8a97b0';
+    ctx.lineWidth = 2;
+    if (minY <= 0 && maxY >= 0) {
+        const cy = toCanvasY(0);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    if (minX <= 0 && maxX >= 0) {
+        const cx = toCanvasX(0);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    
+    // Draw parametric curve with gradient color
+    ctx.lineWidth = 2.5;
+    for (let i = 1; i < points.length; i++) {
+        const p1 = points[i - 1], p2 = points[i];
+        const t = p1.t;
+        // Color gradient from blue (start) to orange (end)
+        const frac = (t - tMin) / (tMax - tMin);
+        const r = Math.round(79 + (249 - 79) * frac);
+        const g = Math.round(156 + (123 - 156) * frac);
+        const b = Math.round(249 + (79 - 249) * frac);
+        ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
+        ctx.beginPath();
+        ctx.moveTo(toCanvasX(p1.x), toCanvasY(p1.y));
+        ctx.lineTo(toCanvasX(p2.x), toCanvasY(p2.y));
+        ctx.stroke();
+    }
+    
+    // Draw arrow at endpoint
+    if (points.length > 1) {
+        const last = points[points.length - 1];
+        const prev = points[points.length - 2];
+        const lx = toCanvasX(last.x), ly = toCanvasY(last.y);
+        const angle = Math.atan2(ly - toCanvasY(prev.y), lx - toCanvasX(prev.x));
+        ctx.fillStyle = '#f97b4f';
+        ctx.beginPath();
+        ctx.moveTo(lx, ly);
+        ctx.lineTo(lx - 10 * Math.cos(angle - 0.4), ly - 10 * Math.sin(angle - 0.4));
+        ctx.lineTo(lx - 10 * Math.cos(angle + 0.4), ly - 10 * Math.sin(angle + 0.4));
+        ctx.closePath();
+        ctx.fill();
+    }
+    
+    // Legend
+    ctx.font = '11px monospace';
+    const first = points.length > 0 ? points[Math.floor(points.length * 0.25)] : null;
+    ctx.fillStyle = '#4f9cf9';
+    ctx.textAlign = 'left';
+    ctx.fillText('x(t) = ' + xExpr, margin + 5, margin + 16);
+    ctx.fillText('y(t) = ' + yExpr, margin + 5, margin + 32);
+    if (first) {
+        ctx.fillStyle = '#aaa';
+        ctx.fillText('t₀ = ' + formatNumber(first.t, 2) + ' → (' + formatNumber(first.x, 2) + ', ' + formatNumber(first.y, 2) + ')', margin + 5, margin + 48);
+    }
+    
+    currentPlotType = 'parametric';
+    currentPlotExpr = xExpr + ', ' + yExpr;
+    document.getElementById('graph-controls').style.display = 'flex';
+    setupCanvasInteractivity(canvas, xExpr + ', ' + yExpr);
+}
+
 function resetGraphView() {
     plotMinX = -10;
     plotMaxX = 10;
@@ -824,7 +1190,17 @@ function resetGraphView() {
     const canvas = document.getElementById('chart-canvas-general');
     if (canvas.style.display !== 'none') {
         const expr = currentPlotExpr || document.getElementById('gen-expr').textContent.replace('f(x) = ', '').replace(' =', '');
-        if (expr.includes(',') && expr.includes('=')) {
+        if (currentPlotType === 'inequality') {
+            const ineqMatch = expr.match(/(>=|<=|>|<)/);
+            if (ineqMatch) genPlotInequality(expr, ineqMatch[1]);
+        } else if (currentPlotType === 'parametric') {
+            const parts = expr.split(',').map(s => s.trim());
+            if (parts.length === 2) {
+                const xE = parts[0].replace(/^x\s*=\s*/, '').trim();
+                const yE = parts[1].replace(/^y\s*=\s*/, '').trim();
+                if (xE && yE) genPlotParametric(xE, yE);
+            }
+        } else if (expr.includes(',') && expr.includes('=')) {
             const eqs = expr.split(',').map(s => s.trim());
             if (eqs.length === 2) genPlotSystem2x2(eqs[0], eqs[1]);
         } else if (expr.includes('=')) {

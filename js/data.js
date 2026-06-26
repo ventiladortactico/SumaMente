@@ -127,6 +127,14 @@ const DB={
     {name:'802.11n máx',val:'600 Mbps'},
     {name:'802.11ac máx',val:'~1.3 Gbps'},
   ],
+  alg:[
+    {name:'Número áureo (φ)',val:'1.618'},
+    {name:'e (Euler)',val:'2.718'},
+    {name:'π',val:'3.14159'},
+    {name:'i (unidad imag.)',val:'√-1'},
+    {name:'Identidad de Euler',val:'e^(iπ)+1=0'},
+    {name:'Teorema binomio',val:'(a+b)ⁿ=∑C(n,k)aⁿ⁻ᵏbᵏ'},
+  ],
 };
 
 const MED_CONST = {

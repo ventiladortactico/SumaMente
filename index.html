@@ -352,6 +352,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
             <div class="name">Geometría</div>
             <div class="desc">Formas</div>
           </div>
+          <div class="module-card" onclick="selectModule('alg')" data-category="academico" data-tags="algebra,matematicas,ecuaciones" data-key="alg" data-name="Álgebra">
+            <span class="dot" style="background:#e8b838"></span>
+            <div class="name">Álgebra</div>
+            <div class="desc">Ecuaciones</div>
+          </div>
         </div>
       </section>
 
@@ -542,8 +547,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
           </div>
           <div class="keypad">
             <button class="key gold" onclick="toggle2ndMode()" id="btn-2nd">2nd</button>
-            <button class="key fn" onclick="pressKey('sin(','π')" data-lbl="sin" data-lbl2="π">sin</button>
-            <button class="key fn" onclick="pressKey('cos(','e')" data-lbl="cos" data-lbl2="e">cos</button>
+            <button class="key fn" onclick="pressKey('sin(','sec(')" data-lbl="sin" data-lbl2="sec">sin</button>
+            <button class="key fn" onclick="pressKey('cos(','csc(')" data-lbl="cos" data-lbl2="csc">cos</button>
             <button class="key fn" onclick="pressKey('tan(','cot(')" data-lbl="tan" data-lbl2="cot">tan</button>
             <button class="key op" onclick="genBack()" id="btn-backspace">⌫</button>
 
@@ -551,9 +556,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
             <button class="key fn" onclick="genKey('^(-1)')">1/x</button>
             <button class="key fn" onclick="genKey('abs(')">|x|</button>
             <button class="key fn" onclick="genKey('x')">x</button>
-            <button class="key fn" onclick="genKey('y')">y</button>
+            <button class="key fn" onclick="pressKey('z','y')" data-lbl="z" data-lbl2="y">z</button>
 
-            <button class="key fn" onclick="genKey('cbrt(')">³√x</button>
+            <button class="key fn" onclick="pressKey('cbrt(','!')" data-lbl="³√x" data-lbl2="!">³√x</button>
             <button class="key op" onclick="genKey('(')">(</button>
             <button class="key op" onclick="genKey(')')">)</button>
             <button class="key fn" onclick="genKey('=')">=</button>
@@ -565,20 +570,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
             <button class="key" onclick="genKey('9')">9</button>
             <button class="key op" onclick="genKey('*')">×</button>
 
-            <button class="key fn" onclick="pressKey('10^(','log(')" data-lbl="10^x" data-lbl2="log">10^x</button>
+            <button class="key fn" onclick="pressKey('π','10^(')" data-lbl="π" data-lbl2="10^x">π</button>
             <button class="key" onclick="genKey('4')">4</button>
             <button class="key" onclick="genKey('5')">5</button>
             <button class="key" onclick="genKey('6')">6</button>
             <button class="key op" onclick="genKey('-')">−</button>
 
-            <button class="key fn" onclick="pressKey('log(','10^(')" data-lbl="log" data-lbl2="10^x">log</button>
+            <button class="key fn" onclick="pressKey('e','log(')" data-lbl="e" data-lbl2="log">e</button>
             <button class="key" onclick="genKey('1')">1</button>
             <button class="key" onclick="genKey('2')">2</button>
             <button class="key" onclick="genKey('3')">3</button>
             <button class="key op" onclick="genKey('+')">+</button>
 
             <button class="key fn" onclick="pressKey('ln(','e^(')" data-lbl="ln" data-lbl2="e^x">ln</button>
-            <button class="key fn" onclick="genNegate()">(−)</button>
+            <button class="key fn" onclick="if(is2nd){genNegate();reset2ndUI()}else genClear()" data-lbl="C" data-lbl2="(−)">C</button>
             <button class="key" onclick="genKey('0')">0</button>
             <button class="key" id="btn-decimal">.</button>
             <button class="key eq" onclick="genEval()">↵</button>
@@ -588,9 +593,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
               <span id="graph-coords" style="font-size:11px;color:var(--text3);font-family:var(--mono)">x: 0, y: 0</span>
             </div>
             <div style="display:flex;gap:6px;margin-top:8px;justify-content:flex-end">
+              <button class="btn-secondary" onclick="copyResult()" title="Copiar resultado" style="font-size:11px;padding:3px 10px;min-width:36px;font-weight:700">📋</button>
               <button class="btn-secondary" id="angle-btn" onclick="toggleAngleMode()" style="font-size:11px;padding:3px 10px;min-width:48px;font-weight:700">DEG</button>
             </div>
           <canvas id="chart-canvas-general" style="display:none;width:100%;height:250px;border-radius:8px;margin-top:12px;background:linear-gradient(135deg, rgba(46,49,73,0.3) 0%, rgba(30,32,40,0.8) 100%);"></canvas>
+          <div class="steps" id="gen-steps"></div>
         </div>
       </div>
     </div>
@@ -1226,6 +1233,58 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
       </div>
     </div>
 
+    <!-- ===== ÁLGEBRA ===== -->
+    <div class="mode-section" id="mode-alg">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Álgebra</span></div>
+        <div class="panel-body">
+          <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📐 Ecuaciones</div>
+          <div class="formula-chips">
+            <button class="chip active" onclick="setFormula('alg','cuadratica',event)">Cuadrática</button>
+            <button class="chip" onclick="setFormula('alg','cubica',event)">Cúbica</button>
+            <button class="chip" onclick="setFormula('alg','lineal',event)">Lineal</button>
+            <button class="chip" onclick="setFormula('alg','discriminante',event)">Discriminante</button>
+            <button class="chip" onclick="setFormula('alg','sistema2x2',event)">Sistema 2×2</button>
+            <button class="chip" onclick="setFormula('alg','sistema3x3',event)">Sistema 3×3</button>
+            <button class="chip" onclick="setFormula('alg','ec2puntos',event)">Recta 2 Puntos</button>
+            <button class="chip" onclick="setFormula('alg','exponencial',event)">Exponencial</button>
+            <button class="chip" onclick="setFormula('alg','logaritmica',event)">Logarítmica</button>
+            <button class="chip" onclick="setFormula('alg','radical',event)">Radical</button>
+            <button class="chip" onclick="setFormula('alg','logaritmo',event)">Logaritmo</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent3);font-weight:700;font-size:0.8rem">🔢 Operaciones</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('alg','regla3',event)">Regla de Tres</button>
+            <button class="chip" onclick="setFormula('alg','progresion',event)">Prog. Aritmética</button>
+            <button class="chip" onclick="setFormula('alg','progresion_geo',event)">Prog. Geométrica</button>
+            <button class="chip" onclick="setFormula('alg','sumatoria_aritmetica',event)">Sumatoria</button>
+            <button class="chip" onclick="setFormula('alg','factorial',event)">Factorial</button>
+            <button class="chip" onclick="setFormula('alg','binomio_cuadrado',event)">Binomio²</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📊 Combinatoria</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('alg','coeficiente_binomial',event)">C(n,k)</button>
+            <button class="chip" onclick="setFormula('alg','permutaciones',event)">P(n,k)</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent3);font-weight:700;font-size:0.8rem">🔢 Números</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('alg','mcd',event)">MCD</button>
+            <button class="chip" onclick="setFormula('alg','mcm',event)">MCM</button>
+            <button class="chip" onclick="setFormula('alg','valor_absoluto',event)">|x|</button>
+          </div>
+          <div style="margin:10px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📏 Geometría Analítica</div>
+          <div class="formula-chips">
+            <button class="chip" onclick="setFormula('alg','pendiente',event)">Pendiente</button>
+            <button class="chip" onclick="setFormula('alg','distancia',event)">Distancia</button>
+            <button class="chip" onclick="setFormula('alg','punto_medio',event)">Punto Medio</button>
+          </div>
+          <div id="form-alg"></div>
+          <div class="result" id="result-alg"></div>
+          <div class="steps" id="steps-alg"></div>
+        </div>
+      </div>
+    </div>
+
   </div>
   <div class="sidebar">
 
@@ -1260,6 +1319,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     </div>
 
 <script src="js/data.js"></script>
+<!-- Módulos extraídos de app.js -->
+<script src="js/globals.js"></script>
+<script src="js/managers.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/evaluator.js"></script>
+<script src="js/solvers.js"></script>
+<script src="js/audio-engine.js"></script>
+<script src="js/pro.js"></script>
+<script src="js/modulos/visuales/app_visual.js"></script>
+<script src="js/pdf-export.js"></script>
+<script src="js/core.js"></script>
+<script src="js/search.js"></script>
+<script src="js/tour.js"></script>
+<script src="js/general-calc.js"></script>
 <!-- Visualizaciones interactivas (js/modulos/visuales/) -->
 <script src="js/modulos/visuales/redes_visual.js"></script>
 <script src="js/modulos/visuales/acustica_visual.js"></script>
@@ -1292,8 +1365,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 <script src="js/modulos/programacion.js"></script>
 <script src="js/modulos/estadistica.js"></script>
 <script src="js/modulos/redes.js"></script>
+<script src="js/modulos/visuales/algebra_visual.js"></script>
+<script src="js/modulos/algebra.js"></script>
 <script src="js/app.js"></script>
-<script src="js/modulos/visuales/app_visual.js"></script>
 
 </body>
 </html>

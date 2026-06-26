@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sumamente-v24-release';
+const CACHE_NAME = 'sumamente-v25-release';
 const ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,18 @@ const ASSETS = [
   './logo.png',
   './js/data.js',
   './js/app.js',
+  './js/globals.js',
+  './js/utils.js',
+  './js/managers.js',
+  './js/core.js',
+  './js/evaluator.js',
+  './js/general-calc.js',
+  './js/solvers.js',
+  './js/audio-engine.js',
+  './js/pdf-export.js',
+  './js/pro.js',
+  './js/search.js',
+  './js/tour.js',
   './js/modulos/electro.js',
   './js/modulos/medicina.js',
   './js/modulos/finanzas.js',

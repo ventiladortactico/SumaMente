@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.load();
     if (!LicenseManager.isPro) ThemeManager.apply('dark');
     updateProButton();
+    checkProPayment();
 
     BillingManager.init();
 

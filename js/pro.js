@@ -1,3 +1,29 @@
+const MP_LINK = 'https://mpago.la/2kZmDcB';
+
+function isWebPlatform() {
+    try { return !(window.Capacitor && window.Capacitor.isNative); } catch (e) { return true; }
+}
+
+function checkProPayment() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('collection_status') === 'approved' || params.get('status') === 'approved') {
+        LicenseManager.activate({
+            tier: 'pro',
+            source: 'mercadopago',
+            activatedAt: new Date().toISOString(),
+            version: 1
+        });
+        LicenseManager.save();
+        updateProButton();
+        history.replaceState(null, '', window.location.pathname + window.location.hash);
+        const toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--accent2);color:#fff;padding:14px 24px;border-radius:12px;font-size:14px;font-weight:700;z-index:9999;animation:proUpIn .25s ease;box-shadow:0 4px 20px rgba(0,0,0,0.4)';
+        toast.textContent = '✓ ¡Pago recibido! PRO activado';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 5000);
+    }
+}
+
 function toggleProModal(show) {
     const el = document.getElementById('modal-pro');
     const showVal = show === undefined ? !el.classList.contains('show') : show;
@@ -52,7 +78,11 @@ function updateProModal() {
     } else {
         statusDiv.innerHTML = '';
         buyBtn.style.display = 'block';
-        restoreBtn.style.display = 'block';
+        if (isWebPlatform()) {
+            restoreBtn.style.display = 'none';
+        } else {
+            restoreBtn.style.display = 'block';
+        }
         if (themeSection) themeSection.style.display = 'none';
     }
 }
@@ -60,6 +90,12 @@ function updateProModal() {
 async function purchasePro() {
     const statusDiv = document.getElementById('pro-status');
     statusDiv.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:12px">Procesando compra...</div>';
+
+    if (isWebPlatform()) {
+        statusDiv.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:12px">Redirigiendo a Mercado Pago...</div>';
+        setTimeout(() => { window.location.href = MP_LINK; }, 500);
+        return;
+    }
 
     const success = await BillingManager.purchasePro();
 

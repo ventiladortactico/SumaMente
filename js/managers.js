@@ -10,28 +10,35 @@ const AdManager = {
             this.isInitialized = true;
             console.log('AdMob inicializado');
         } catch (error) {
-            console.log('AdMob no disponible (web o error):', error.message);
+            console.log('AdMob no disponible (web):', error.message);
         }
     },
 
     async showBanner() {
-        if (!this.isInitialized || LicenseManager.isPro || LicenseManager.isCollaborator) return;
-        try {
-            const { AdMob } = await import('@capacitor-community/admob');
-            await AdMob.showBanner({ adId: this.bannerId, position: 'bottom', margin: 0, isTesting: false });
-            console.log('Banner AdMob mostrado');
-        } catch (error) {
-            console.log('Error al mostrar banner:', error.message);
+        if (LicenseManager.isPro || LicenseManager.isCollaborator) return;
+        const webAd = document.getElementById('web-ad-wrap');
+        if (webAd && !webAd.classList.contains('show')) {
+            webAd.classList.add('show');
+            try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+        }
+        if (this.isInitialized) {
+            try {
+                const { AdMob } = await import('@capacitor-community/admob');
+                await AdMob.showBanner({ adId: this.bannerId, position: 'bottom', margin: 0, isTesting: false });
+            } catch (error) {
+                console.log('Error banner AdMob:', error.message);
+            }
         }
     },
 
     async hideBanner() {
+        const webAd = document.getElementById('web-ad-wrap');
+        if (webAd) webAd.classList.remove('show');
         try {
             const { AdMob } = await import('@capacitor-community/admob');
             await AdMob.hideBanner();
-            console.log('Banner AdMob oculto');
         } catch (error) {
-            console.log('Error al ocultar banner:', error.message);
+            console.log('Error ocultar AdMob:', error.message);
         }
     }
 };

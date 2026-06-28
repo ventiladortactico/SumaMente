@@ -12,6 +12,7 @@
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
 <link rel="manifest" href="manifest.json">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8506144157862831" crossorigin="anonymous"></script>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -224,6 +225,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 
 /* STATUS BAR */
 .statusbar{display:flex;justify-content:space-between;align-items:center;padding:8px 0 0;border-top:1px solid var(--border);margin-top:12px}
+#web-ad-wrap{width:100%;overflow:hidden;min-height:50px;display:none;justify-content:center;padding:4px 0}
+#web-ad-wrap.show{display:flex}
 .status-item{font-size:10px;color:var(--text3);letter-spacing:0.5px}
 .status-dot{width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block;margin-right:5px;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
@@ -1317,6 +1320,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
   <div class="status-item" id="status-mode">Modo: General</div>
   <div class="status-item">SumaMente v1.2</div>
     </div>
+
+<div id="web-ad-wrap">
+<!-- SumaMente Banner -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8506144157862831"
+     data-ad-slot="6950852469"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+</div>
 
 <script src="js/data.js"></script>
 <!-- Módulos extraídos de app.js -->

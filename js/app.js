@@ -48,11 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     BillingManager.init();
 
-    AdManager.init().then(() => {
-        if (!LicenseManager.isPro && !LicenseManager.isCollaborator) {
-            setTimeout(() => AdManager.showBanner(), 1000);
-        }
-    });
+    if (!LicenseManager.isPro && !LicenseManager.isCollaborator) {
+        AdManager.showBanner();
+    }
+    AdManager.init();
 
     renderUnifiedDB('general');
     renderHistory();

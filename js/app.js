@@ -48,9 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     BillingManager.init();
 
-    if (!LicenseManager.isPro && !LicenseManager.isCollaborator) {
-        AdManager.showBanner();
-    }
+    AdManager.showBanner();
     AdManager.init();
 
     renderUnifiedDB('general');

@@ -15,10 +15,13 @@ const AdManager = {
     },
 
     async showBanner() {
-        if (LicenseManager.isPro || LicenseManager.isCollaborator) return;
+        if (LicenseManager.isPro || LicenseManager.isCollaborator) {
+            this.hideBanner();
+            return;
+        }
         const webAd = document.getElementById('web-ad-wrap');
-        if (webAd && !webAd.classList.contains('show')) {
-            webAd.classList.add('show');
+        if (webAd) {
+            webAd.classList.remove('pro-hidden');
             try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
         }
         if (this.isInitialized) {
@@ -33,7 +36,7 @@ const AdManager = {
 
     async hideBanner() {
         const webAd = document.getElementById('web-ad-wrap');
-        if (webAd) webAd.classList.remove('show');
+        if (webAd) webAd.classList.add('pro-hidden');
         try {
             const { AdMob } = await import('@capacitor-community/admob');
             await AdMob.hideBanner();

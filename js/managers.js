@@ -22,7 +22,9 @@ const AdManager = {
         const webAd = document.getElementById('web-ad-wrap');
         if (webAd) {
             webAd.classList.remove('pro-hidden');
-            try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+            setTimeout(() => {
+                try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+            }, 100);
         }
         if (this.isInitialized) {
             try {

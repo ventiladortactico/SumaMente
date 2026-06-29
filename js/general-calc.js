@@ -227,7 +227,7 @@ function genEval() {
         
         if (/x/.test(expr)) {
             
-            if (/x\^2|x²/.test(expr)) {
+            if (/x\^2|x²/.test(expr) && !expr.includes('/')) {
                 const plotExpr = expr.includes('=') ? expr.split('=')[0].trim() : expr;
                 const analysis = analyzeQuadratic(plotExpr);
                 if (analysis) {

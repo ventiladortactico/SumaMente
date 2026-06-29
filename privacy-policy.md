@@ -39,4 +39,4 @@ Cualquier cambio será notificado mediante una actualización de esta página.
 
 ## 7. Contacto
 
-Para consultas sobre esta política de privacidad, contactar a través del repositorio del proyecto: https://github.com/anomalyco/calculadora_cientifica
+Para consultas sobre esta política de privacidad, contactar a través del repositorio del proyecto: https://github.com/ventiladortactico/SumaMente

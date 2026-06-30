@@ -5,23 +5,19 @@ function isWebPlatform() {
 }
 
 function checkProPayment() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('collection_status') === 'approved' || params.get('status') === 'approved') {
-        LicenseManager.activate({
-            tier: 'pro',
-            source: 'mercadopago',
-            activatedAt: new Date().toISOString(),
-            version: 1
-        });
-        LicenseManager.save();
-        updateProButton();
-        history.replaceState(null, '', window.location.pathname + window.location.hash);
-        const toast = document.createElement('div');
-        toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--accent2);color:#fff;padding:14px 24px;border-radius:12px;font-size:14px;font-weight:700;z-index:9999;animation:proUpIn .25s ease;box-shadow:0 4px 20px rgba(0,0,0,0.4)';
-        toast.textContent = '✓ ¡Pago recibido! PRO activado';
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 5000);
-    }
+    try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('collection_status') === 'approved' || params.get('status') === 'approved') {
+            LicenseManager.activate('pro', 'mercadopago', '');
+            updateProButton();
+            try { history.replaceState(null, '', window.location.pathname + window.location.hash); } catch(e) {}
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--accent2);color:#fff;padding:14px 24px;border-radius:12px;font-size:14px;font-weight:700;z-index:9999;animation:proUpIn .25s ease;box-shadow:0 4px 20px rgba(0,0,0,0.4)';
+            toast.textContent = '✓ ¡Pago recibido! PRO activado';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
+        }
+    } catch(e) {}
 }
 
 function toggleProModal(show) {

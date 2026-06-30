@@ -1,4 +1,4 @@
-package com.sumamente.app;
+package com.sumamente.calculadora;
 
 import com.getcapacitor.BridgeActivity;
 

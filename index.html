@@ -11,7 +11,50 @@
 <link rel="preload" as="image" href="logo.jpg">
 <title>SumaMente - Calculadora Científica con Fórmulas</title>
 <meta name="description" content="Calculadora científica online con módulos de matemática, física, química, medicina, finanzas y más. Resuelve ecuaciones, conversiones y fórmulas al instante.">
+<meta property="og:title" content="SumaMente - Calculadora Científica con Fórmulas">
+<meta property="og:description" content="Calculadora científica online con módulos de matemática, física, química, medicina, finanzas y más. Resuelve ecuaciones, conversiones y fórmulas al instante.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://suma-mente.vercel.app/">
+<meta property="og:image" content="https://suma-mente.vercel.app/logo.jpg">
+<meta property="og:locale" content="es_AR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SumaMente - Calculadora Científica con Fórmulas">
+<meta name="twitter:description" content="Calculadora científica online con módulos de matemática, física, química, medicina, finanzas y más.">
+<meta name="twitter:image" content="https://suma-mente.vercel.app/logo.jpg">
 <meta name="theme-color" content="#0a0b0e">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "SumaMente",
+  "description": "Calculadora científica online con módulos de matemática, física, química, medicina, finanzas y más. Resuelve ecuaciones, conversiones y fórmulas al instante.",
+  "url": "https://suma-mente.vercel.app/",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "3.50",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "featureList": [
+    "Calculadora científica",
+    "Módulos de electrónica",
+    "Módulos de medicina",
+    "Módulos de finanzas argentinas",
+    "Módulos de química",
+    "Módulos de arquitectura",
+    "Módulos de mecánica",
+    "Módulos de geometría",
+    "Conversores de unidades",
+    "Módulos de física",
+    "Sistema de favoritos",
+    "Búsqueda de fórmulas"
+  ],
+  "inLanguage": "es",
+  "datePublished": "2024"
+}
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <!-- Bidvertiser2105538 -->
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -317,8 +360,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <div class="version" id="version-tap" style="cursor:pointer">v1.2 © Pro Dynamic</div>
   </div>
   <div style="display:flex;gap:6px">
-    <button class="btn-secondary" onclick="toggleSteps()">◀ pasos</button>
-    <button class="btn-secondary" onclick="clearHistory()">limpiar</button>
+    <button class="btn-secondary" onclick="toggleSteps()">◀ Pasos</button>
+    <button class="btn-secondary" onclick="clearHistory()">Limpiar</button>
   </div>
 </div>
 
@@ -341,7 +384,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 <div class="modal" id="modal-modules" onclick="toggleModal(false)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="toggleModal(false)">✕</button>
-    <div class="panel-title" style="margin-bottom:10px">Seleccionar Módulo</div>
+    <h1 style="font-size:22px;font-weight:700;color:var(--text);margin:0 0 10px 0">Calculadora Científica Modular</h1>
+    <p style="font-size:13px;color:var(--text2);margin:0 0 20px 0">Selecciona un módulo para comenzar</p>
     <div class="modal-grid">
 
       <!-- General destacado -->
@@ -427,7 +471,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
           </div>
           <div class="module-card coming-soon" data-category="tecnologia" data-tags="ia,datos" data-key="" data-name="IA y Ciencia de Datos">
             <div class="name">🤖 IA y Ciencia de Datos</div>
-            <div class="desc">⌛ Próximamente</div>
+            <div class="desc">🚧 En desarrollo - Lanzamiento 2025</div>
           </div>
         </div>
       </section>
@@ -503,7 +547,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <div class="up-icon">🔒</div>
     <div class="up-title">SumaMente PRO</div>
     <div class="up-feature" id="up-feature-name">Exportar PDF</div>
-    <div class="up-desc" id="up-feature-desc">Esta funcionalidad es exclusiva de PRO. Actualizá para acceder a todas las herramientas premium.</div>
+    <div class="up-desc" id="up-feature-desc">Esta funcionalidad es exclusiva de PRO. Actualiza para acceder a todas las herramientas premium.</div>
     <button class="up-btn" onclick="openProFromUpgrade()">⭐ Actualizar a PRO</button>
     <button class="up-skip" onclick="closeProUpgrade()">Ahora no</button>
   </div>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -19,6 +19,7 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 :root{
 --bg:#0a0b0e;
 --surface:#111318;
@@ -35,7 +36,7 @@
 --success:#4ff97b;
 --text:#e8edf5;
 --text2:#8a97b0;
---text3:#4a5570;
+--text3:#8899c0;
 --mono:'JetBrains Mono',monospace;
 --sans:'Syne',sans-serif;
 }
@@ -247,6 +248,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 .mode-section.active{display:block}
 
 /* SCROLLBAR */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
@@ -318,10 +320,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <span class="current-mode-name" id="current-name">General</span>
   </div>
   <div style="display:flex;gap:8px;align-items:center">
-    <button class="btn-secondary" id="btn-search" onclick="toggleSearch()" title="Buscar fórmula (Ctrl+K)" style="padding:7px 10px"><span style="font-size:15px">🔍</span></button>
+    <button class="btn-secondary" id="btn-search" onclick="toggleSearch()" aria-label="Buscar fórmula (Ctrl+K)" style="padding:7px 10px"><span style="font-size:15px" aria-hidden="true">🔍</span></button>
     <button class="btn-secondary" id="btn-pro" onclick="toggleProModal()" style="padding:7px 10px;background:var(--accent);color:#0a0b0e;border-color:var(--accent);font-weight:700">⭐ PRO</button>
-    <button class="btn-menu" onclick="toggleModal(true)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    <button class="btn-menu" onclick="toggleModal(true)" aria-label="Abrir módulos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
       MÓDULOS
     </button>
   </div>
@@ -478,7 +480,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <button class="modal-close" onclick="toggleSearch(false)">✕</button>
     <div class="search-header">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="search-input" placeholder="Buscar fórmula (ej: ohm, imc, ph, subred...)">
+      <label for="search-input" class="sr-only">Buscar fórmula</label>
+<input type="text" id="search-input" placeholder="Buscar fórmula (ej: ohm, imc, ph, subred...)">
     </div>
     <div id="search-results"></div>
     <div id="search-favorites" class="search-favorites"></div>
@@ -536,7 +539,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <div id="collab-section" style="margin-top:15px;border-top:1px solid var(--border);padding-top:12px">
       <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:8px">¿Colaborador? Ingresa tu código</div>
       <div style="display:flex;gap:6px">
-        <input type="text" id="collab-code" placeholder="Código de regalo" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:var(--sans);outline:none">
+        <label for="collab-code" class="sr-only">Código de regalo</label>
+<input type="text" id="collab-code" placeholder="Código de regalo" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:var(--sans);outline:none">
         <button class="btn-secondary" id="btn-redeem-code" onclick="redeemProCode()" style="padding:6px 12px;font-size:11px;font-weight:600">Canjear</button>
       </div>
       <div id="code-status" style="font-size:11px;text-align:center;margin-top:6px"></div>
@@ -608,7 +612,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
               <span id="graph-coords" style="font-size:11px;color:var(--text3);font-family:var(--mono)">x: 0, y: 0</span>
             </div>
             <div style="display:flex;gap:6px;margin-top:8px;justify-content:flex-end">
-              <button class="btn-secondary" onclick="copyResult()" title="Copiar resultado" style="font-size:11px;padding:3px 10px;min-width:36px;font-weight:700">📋</button>
+              <button class="btn-secondary" onclick="copyResult()" aria-label="Copiar resultado" style="font-size:11px;padding:3px 10px;min-width:36px;font-weight:700"><span aria-hidden="true">📋</span></button>
               <button class="btn-secondary" id="angle-btn" onclick="toggleAngleMode()" style="font-size:11px;padding:3px 10px;min-width:48px;font-weight:700">DEG</button>
             </div>
           <canvas id="chart-canvas-general" style="display:none;width:100%;height:250px;border-radius:8px;margin-top:12px;background:linear-gradient(135deg, rgba(46,49,73,0.3) 0%, rgba(30,32,40,0.8) 100%);"></canvas>
@@ -710,9 +714,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
       <div class="panel">
         <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center">
           <span class="panel-title">Finanzas</span>
-          <label style="font-size:9px;display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text3)">
-            <input type="checkbox" id="modo-ar" onchange="renderForm('fin', activeFormula['fin'])"> MODO ARGENTINA
-          </label>
+          <label for="modo-ar" style="font-size:9px;display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text3)">MODO ARGENTINA</label>
+            <input type="checkbox" id="modo-ar" onchange="renderForm('fin', activeFormula['fin'])">
         </div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">💰 Préstamos y Tasas</div>
@@ -1321,7 +1324,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 
     <!-- Historial -->
     <div class="panel">
-      <div class="panel-header"><span class="panel-title">Historial</span><button onclick="exportGenPDF()" title="Exportar PDF" style="margin-left:auto;background:none;border:1px solid var(--border2);color:var(--text3);border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='var(--accent2)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">📄 PDF</button></div>
+      <div class="panel-header"><span class="panel-title">Historial</span><button onclick="exportGenPDF()" aria-label="Exportar PDF" style="margin-left:auto;background:none;border:1px solid var(--border2);color:var(--text3);border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='var(--accent2)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'"><span aria-hidden="true">📄</span> PDF</button></div>
       <div class="panel-body">
         <div class="history-list" id="history-list">
           <div style="font-size:11px;color:var(--text3);padding:10px 0">Sin cálculos aún</div>

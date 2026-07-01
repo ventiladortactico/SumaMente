@@ -96,7 +96,7 @@ const ThemeManager = {
                 '--bg': '#0a0b0e', '--surface': '#111318', '--surface2': '#181c24',
                 '--surface3': '#1e232f', '--border': '#2a3040', '--border2': '#3a4558',
                 '--accent': '#4f9cf9', '--accent2': '#38e8c8', '--accent3': '#f97b4f',
-                '--accent4': '#a78bfa', '--text': '#e8edf5', '--text2': '#8a97b0', '--text3': '#4a5570'
+                '--accent4': '#a78bfa', '--text': '#e8edf5', '--text2': '#8a97b0', '--text3': '#8899c0'
             }
         },
         ocean: {
@@ -105,7 +105,7 @@ const ThemeManager = {
                 '--bg': '#0a0e1a', '--surface': '#0f1a2e', '--surface2': '#142240',
                 '--surface3': '#1a2d52', '--border': '#1e3a6e', '--border2': '#2a5090',
                 '--accent': '#5bc0eb', '--accent2': '#48e5c2', '--accent3': '#f9a84f',
-                '--accent4': '#9b72cf', '--text': '#e0f0ff', '--text2': '#7ab0d4', '--text3': '#3a6080'
+                '--accent4': '#9b72cf', '--text': '#e0f0ff', '--text2': '#7ab0d4', '--text3': '#5a80b0'
             }
         },
         forest: {
@@ -114,7 +114,7 @@ const ThemeManager = {
                 '--bg': '#0a1008', '--surface': '#111a10', '--surface2': '#1a2a18',
                 '--surface3': '#243a20', '--border': '#2a4a28', '--border2': '#3a6a38',
                 '--accent': '#6bc46e', '--accent2': '#4ade80', '--accent3': '#f9c74f',
-                '--accent4': '#a78bfa', '--text': '#e0f0d8', '--text2': '#7aa878', '--text3': '#3a6838'
+                '--accent4': '#a78bfa', '--text': '#e0f0d8', '--text2': '#7aa878', '--text3': '#5a8868'
             }
         },
         midnight: {

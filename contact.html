@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto - SumaMente</title>
+    <meta name="description" content="Contáctanos para preguntas, sugerencias o soporte sobre SumaMente, la calculadora científica modular.">
+    <link rel="canonical" href="https://suma-mente.vercel.app/contact.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0b0e;
+            --surface: #14161f;
+            --surface2: #1e232f;
+            --surface3: #2a3040;
+            --border: #2a3040;
+            --border2: #3a4155;
+            --text: #e8edf5;
+            --text2: #8a97b0;
+            --text3: #4a5570;
+            --accent: #4f9cf9;
+            --accent2: #38e8c8;
+        }
+        body {
+            font-family: 'Syne', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        p {
+            margin-bottom: 15px;
+            color: var(--text2);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-weight: 600;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 14px;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        button {
+            background: var(--accent);
+            color: #0a0b0e;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: var(--accent2);
+            transform: translateY(-1px);
+        }
+        .info {
+            background: var(--surface2);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-top: 30px;
+        }
+        .info h3 {
+            color: var(--accent2);
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Volver a SumaMente</a>
+        
+        <h1>Contacto</h1>
+        
+        <p>¿Tienes preguntas, sugerencias o necesitas soporte? Completa el formulario y te responderemos lo antes posible.</p>
+        
+        <form onsubmit="event.preventDefault(); alert('Gracias por tu mensaje. Te responderemos pronto.');">
+            <div class="form-group">
+                <label for="name">Nombre</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">Asunto</label>
+                <input type="text" id="subject" name="subject" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="message">Mensaje</label>
+                <textarea id="message" name="message" required></textarea>
+            </div>
+            
+            <button type="submit">Enviar Mensaje</button>
+        </form>
+        
+        <div class="info">
+            <h3>Información Adicional</h3>
+            <p>Para consultas sobre la versión PRO, problemas técnicos o reportar bugs, incluye la mayor cantidad de detalles posible en tu mensaje.</p>
+            <p>Tiempo de respuesta: usualmente 24-48 horas hábiles.</p>
+        </div>
+        
+        <p style="margin-top: 40px; font-size: 14px; color: var(--text3);">© 2024 SumaMente. Todos los derechos reservados.</p>
+    </div>
+</body>
+</html>

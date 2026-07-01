@@ -225,8 +225,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 
 /* STATUS BAR */
 .statusbar{display:flex;justify-content:space-between;align-items:center;padding:8px 0 0;border-top:1px solid var(--border);margin-top:12px}
-#web-ad-wrap{width:100%;overflow:hidden;min-height:50px;display:flex;justify-content:center;align-items:center;padding:4px 0}
-#web-ad-wrap.pro-hidden{display:none}
+.ad-wrap{width:100%;overflow:hidden;min-height:50px;display:flex;justify-content:center;align-items:center;padding:4px 0}
+.ad-wrap.pro-hidden{display:none}
 .status-item{font-size:10px;color:var(--text3);letter-spacing:0.5px}
 .status-dot{width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block;margin-right:5px;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
@@ -1309,6 +1309,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
       </div>
     </div>
 
+    <!-- Sidebar Ad -->
+    <div class="ad-wrap" id="sidebar-ad-wrap">
+      <SCRIPT data-cfasync="false" SRC="//bdv.bidvertiser.com/BidVertiser.dbm?pid=942700&bid=2105538" TYPE="text/javascript"></SCRIPT>
+    </div>
+
     <!-- Historial -->
     <div class="panel">
       <div class="panel-header"><span class="panel-title">Historial</span><button onclick="exportGenPDF()" title="Exportar PDF" style="margin-left:auto;background:none;border:1px solid var(--border2);color:var(--text3);border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='var(--accent2)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">📄 PDF</button></div>
@@ -1334,7 +1339,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
   <div class="status-item">SumaMente v1.2</div>
     </div>
 
-<div id="web-ad-wrap">
+<div id="web-ad-wrap" class="ad-wrap">
 <!-- Begin BidVertiser code -->
 <SCRIPT data-cfasync="false" SRC="//bdv.bidvertiser.com/BidVertiser.dbm?pid=942700&bid=2105538" TYPE="text/javascript"></SCRIPT>
 <!-- End BidVertiser code -->

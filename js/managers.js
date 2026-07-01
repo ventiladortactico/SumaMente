@@ -19,8 +19,7 @@ const AdManager = {
             this.hideBanner();
             return;
         }
-        const webAd = document.getElementById('web-ad-wrap');
-        if (webAd) webAd.classList.remove('pro-hidden');
+        document.querySelectorAll('.ad-wrap').forEach(el => el.classList.remove('pro-hidden'));
         if (this.isInitialized) {
             try {
                 const { AdMob } = await import('@capacitor-community/admob');
@@ -32,8 +31,7 @@ const AdManager = {
     },
 
     async hideBanner() {
-        const webAd = document.getElementById('web-ad-wrap');
-        if (webAd) webAd.classList.add('pro-hidden');
+        document.querySelectorAll('.ad-wrap').forEach(el => el.classList.add('pro-hidden'));
         try {
             const { AdMob } = await import('@capacitor-community/admob');
             await AdMob.hideBanner();

@@ -1,0 +1,1 @@
+    <button class="btn-secondary" id="btn-search" onclick="toggleSearch()" aria-label="Buscar fórmula (Ctrl+K)" style="padding:7px 10px"><span style="font-size:15px" aria-hidden="true">??</span></button>

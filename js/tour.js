@@ -128,7 +128,7 @@ const TourManager = {
                 <button class="tour-skip">Saltar</button>
             </div>
             <div class="tour-body">
-                <h3 class="tour-title">${s.title}</h3>
+                <h2 class="tour-title" style="font-size:inherit;font-weight:inherit;margin:0">${s.title}</h2>
                 <p class="tour-text">${s.text}</p>
             </div>
             <div class="tour-dots">${dots}</div>

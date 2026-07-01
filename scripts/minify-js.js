@@ -4,7 +4,38 @@ const esbuild = require('esbuild');
 
 const jsDir = path.join(__dirname, '..', 'js');
 
+// Archivos a excluir de la minificación por conflictos de nombres
+const excludeFiles = [
+    'acustica_visual.js',
+    'algebra_visual.js',
+    'diseno_visual.js',
+    'electro_visual.js',
+    'finanzas_visual.js',
+    'fisica_visual.js',
+    'geometria_visual.js',
+    'mecanica_visual.js',
+    'medicina_visual.js',
+    'nutricion_visual.js',
+    'programacion_visual.js',
+    'quimica_visual.js',
+    'redes_visual.js',
+    'unidades_visual.js',
+    'estadistica_visual.js',
+    'civil_visual.js',
+    'app_visual.js'
+];
+
+function shouldExclude(filePath) {
+    const fileName = path.basename(filePath);
+    return excludeFiles.includes(fileName);
+}
+
 function minifyFile(filePath) {
+    if (shouldExclude(filePath)) {
+        console.log(`⊘ Skipped: ${path.relative(__dirname, filePath)}`);
+        return;
+    }
+    
     const relativePath = path.relative(__dirname, filePath);
     
     esbuild.build({

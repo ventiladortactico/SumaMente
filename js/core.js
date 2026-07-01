@@ -88,6 +88,26 @@ function setFormula(module, key, event) {
     document.getElementById('steps-' + module).classList.remove('show');
 }
 
+const _visualScripts = {
+    electro: 'electro_visual', med: 'medicina_visual', fin: 'finanzas_visual',
+    quim: 'quimica_visual', civil: 'civil_visual', mec: 'mecanica_visual',
+    geom: 'geometria_visual', unit: 'unidades_visual', fis: 'fisica_visual',
+    diseno: 'diseno_visual', nutri: 'nutricion_visual', acust: 'acustica_visual',
+    prog: 'programacion_visual', redes: 'redes_visual', alg: 'algebra_visual'
+};
+const _loadedVisuals = new Set();
+
+function _loadVisual(module, callback) {
+    if (_loadedVisuals.has(module)) { callback(); return; }
+    const file = _visualScripts[module];
+    if (!file) { callback(); return; }
+    const s = document.createElement('script');
+    s.src = `js/modulos/visuales/${file}.js`;
+    s.onload = () => { _loadedVisuals.add(module); callback(); };
+    s.onerror = () => { callback(); };
+    document.body.appendChild(s);
+}
+
 function renderChart(module, res) {
     const canvas = document.getElementById(`chart-canvas-${module}`);
     if (!canvas) return;
@@ -108,10 +128,12 @@ function renderChart(module, res) {
     window._lastChartRender = window._lastChartRender || {};
     window._lastChartRender[module] = res.chart;
 
-    try {
-        res.chart(canvas);
-    } catch (e) {
-        console.error('Error en gráfico:', module, e);
+    if (_loadedVisuals.has(module)) {
+        try { res.chart(canvas); } catch (e) { console.error('Error en gráfico:', module, e); }
+    } else {
+        _loadVisual(module, () => {
+            try { res.chart(canvas); } catch (e) { console.error('Error en gráfico:', module, e); }
+        });
     }
 }
 

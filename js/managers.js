@@ -20,12 +20,7 @@ const AdManager = {
             return;
         }
         const webAd = document.getElementById('web-ad-wrap');
-        if (webAd) {
-            webAd.classList.remove('pro-hidden');
-            setTimeout(() => {
-                try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
-            }, 100);
-        }
+        if (webAd) webAd.classList.remove('pro-hidden');
         if (this.isInitialized) {
             try {
                 const { AdMob } = await import('@capacitor-community/admob');

@@ -1,320 +1,49 @@
-function renderFunctionToSVG(exprStr, w, h, themeVars) {
-    if (!exprStr || !/[x]/.test(exprStr)) return '';
-    exprStr = exprStr.replace(/²/g, '^2').replace(/π/g, 'pi');
-    w = w || 500; h = h || 250;
-    const margin = 40;
-    const plotW = w - margin * 2;
-    const plotH = h - margin * 2;
-    const minX = -6, maxX = 6;
-
-    const pts = [];
-    const steps = 400;
-    for (let i = 0; i <= steps; i++) {
-        const x = minX + (maxX - minX) * i / steps;
-        try {
-            const y = safeMathEval(exprStr, { x });
-            if (isFinite(y)) pts.push({ x, y });
-        } catch(e) {}
-    }
-
-    const allY = pts.filter(p => p.y !== null).map(p => p.y);
-    let minY, maxY;
-    if (allY.length > 10) {
-        const sorted = [...allY].sort((a, b) => a - b);
-        const t0 = Math.floor(sorted.length * 0.02);
-        const t1 = Math.ceil(sorted.length * 0.98);
-        minY = sorted[t0]; maxY = sorted[t1 - 1];
-    } else if (allY.length > 0) {
-        minY = Math.min(...allY); maxY = Math.max(...allY);
-    } else { return ''; }
-    const yRange = maxY - minY || 1;
-    minY -= yRange * 0.12; maxY += yRange * 0.12;
-
-    const toX = (x) => margin + (x - minX) / (maxX - minX) * plotW;
-    const toY = (y) => margin + (maxY - y) / (maxY - minY) * plotH;
-
-    const v = themeVars || {};
-    const bg = v['--bg'] || '#0a0b0e';
-    const border = v['--border'] || '#2a3040';
-    const accent = v['--accent'] || '#4f9cf9';
-    const text2 = v['--text2'] || '#8a97b0';
-    const text3 = v['--text3'] || '#4a5570';
-
-    const xStep = Math.pow(10, Math.floor(Math.log10((maxX - minX) / 5)));
-    const yStep = Math.pow(10, Math.floor(Math.log10((maxY - minY) / 5)));
-    let gridLines = '';
-    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep / 2) {
-        const cx = toX(x).toFixed(1);
-        gridLines += `<line x1="${cx}" y1="${margin}" x2="${cx}" y2="${margin + plotH}" stroke="${text3}" stroke-opacity="0.3" stroke-width="0.5"/>`;
-    }
-    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep / 2) {
-        const cy = toY(y).toFixed(1);
-        gridLines += `<line x1="${margin}" y1="${cy}" x2="${margin + plotW}" y2="${cy}" stroke="${text3}" stroke-opacity="0.3" stroke-width="0.5"/>`;
-    }
-    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
-        const cx = toX(x).toFixed(1);
-        gridLines += `<line x1="${cx}" y1="${margin}" x2="${cx}" y2="${margin + plotH}" stroke="${text3}" stroke-opacity="0.6" stroke-width="1"/>`;
-    }
-    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
-        const cy = toY(y).toFixed(1);
-        gridLines += `<line x1="${margin}" y1="${cy}" x2="${margin + plotW}" y2="${cy}" stroke="${text3}" stroke-opacity="0.6" stroke-width="1"/>`;
-    }
-
-    let axes = '';
-    if (minY <= 0 && maxY >= 0) {
-        const cy = toY(0).toFixed(1);
-        axes += `<line x1="${margin}" y1="${cy}" x2="${margin + plotW}" y2="${cy}" stroke="${text2}" stroke-width="2"/>`;
-    }
-    if (minX <= 0 && maxX >= 0) {
-        const cx = toX(0).toFixed(1);
-        axes += `<line x1="${cx}" y1="${margin}" x2="${cx}" y2="${margin + plotH}" stroke="${text2}" stroke-width="2"/>`;
-    }
-
-    let labels = '';
-    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
-        if (Math.abs(x) < 0.001) continue;
-        const cx = toX(x).toFixed(1);
-        const ly = (minY <= 0 && maxY >= 0) ? toY(0) : margin + plotH;
-        labels += `<text x="${cx}" y="${ly + 12}" fill="${text2}" font-size="9" font-family="monospace" text-anchor="middle">${parseFloat(x.toPrecision(3))}</text>`;
-    }
-    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
-        if (Math.abs(y) < 0.001) continue;
-        const cy = toY(y).toFixed(1);
-        const lx = (minX <= 0 && maxX >= 0) ? toX(0) : margin;
-        labels += `<text x="${lx - 5}" y="${cy + 3}" fill="${text2}" font-size="9" font-family="monospace" text-anchor="end">${parseFloat(y.toPrecision(3))}</text>`;
-    }
-
-    let pathD = '';
-    let started = false;
-    for (const p of pts) {
-        if (p.y === null) { started = false; continue; }
-        const cx = toX(p.x).toFixed(2);
-        const cy = toY(p.y).toFixed(2);
-        if (!started) { pathD += `M${cx},${cy}`; started = true; } else pathD += `L${cx},${cy}`;
-    }
-
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="background:${bg};border-radius:6px;border:1px solid ${border}">
-        ${gridLines}
-        ${axes}
-        <path d="${pathD}" fill="none" stroke="${accent}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        ${labels}
-    </svg>`;
-}
-
-function getCanvasImage(module) {
-    const canvas = document.getElementById('chart-canvas-' + module);
-    if (!canvas) return null;
-    void canvas.offsetHeight;
-    if (canvas.width > 0 && canvas.height > 0) {
-        try {
-            return canvas.toDataURL('image/png');
-        } catch (e) {
-            return null;
-        }
-    }
-    if (window._lastChartRender && window._lastChartRender[module]) {
-        try {
-            const dpr = window.devicePixelRatio || 1;
-            const rect = canvas.getBoundingClientRect();
-            const w = (rect.width || canvas.clientWidth || 300) * dpr;
-            const h = (rect.height || canvas.clientHeight || 150) * dpr;
-            if (w > 0 && h > 0) {
-                canvas.width = w;
-                canvas.height = h;
-                window._lastChartRender[module](canvas);
-                return canvas.toDataURL('image/png');
-            }
-        } catch (e) {}
-    }
-    return null;
-}
-
-function _downloadHTMLasPDF(htmlContent, filename) {
-    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
-}
-
-function exportGenPDF() {
-    if (!LicenseManager.isPro) { showProUpgradeModal('Exportar PDF', 'Exportá tus cálculos y gráficos en formato PDF con un solo clic.'); return; }
-    showPDFChoice((mode) => {
-        if (mode === 'last') {
-            let moduleName = 'General';
-            let resultLabel = '';
-            let resultKey = '';
-            let isModule = false;
-            let steps = [];
-            let expr = '';
-            let result = '0';
-            let chartImg = null;
-
-            if (history.length > 0) {
-                const last = history[0];
-                expr = last.expr || '';
-                result = last.val;
-                steps = last.steps || [];
-                moduleName = last.module || 'General';
-                resultLabel = last.label || '';
-                resultKey = last.key || '';
-                isModule = !last.expr && last.module !== 'general';
-
-                if (isModule) {
-                    chartImg = last.chartDataUrl || getCanvasImage(moduleName);
-                } else {
-                    const canPlot = last.key === 'func' || last.key === 'quadratic' || last.key === 'system' || last.key === 'linear2var' || (last.key === 'eq' && expr && /x/.test(expr));
-                    if (canPlot) {
-                        if (!chartImg && expr && /[x]/.test(expr)) {
-                            const _v = (ThemeManager.themes[ThemeManager.current || 'dark'] || ThemeManager.themes.dark).vars;
-                            let clean = expr;
-                            if (clean.includes('=')) clean = clean.split('=')[0].trim();
-                            clean = clean.replace(/²/g, '^2').replace(/π/g, 'pi');
-                            const svg = renderFunctionToSVG(clean, 500, 250, _v);
-                            if (svg) chartImg = 'data:image/svg+xml,' + encodeURIComponent(svg);
-                        }
-                    }
-                }
-            }
-            if (!expr && result === '0') return;
-
-            const displayLabel = isModule ? resultLabel : (expr ? `Resultado: ${expr}` : 'Resultado');
-            const displayKey = isModule ? resultKey : (expr || 'resultado');
-            exportResultPDF(moduleName, displayKey, result, displayLabel, steps, chartImg);
-        } else {
-            exportHistoryPDF();
-        }
-    });
-}
-
-function showPDFChoice(callback) {
-    const overlay = document.createElement('div');
-    overlay.id = 'pdf-choice-overlay';
-    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s';
-    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
-    overlay.innerHTML = `
+function renderFunctionToSVG(o,n,s,x){if(!o||!/[x]/.test(o))return"";o=o.replace(/²/g,"^2").replace(/π/g,"pi"),n=n||500,s=s||250;const e=40,r=n-e*2,d=s-e*2,a=-6,c=6,u=[],g=400;for(let t=0;t<=g;t++){const l=a+(c-a)*t/g;try{const f=safeMathEval(o,{x:l});isFinite(f)&&u.push({x:l,y:f})}catch{}}const i=u.filter(t=>t.y!==null).map(t=>t.y);let p,m;if(i.length>10){const t=[...i].sort((C,H)=>C-H),l=Math.floor(t.length*.02),f=Math.ceil(t.length*.98);p=t[l],m=t[f-1]}else if(i.length>0)p=Math.min(...i),m=Math.max(...i);else return"";const b=m-p||1;p-=b*.12,m+=b*.12;const y=t=>e+(t-a)/(c-a)*r,v=t=>e+(m-t)/(m-p)*d,k=x||{},T=k["--bg"]||"#0a0b0e",E=k["--border"]||"#2a3040",R=k["--accent"]||"#4f9cf9",M=k["--text2"]||"#8a97b0",P=k["--text3"]||"#4a5570",h=Math.pow(10,Math.floor(Math.log10((c-a)/5))),$=Math.pow(10,Math.floor(Math.log10((m-p)/5)));let w="";for(let t=Math.ceil(a/h)*h;t<=c;t+=h/2){const l=y(t).toFixed(1);w+=`<line x1="${l}" y1="${e}" x2="${l}" y2="${e+d}" stroke="${P}" stroke-opacity="0.3" stroke-width="0.5"/>`}for(let t=Math.ceil(p/$)*$;t<=m;t+=$/2){const l=v(t).toFixed(1);w+=`<line x1="${e}" y1="${l}" x2="${e+r}" y2="${l}" stroke="${P}" stroke-opacity="0.3" stroke-width="0.5"/>`}for(let t=Math.ceil(a/h)*h;t<=c;t+=h){const l=y(t).toFixed(1);w+=`<line x1="${l}" y1="${e}" x2="${l}" y2="${e+d}" stroke="${P}" stroke-opacity="0.6" stroke-width="1"/>`}for(let t=Math.ceil(p/$)*$;t<=m;t+=$){const l=v(t).toFixed(1);w+=`<line x1="${e}" y1="${l}" x2="${e+r}" y2="${l}" stroke="${P}" stroke-opacity="0.6" stroke-width="1"/>`}let z="";if(p<=0&&m>=0){const t=v(0).toFixed(1);z+=`<line x1="${e}" y1="${t}" x2="${e+r}" y2="${t}" stroke="${M}" stroke-width="2"/>`}if(a<=0&&c>=0){const t=y(0).toFixed(1);z+=`<line x1="${t}" y1="${e}" x2="${t}" y2="${e+d}" stroke="${M}" stroke-width="2"/>`}let F="";for(let t=Math.ceil(a/h)*h;t<=c;t+=h){if(Math.abs(t)<.001)continue;const l=y(t).toFixed(1),f=p<=0&&m>=0?v(0):e+d;F+=`<text x="${l}" y="${f+12}" fill="${M}" font-size="9" font-family="monospace" text-anchor="middle">${parseFloat(t.toPrecision(3))}</text>`}for(let t=Math.ceil(p/$)*$;t<=m;t+=$){if(Math.abs(t)<.001)continue;const l=v(t).toFixed(1),f=a<=0&&c>=0?y(0):e;F+=`<text x="${f-5}" y="${l+3}" fill="${M}" font-size="9" font-family="monospace" text-anchor="end">${parseFloat(t.toPrecision(3))}</text>`}let D="",L=!1;for(const t of u){if(t.y===null){L=!1;continue}const l=y(t.x).toFixed(2),f=v(t.y).toFixed(2);L?D+=`L${l},${f}`:(D+=`M${l},${f}`,L=!0)}return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n} ${s}" width="${n}" height="${s}" style="background:${T};border-radius:6px;border:1px solid ${E}">
+        ${w}
+        ${z}
+        <path d="${D}" fill="none" stroke="${R}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        ${F}
+    </svg>`}function getCanvasImage(o){const n=document.getElementById("chart-canvas-"+o);if(!n)return null;if(n.offsetHeight,n.width>0&&n.height>0)try{return n.toDataURL("image/png")}catch{return null}if(window._lastChartRender&&window._lastChartRender[o])try{const s=window.devicePixelRatio||1,x=n.getBoundingClientRect(),e=(x.width||n.clientWidth||300)*s,r=(x.height||n.clientHeight||150)*s;if(e>0&&r>0)return n.width=e,n.height=r,window._lastChartRender[o](n),n.toDataURL("image/png")}catch{}return null}function _downloadHTMLasPDF(o,n){const s=new Blob([o],{type:"text/html;charset=utf-8"}),x=URL.createObjectURL(s),e=document.createElement("a");e.href=x,e.download=n,document.body.appendChild(e),e.click(),document.body.removeChild(e),setTimeout(()=>URL.revokeObjectURL(x),2e3)}function exportGenPDF(){if(!LicenseManager.isPro){showProUpgradeModal("Exportar PDF","Export\xE1 tus c\xE1lculos y gr\xE1ficos en formato PDF con un solo clic.");return}showPDFChoice(o=>{if(o==="last"){let n="General",s="",x="",e=!1,r=[],d="",a="0",c=null;if(history.length>0){const i=history[0];if(d=i.expr||"",a=i.val,r=i.steps||[],n=i.module||"General",s=i.label||"",x=i.key||"",e=!i.expr&&i.module!=="general",e)c=i.chartDataUrl||getCanvasImage(n);else if((i.key==="func"||i.key==="quadratic"||i.key==="system"||i.key==="linear2var"||i.key==="eq"&&d&&/x/.test(d))&&!c&&d&&/[x]/.test(d)){const m=(ThemeManager.themes[ThemeManager.current||"dark"]||ThemeManager.themes.dark).vars;let b=d;b.includes("=")&&(b=b.split("=")[0].trim()),b=b.replace(/²/g,"^2").replace(/π/g,"pi");const y=renderFunctionToSVG(b,500,250,m);y&&(c="data:image/svg+xml,"+encodeURIComponent(y))}}if(!d&&a==="0")return;const u=e?s:d?`Resultado: ${d}`:"Resultado";exportResultPDF(n,e?x:d||"resultado",a,u,r,c)}else exportHistoryPDF()})}function showPDFChoice(o){const n=document.createElement("div");n.id="pdf-choice-overlay",n.style.cssText="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s",n.onclick=s=>{s.target===n&&n.remove()},n.innerHTML=`
         <div style="background:var(--surface2,#181c24);border:1px solid var(--border,#2a3040);border-radius:12px;padding:24px;max-width:340px;width:90%;text-align:center">
-            <div style="font-size:32px;margin-bottom:8px">📄</div>
+            <div style="font-size:32px;margin-bottom:8px">\u{1F4C4}</div>
             <div style="font-family:var(--sans,'Syne',sans-serif);font-size:18px;font-weight:700;color:var(--text,#e8edf5);margin-bottom:4px">Exportar PDF</div>
-            <div style="font-size:12px;color:var(--text3,#4a5570);margin-bottom:20px">¿Qué querés exportar?</div>
-            <button id="pdf-choice-last" style="display:block;width:100%;padding:12px;margin-bottom:8px;background:var(--accent,#4f9cf9);color:#0a0b0e;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Último cálculo</button>
-            <button id="pdf-choice-history" style="display:block;width:100%;padding:12px;margin-bottom:12px;background:var(--surface3,#1e232f);color:var(--text,#e8edf5);border:1px solid var(--border,#2a3040);border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">Historial completo (${history.length} cálculos)</button>
+            <div style="font-size:12px;color:var(--text3,#4a5570);margin-bottom:20px">\xBFQu\xE9 quer\xE9s exportar?</div>
+            <button id="pdf-choice-last" style="display:block;width:100%;padding:12px;margin-bottom:8px;background:var(--accent,#4f9cf9);color:#0a0b0e;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">\xDAltimo c\xE1lculo</button>
+            <button id="pdf-choice-history" style="display:block;width:100%;padding:12px;margin-bottom:12px;background:var(--surface3,#1e232f);color:var(--text,#e8edf5);border:1px solid var(--border,#2a3040);border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">Historial completo (${history.length} c\xE1lculos)</button>
             <button id="pdf-choice-cancel" style="background:none;border:none;color:var(--text3,#4a5570);font-size:12px;cursor:pointer;padding:4px">Cancelar</button>
-        </div>`;
-    document.body.appendChild(overlay);
-    document.getElementById('pdf-choice-last').onclick = () => { overlay.remove(); callback('last'); };
-    document.getElementById('pdf-choice-history').onclick = () => { overlay.remove(); callback('history'); };
-    document.getElementById('pdf-choice-cancel').onclick = () => { overlay.remove(); };
-    document.addEventListener('keydown', function handler(e) { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', handler); } });
-}
-
-function exportHistoryPDF() {
-    if (!LicenseManager.isPro) { showProUpgradeModal('Exportar historial en PDF', 'Exportá todo tu historial de cálculos en un PDF completo.'); return; }
-    if (history.length === 0) { alert('No hay cálculos en el historial'); return; }
-
-    const _v = (ThemeManager.themes[ThemeManager.current || 'dark'] || ThemeManager.themes.dark).vars;
-    const _css = `*{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-sizing:border-box;margin:0;padding:0}
-body{background:${_v['--bg']};color:${_v['--text']};font-family:'JetBrains Mono',monospace;padding:30px;max-width:800px;margin:0 auto}
-h1{font-family:'Syne',sans-serif;font-size:22px;color:${_v['--accent']};margin-bottom:5px}
-.sub{font-size:11px;color:${_v['--text3']};margin-bottom:25px}
-.entry{border-bottom:1px solid ${_v['--border']};padding-bottom:18px;margin-bottom:22px}
+        </div>`,document.body.appendChild(n),document.getElementById("pdf-choice-last").onclick=()=>{n.remove(),o("last")},document.getElementById("pdf-choice-history").onclick=()=>{n.remove(),o("history")},document.getElementById("pdf-choice-cancel").onclick=()=>{n.remove()},document.addEventListener("keydown",function s(x){x.key==="Escape"&&(n.remove(),document.removeEventListener("keydown",s))})}function exportHistoryPDF(){if(!LicenseManager.isPro){showProUpgradeModal("Exportar historial en PDF","Export\xE1 todo tu historial de c\xE1lculos en un PDF completo.");return}if(history.length===0){alert("No hay c\xE1lculos en el historial");return}const o=(ThemeManager.themes[ThemeManager.current||"dark"]||ThemeManager.themes.dark).vars,n=`*{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-sizing:border-box;margin:0;padding:0}
+body{background:${o["--bg"]};color:${o["--text"]};font-family:'JetBrains Mono',monospace;padding:30px;max-width:800px;margin:0 auto}
+h1{font-family:'Syne',sans-serif;font-size:22px;color:${o["--accent"]};margin-bottom:5px}
+.sub{font-size:11px;color:${o["--text3"]};margin-bottom:25px}
+.entry{border-bottom:1px solid ${o["--border"]};padding-bottom:18px;margin-bottom:22px}
 .entry:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.label{font-size:12px;color:${_v['--text2']};text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
-.value{font-size:28px;font-weight:700;color:${_v['--text']};margin-bottom:20px;word-break:break-all}
-.step{background:${_v['--surface']};border:1px solid ${_v['--border']};border-radius:6px;padding:8px 12px;margin-bottom:4px;font-size:12px;color:${_v['--text']}}
-.steps-title{font-size:12px;color:${_v['--text3']};margin-bottom:8px;margin-top:20px;text-transform:uppercase;letter-spacing:1px}
-.footer{margin-top:30px;padding-top:15px;border-top:1px solid ${_v['--border']};font-size:10px;color:${_v['--text3']};text-align:center}
-.badge{display:inline-block;background:${_v['--accent2']};color:${_v['--bg']};font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;margin-left:8px}`;
-
-    let html = '';
-    history.forEach((h, idx) => {
-    const canPlot = h.key === 'func' || h.key === 'quadratic' || h.key === 'system' || h.key === 'linear2var' || (h.key === 'eq' && h.expr && /x/.test(h.expr));
-        let chartImg = null;
-        if (canPlot) {
-            let plotExpr = h.expr || (h.label ? h.label.replace('f(x) = ', '') : '');
-            if (h.key === 'eq' && plotExpr.includes('=')) {
-                plotExpr = plotExpr.split('=')[0].trim();
-            }
-            plotExpr = plotExpr.replace(/²/g, '^2').replace(/π/g, 'pi');
-            if (plotExpr && /x/.test(plotExpr)) {
-                chartImg = renderFunctionToSVG(plotExpr, 500, 250, _v);
-            }
-    } else if (h.key !== 'expr' && h.chartDataUrl) {
-            chartImg = h.chartDataUrl;
-        }
-        const chartHtml = chartImg
-            ? (chartImg.startsWith('data:')
-                ? `<div style="margin:20px 0;text-align:center"><img src="${chartImg}" style="max-width:100%;border-radius:8px;border:1px solid ${_v['--border']}"></div>`
-                : `<div style="margin:20px 0;text-align:center">${chartImg}</div>`)
-            : '';
-        let stepsHtml = '';
-        if (h.steps && h.steps.length) {
-            stepsHtml = `<div class="steps-title">Pasos de resolución</div>`;
-            h.steps.forEach(s => stepsHtml += `<div class="step">${s}</div>`);
-        }
-        html += `<div class="entry">
-            <div class="label">${h.module} · ${h.key} · ${h.time}</div>
-            <div style="font-size:13px;color:${_v['--text2']};margin-bottom:4px">${h.label || ''}</div>
-            <div class="value">${h.val}</div>
-            ${chartHtml}${stepsHtml}
-        </div>`;
-    });
-
-    const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SumaMente - Historial</title><style>${_css}</style></head><body style="background:${_v['--bg']};color:${_v['--text']};padding:30px;font-family:'JetBrains Mono',monospace">
-    <h1 style="font-family:'Syne',sans-serif;font-size:22px;color:${_v['--accent']};margin-bottom:5px">SumaMente${LicenseManager.isPro ? ' <span class="badge">PRO</span>' : ''}</h1>
-    <div class="sub">Historial completo · ${history.length} cálculos · ${new Date().toLocaleString('es-AR')}</div>
-    ${html}
-    <div class="footer">Generado por SumaMente Cientifica</div></body></html>`;
-
-    const w = window.open('', '_blank');
-    if (!w) { alert('Permite ventanas emergentes para exportar PDF'); return; }
-    w.document.write(fullHTML);
-    w.document.close();
-    setTimeout(() => { w.focus(); w.print(); }, 500);
-}
-
-function exportResultPDF(module, key, val, label, steps, chartImg) {
-    if (typeof steps === 'string' && steps.startsWith('%')) {
-        try { steps = JSON.parse(decodeURIComponent(steps)); } catch(e) { steps = []; }
-    }
-    if (!Array.isArray(steps)) steps = [];
-
-    const date = new Date().toLocaleString('es-AR');
-    const _v = (ThemeManager.themes[ThemeManager.current || 'dark'] || ThemeManager.themes.dark).vars;
-    const _css = `*{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-sizing:border-box;margin:0;padding:0}
-body{background:${_v['--bg']};color:${_v['--text']};font-family:'JetBrains Mono',monospace;padding:30px;max-width:800px;margin:0 auto}
-h1{font-family:'Syne',sans-serif;font-size:22px;color:${_v['--accent']};margin-bottom:5px}
-.sub{font-size:11px;color:${_v['--text3']};margin-bottom:25px}
-.label{font-size:12px;color:${_v['--text2']};text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
-.value{font-size:28px;font-weight:700;color:${_v['--text']};margin-bottom:20px;word-break:break-all}
-.step{background:${_v['--surface']};border:1px solid ${_v['--border']};border-radius:6px;padding:8px 12px;margin-bottom:4px;font-size:12px;color:${_v['--text']}}
-.steps-title{font-size:12px;color:${_v['--text3']};margin-bottom:8px;margin-top:20px;text-transform:uppercase;letter-spacing:1px}
-.footer{margin-top:30px;padding-top:15px;border-top:1px solid ${_v['--border']};font-size:10px;color:${_v['--text3']};text-align:center}
-.badge{display:inline-block;background:${_v['--accent2']};color:${_v['--bg']};font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;margin-left:8px}`;
-    const chartHtml = chartImg
-        ? `<div style="margin:20px 0;text-align:center"><img src="${chartImg}" style="max-width:100%;border-radius:8px;border:1px solid ${_v['--border']}"></div>`
-        : '';
-    let stepsHtml = '';
-    if (steps.length) {
-        stepsHtml = `<div class="steps-title">Pasos de resolución</div>`;
-        steps.forEach(s => stepsHtml += `<div class="step">${s}</div>`);
-    }
-
-    const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SumaMente - ${label}</title><style>${_css}</style></head><body style="background:${_v['--bg']};color:${_v['--text']};padding:30px;font-family:'JetBrains Mono',monospace">
-    <h1 style="font-family:'Syne',sans-serif;font-size:22px;color:${_v['--accent']};margin-bottom:5px">SumaMente${LicenseManager.isPro ? ' <span class="badge">PRO</span>' : ''}</h1>
-    <div class="sub">${module} · ${key} · ${date}</div>
-    <div class="label">${label}</div>
-    <div class="value">${val}</div>
-    ${chartHtml}${stepsHtml}
-    <div class="footer">Generado por SumaMente Cientifica</div></body></html>`;
-
-    const w = window.open('', '_blank');
-    if (!w) { alert('Permite ventanas emergentes para exportar PDF'); return; }
-    w.document.write(fullHTML);
-    w.document.close();
-    setTimeout(() => { w.focus(); w.print(); }, 500);
-}
+.label{font-size:12px;color:${o["--text2"]};text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.value{font-size:28px;font-weight:700;color:${o["--text"]};margin-bottom:20px;word-break:break-all}
+.step{background:${o["--surface"]};border:1px solid ${o["--border"]};border-radius:6px;padding:8px 12px;margin-bottom:4px;font-size:12px;color:${o["--text"]}}
+.steps-title{font-size:12px;color:${o["--text3"]};margin-bottom:8px;margin-top:20px;text-transform:uppercase;letter-spacing:1px}
+.footer{margin-top:30px;padding-top:15px;border-top:1px solid ${o["--border"]};font-size:10px;color:${o["--text3"]};text-align:center}
+.badge{display:inline-block;background:${o["--accent2"]};color:${o["--bg"]};font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;margin-left:8px}`;let s="";history.forEach((r,d)=>{const a=r.key==="func"||r.key==="quadratic"||r.key==="system"||r.key==="linear2var"||r.key==="eq"&&r.expr&&/x/.test(r.expr);let c=null;if(a){let i=r.expr||(r.label?r.label.replace("f(x) = ",""):"");r.key==="eq"&&i.includes("=")&&(i=i.split("=")[0].trim()),i=i.replace(/²/g,"^2").replace(/π/g,"pi"),i&&/x/.test(i)&&(c=renderFunctionToSVG(i,500,250,o))}else r.key!=="expr"&&r.chartDataUrl&&(c=r.chartDataUrl);const u=c?c.startsWith("data:")?`<div style="margin:20px 0;text-align:center"><img src="${c}" style="max-width:100%;border-radius:8px;border:1px solid ${o["--border"]}"></div>`:`<div style="margin:20px 0;text-align:center">${c}</div>`:"";let g="";r.steps&&r.steps.length&&(g='<div class="steps-title">Pasos de resoluci\xF3n</div>',r.steps.forEach(i=>g+=`<div class="step">${i}</div>`)),s+=`<div class="entry">
+            <div class="label">${r.module} \xB7 ${r.key} \xB7 ${r.time}</div>
+            <div style="font-size:13px;color:${o["--text2"]};margin-bottom:4px">${r.label||""}</div>
+            <div class="value">${r.val}</div>
+            ${u}${g}
+        </div>`});const x=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SumaMente - Historial</title><style>${n}</style></head><body style="background:${o["--bg"]};color:${o["--text"]};padding:30px;font-family:'JetBrains Mono',monospace">
+    <h1 style="font-family:'Syne',sans-serif;font-size:22px;color:${o["--accent"]};margin-bottom:5px">SumaMente${LicenseManager.isPro?' <span class="badge">PRO</span>':""}</h1>
+    <div class="sub">Historial completo \xB7 ${history.length} c\xE1lculos \xB7 ${new Date().toLocaleString("es-AR")}</div>
+    ${s}
+    <div class="footer">Generado por SumaMente Cientifica</div></body></html>`,e=window.open("","_blank");if(!e){alert("Permite ventanas emergentes para exportar PDF");return}e.document.write(x),e.document.close(),setTimeout(()=>{e.focus(),e.print()},500)}function exportResultPDF(o,n,s,x,e,r){if(typeof e=="string"&&e.startsWith("%"))try{e=JSON.parse(decodeURIComponent(e))}catch{e=[]}Array.isArray(e)||(e=[]);const d=new Date().toLocaleString("es-AR"),a=(ThemeManager.themes[ThemeManager.current||"dark"]||ThemeManager.themes.dark).vars,c=`*{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-sizing:border-box;margin:0;padding:0}
+body{background:${a["--bg"]};color:${a["--text"]};font-family:'JetBrains Mono',monospace;padding:30px;max-width:800px;margin:0 auto}
+h1{font-family:'Syne',sans-serif;font-size:22px;color:${a["--accent"]};margin-bottom:5px}
+.sub{font-size:11px;color:${a["--text3"]};margin-bottom:25px}
+.label{font-size:12px;color:${a["--text2"]};text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.value{font-size:28px;font-weight:700;color:${a["--text"]};margin-bottom:20px;word-break:break-all}
+.step{background:${a["--surface"]};border:1px solid ${a["--border"]};border-radius:6px;padding:8px 12px;margin-bottom:4px;font-size:12px;color:${a["--text"]}}
+.steps-title{font-size:12px;color:${a["--text3"]};margin-bottom:8px;margin-top:20px;text-transform:uppercase;letter-spacing:1px}
+.footer{margin-top:30px;padding-top:15px;border-top:1px solid ${a["--border"]};font-size:10px;color:${a["--text3"]};text-align:center}
+.badge{display:inline-block;background:${a["--accent2"]};color:${a["--bg"]};font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;margin-left:8px}`,u=r?`<div style="margin:20px 0;text-align:center"><img src="${r}" style="max-width:100%;border-radius:8px;border:1px solid ${a["--border"]}"></div>`:"";let g="";e.length&&(g='<div class="steps-title">Pasos de resoluci\xF3n</div>',e.forEach(m=>g+=`<div class="step">${m}</div>`));const i=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SumaMente - ${x}</title><style>${c}</style></head><body style="background:${a["--bg"]};color:${a["--text"]};padding:30px;font-family:'JetBrains Mono',monospace">
+    <h1 style="font-family:'Syne',sans-serif;font-size:22px;color:${a["--accent"]};margin-bottom:5px">SumaMente${LicenseManager.isPro?' <span class="badge">PRO</span>':""}</h1>
+    <div class="sub">${o} \xB7 ${n} \xB7 ${d}</div>
+    <div class="label">${x}</div>
+    <div class="value">${s}</div>
+    ${u}${g}
+    <div class="footer">Generado por SumaMente Cientifica</div></body></html>`,p=window.open("","_blank");if(!p){alert("Permite ventanas emergentes para exportar PDF");return}p.document.write(i),p.document.close(),setTimeout(()=>{p.focus(),p.print()},500)}

@@ -13,6 +13,7 @@
     "@capacitor-community/admob": "^8.0.0",
     "@capacitor/android": "^7.6.7",
     "@capacitor/core": "^7.6.7",
+    "@vercel/analytics": "^2.0.1",
     "canvas": "^3.2.3",
     "capacitor-plugin-cdv-purchase": "^13.17.2"
   },

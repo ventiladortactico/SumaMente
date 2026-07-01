@@ -10,7 +10,6 @@ function minifyFile(filePath) {
     esbuild.build({
         entryPoints: [filePath],
         minify: true,
-        minifyIdentifiers: true,
         minifySyntax: true,
         minifyWhitespace: true,
         drop: ['console', 'debugger'],

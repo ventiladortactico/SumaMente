@@ -1,4 +1,4 @@
-const FinanzasVisual = {
+window.FinanzasVisual = window.FinanzasVisual || {
     // Almacén global interno para manejar transiciones fluidas e impedir superposiciones
     animations: {},
 

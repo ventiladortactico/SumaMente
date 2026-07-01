@@ -1,4 +1,4 @@
-const MecanicaVisual = {
+window.MecanicaVisual = window.MecanicaVisual || {
     // Almacena identificadores activos para evitar parpadeos o colisiones de requestAnimationFrame
     loops: {},
 

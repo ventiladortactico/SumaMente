@@ -1,4 +1,4 @@
-const QuimicaVisual = {
+window.QuimicaVisual = window.QuimicaVisual || {
     loops: {},
 
     initCanvas: function(canvas) {

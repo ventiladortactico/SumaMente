@@ -1,4 +1,4 @@
-const GeometriaVisual = {
+window.GeometriaVisual = window.GeometriaVisual || {
     initCanvas: function(canvas) {
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();

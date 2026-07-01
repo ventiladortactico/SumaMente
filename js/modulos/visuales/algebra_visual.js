@@ -1,4 +1,4 @@
-const AlgebraVisual = {
+window.AlgebraVisual = window.AlgebraVisual || {
     initCanvas(canvas) {
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();

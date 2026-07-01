@@ -1,4 +1,4 @@
-const DisenoVisual = {
+window.DisenoVisual = window.DisenoVisual || {
     initCanvas: function(canvas) {
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();

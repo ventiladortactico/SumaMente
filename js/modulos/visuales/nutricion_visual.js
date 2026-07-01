@@ -1,4 +1,4 @@
-﻿const NutricionVisual = {
+﻿window.NutricionVisual = window.NutricionVisual || {
     initCanvas: function(canvas) {
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();

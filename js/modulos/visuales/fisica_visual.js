@@ -1,4 +1,4 @@
-const FisicaVisual = {
+window.FisicaVisual = window.FisicaVisual || {
     loops: {},
 
     initCanvas: function(canvas) {

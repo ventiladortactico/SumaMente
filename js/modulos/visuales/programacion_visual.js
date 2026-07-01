@@ -1,4 +1,4 @@
-const ProgramacionVisual = {
+window.ProgramacionVisual = window.ProgramacionVisual || {
     initCanvas: function(canvas) {
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();

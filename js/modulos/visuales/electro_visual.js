@@ -1,4 +1,4 @@
-const ElectroVisual = {
+window.ElectroVisual = window.ElectroVisual || {
     loops: {},
 
     initCanvas: function(canvas) {

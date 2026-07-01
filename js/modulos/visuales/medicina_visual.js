@@ -1,4 +1,4 @@
-﻿const MedicinaVisual = {
+﻿window.MedicinaVisual = window.MedicinaVisual || {
     _loop: {},
 
     _startLoop: function(canvas, fn) {

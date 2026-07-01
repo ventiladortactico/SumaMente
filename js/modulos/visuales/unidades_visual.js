@@ -1,4 +1,4 @@
-const UnidadesVisual = {
+window.UnidadesVisual = window.UnidadesVisual || {
     initCanvas: function(canvas) {
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();

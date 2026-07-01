@@ -1,3 +1,19 @@
+// Notification bar
+function enableNotifs() {
+    if (!('Notification' in window)) return;
+    Notification.requestPermission().then(perm => {
+        if (perm === 'granted') {
+            hideNotifBar();
+            localStorage.setItem('SumaMente_notif', 'granted');
+        }
+    });
+}
+function hideNotifBar() {
+    const bar = document.getElementById('notif-bar');
+    if (bar) bar.style.display = 'none';
+    localStorage.setItem('SumaMente_notif_dismissed', '1');
+}
+
 // Ctrl+K abre busqueda + teclado calculadora general
 document.addEventListener('keydown', e => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -104,6 +120,14 @@ document.addEventListener('DOMContentLoaded', () => {
             _tapTimer = setTimeout(() => { _tapCount = 0; }, 1500);
         }
     });
+
+    // Notification bar
+    if ('Notification' in window && Notification.permission === 'default' && !localStorage.getItem('SumaMente_notif_dismissed')) {
+        setTimeout(() => {
+            const bar = document.getElementById('notif-bar');
+            if (bar && !LicenseManager.isPro) bar.style.display = 'flex';
+        }, 8000);
+    }
 
     // Ripple effect, locale decimal, backspace long-press (keypad)
     document.querySelector('.keypad')?.addEventListener('click', e => {

@@ -1322,9 +1322,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     </div>
 
     <!-- Sidebar Ad -->
-    <div class="ad-wrap" id="sidebar-ad-wrap">
-      <SCRIPT data-cfasync="false" SRC="//bdv.bidvertiser.com/BidVertiser.dbm?pid=942700&bid=2105538" TYPE="text/javascript" async></SCRIPT>
-    </div>
+    <div class="ad-wrap" id="sidebar-ad-wrap"></div>
 
     <!-- Historial -->
     <div class="panel">
@@ -1351,11 +1349,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
   <div class="status-item">SumaMente v1.2</div>
     </div>
 
-<div id="web-ad-wrap" class="ad-wrap">
-<!-- Begin BidVertiser code -->
-<SCRIPT data-cfasync="false" SRC="//bdv.bidvertiser.com/BidVertiser.dbm?pid=942700&bid=2105538" TYPE="text/javascript"></SCRIPT>
-<!-- End BidVertiser code -->
-</div>
+<div id="web-ad-wrap" class="ad-wrap"></div>
 
 <script defer src="js/data.js"></script>
 <!-- Módulos extraídos de app.js -->
@@ -1408,19 +1402,31 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 <script defer src="js/modulos/algebra.js"></script>
 <script defer src="js/app.js"></script>
 
-<script type='text/javascript'>
-(function(d) {
-	var params = { bvpushsubid: 2105538, cb: (new Date()).getTime() };
-	var qs = Object.keys(params).reduce(function(a, k){ a.push(k + '=' + encodeURIComponent(params[k])); return a},[]).join(String.fromCharCode(38));
-	var s = d.createElement('script'); s.type='text/javascript';s.async=true;
-	var p = 'https:' == document.location.protocol ? 'https' : 'http';
-	s.src = p + "://cdn.hyperpromote.com/bidvertiser/tags/activejs/bdpush.js?" + qs;
-	d.getElementsByTagName('body').item(0).appendChild(s);
-})(document);
-</script>
+
 
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
 <script defer src="https://va.vercel-scripts.com/v1/script.js"></script>
+
+<script>
+// Cargar anuncios despu&eacute;s del LCP para no bloquear rendimiento
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    var containers = ['web-ad-wrap', 'sidebar-ad-wrap'];
+    containers.forEach(function(id){
+      var c = document.getElementById(id);
+      if (!c || c.classList.contains('pro-hidden')) return;
+      var s = document.createElement('script');
+      s.src = '//bdv.bidvertiser.com/BidVertiser.dbm?pid=942700&bid=2105538';
+      s.type = 'text/javascript'; s.async = true; s.setAttribute('data-cfasync','false');
+      c.appendChild(s);
+    });
+    var p = document.location.protocol === 'https:' ? 'https' : 'http';
+    var sp = document.createElement('script'); sp.type = 'text/javascript'; sp.async = true;
+    sp.src = p + '://cdn.hyperpromote.com/bidvertiser/tags/activejs/bdpush.js?bvpushsubid=2105538&cb=' + Date.now();
+    document.body.appendChild(sp);
+  }, 1500);
+});
+</script>
 </body>
 </html>
 

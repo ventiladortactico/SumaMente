@@ -1,1 +1,1077 @@
-const DisenoVisual={initCanvas:function(i){const d=window.devicePixelRatio||1,h=i.getBoundingClientRect();i.width=h.width*d,i.height=h.height*d;const x=i.getContext("2d");return x.scale(d,d),x},_loop:{},_startLoop:function(i,d){this._loop[i.id]&&cancelAnimationFrame(this._loop[i.id]);const h=()=>{d(),this._loop[i.id]=requestAnimationFrame(h)};h()},_stopLoop:function(i){this._loop[i.id]&&(cancelAnimationFrame(this._loop[i.id]),delete this._loop[i.id])},conv:function(i,d,h,x,l){this._stopLoop(i);const e=this.initCanvas(i),t=i.width/(window.devicePixelRatio||1),o=i.height/(window.devicePixelRatio||1);let a=0;this._startLoop(i,()=>{e.clearRect(0,0,t,o),a+=.03;const n=e.createRadialGradient(t/2,o/2,5,t/2,o/2,t*.5);n.addColorStop(0,"rgba(79, 156, 249, 0.05)"),n.addColorStop(1,"rgba(10, 11, 14, 0)"),e.fillStyle=n,e.fillRect(0,0,t,o),e.strokeStyle="#2a3345",e.lineWidth=1.5,e.beginPath(),e.moveTo(20,o/2+12),e.lineTo(t-20,o/2+12),e.stroke();for(let f=20;f<t-20;f+=12){const s=f%48===20;e.strokeStyle=s?"#4a5570":"#2a3345",e.lineWidth=s?2:1,e.beginPath(),e.moveTo(f,o/2+12),e.lineTo(f,o/2+(s?0:6)),e.stroke()}const r=20+(Math.min(d/100,1)||.3)*(t-40);e.fillStyle="#4f9cf9",e.shadowColor="#4f9cf9",e.shadowBlur=10+5*Math.sin(a),e.beginPath(),e.arc(r,o/2+6,6,0,Math.PI*2),e.fill(),e.shadowBlur=0,e.fillStyle="#fff",e.font="bold 14px JetBrains Mono",e.textAlign="center",e.fillText(`${d} ${h} \u2192 ${l.toFixed(1)} ${x}`,t/2,o/2-18),e.fillStyle="#4a5570",e.font="8px JetBrains Mono",e.fillText(`${h}`,20,o/2+28),e.textAlign="right",e.fillText(`${x}`,t-20,o/2+28)})},resolucion:function(i,d,h,x,l,e){this._stopLoop(i);const t=this.initCanvas(i),o=i.width/(window.devicePixelRatio||1),a=i.height/(window.devicePixelRatio||1),n=20,r=Math.max(d+x*2,h+x*2),f=Math.min((o-2*n)/r,(a-2*n)/r),s=(d+x*2)*f,c=(h+x*2)*f,b=d*f,S=h*f,p=(o-s)/2,g=(a-c)/2;t.clearRect(0,0,o,a);const w=t.createRadialGradient(o/2,a/2,5,o/2,a/2,o*.5);w.addColorStop(0,"rgba(249, 79, 79, 0.04)"),w.addColorStop(1,"rgba(10, 11, 14, 0)"),t.fillStyle=w,t.fillRect(0,0,o,a),t.strokeStyle="#f94f4f",t.lineWidth=1.5,t.setLineDash([5,4]),t.strokeRect(p,g,s,c),t.setLineDash([]);const R=p+x*f,y=g+x*f;t.fillStyle="rgba(79, 156, 249, 0.12)",t.fillRect(R,y,b,S),t.strokeStyle="#4f9cf9",t.lineWidth=2.5,t.strokeRect(R,y,b,S),t.strokeStyle="#2a3345",t.lineWidth=1,t.beginPath(),t.moveTo(p-5,g+c/2),t.lineTo(p,g+c/2),t.moveTo(p+s,g+c/2),t.lineTo(p+s+5,g+c/2),t.moveTo(p+s/2,g-5),t.lineTo(p+s/2,g),t.moveTo(p+s/2,g+c),t.lineTo(p+s/2,g+c+5),t.stroke(),t.fillStyle="#fff",t.font="bold 10px JetBrains Mono",t.textAlign="center",t.fillText(`Lienzo final: ${l} \xD7 ${e} px`,o/2,a-6),t.fillStyle="#4a5570",t.font="7px JetBrains Mono",t.fillText(`${d}\xD7${h}mm + ${x}mm bleed`,o/2,a-18)},typeScale:function(i,d,h,x,l,e){this._stopLoop(i);const t=this.initCanvas(i),o=i.width/(window.devicePixelRatio||1),a=i.height/(window.devicePixelRatio||1);let n=0;this._startLoop(i,()=>{t.clearRect(0,0,o,a),n+=.02,t.fillStyle="#fff",t.font=`bold ${Math.min(h*.6,26)}px "Segoe UI", system-ui`,t.textAlign="left",t.textBaseline="middle",t.fillText("Encabezado H1",15,32);const r=t.measureText("Encabezado H1").width;t.fillStyle="#4a5570",t.font="8px JetBrains Mono",t.fillText(`${Math.round(h)}px`,20+r+5,32),t.fillStyle="#e8edf5",t.font=`bold ${Math.min(x*.6,20)}px "Segoe UI", system-ui`,t.fillText("Encabezado H2",15,62);const f=t.measureText("Encabezado H2").width;t.fillStyle="#4a5570",t.font="8px JetBrains Mono",t.fillText(`${Math.round(x)}px`,20+f+5,62),t.fillStyle="#8a99ad",t.font=`${Math.min(d*.8,14)}px "Segoe UI", system-ui`,t.fillText(`Texto Cuerpo (${d}px)`,15,90),t.fillStyle="#627284",t.font=`${Math.min(e*.8,11)}px "Segoe UI", system-ui`,t.fillText(`Texto peque\xF1o (${e.toFixed(1)}px)`,15,112),t.strokeStyle=`rgba(79, 156, 249, ${.1+.05*Math.sin(n)})`,t.lineWidth=1,t.beginPath(),t.moveTo(15,22+Math.sin(n)*2),t.lineTo(o-15,22+Math.sin(n)*2),t.stroke()})},aspectRatio:function(i,d,h,x,l,e){this._stopLoop(i);const t=this.initCanvas(i),o=i.width/(window.devicePixelRatio||1),a=i.height/(window.devicePixelRatio||1);let n=0;this._startLoop(i,()=>{t.clearRect(0,0,o,a),n+=.03;const r=t.createRadialGradient(o/2,a/2,5,o/2,a/2,o*.5);r.addColorStop(0,"rgba(249, 79, 79, 0.04)"),r.addColorStop(1,"rgba(10, 11, 14, 0)"),t.fillStyle=r,t.fillRect(0,0,o,a);const f=o-40,s=a-40;if(t.fillStyle="#1b1f2b",t.fillRect(20,20,f,s),t.strokeStyle="#374151",t.strokeRect(20,20,f,s),t.fillStyle=`rgba(249, 79, 79, ${.25+.1*Math.sin(n)})`,l>0){const c=l/h*s;t.fillRect(20,20,f,c),t.fillRect(20,20+s-c,f,c)}else if(e>0){const c=e/d*f;t.fillRect(20,20,c,s),t.fillRect(20+f-c,20,c,s)}t.fillStyle="#fff",t.font="10px JetBrains Mono",t.textAlign="center",t.fillText(`Original: ${d}\xD7${h}`,o/2,a-6)})},color:function(i,d,h,x){this._stopLoop(i);const l=this.initCanvas(i),e=i.width/(window.devicePixelRatio||1),t=i.height/(window.devicePixelRatio||1);let o=0;this._startLoop(i,()=>{l.clearRect(0,0,e,t),o+=.03,l.fillStyle=h,l.fillRect(0,0,e,t),l.shadowColor=d,l.shadowBlur=20,l.fillStyle=d,l.font='bold 20px "Segoe UI", system-ui',l.textAlign="center",l.textBaseline="middle",l.fillText("Texto de Prueba",e/2,t/2-12),l.shadowBlur=0,l.fillStyle="#fff",l.font="bold 14px JetBrains Mono",l.fillText(`Contraste: ${x.toFixed(1)}:1`,e/2,t/2+25),l.fillStyle=x>=4.5?"#4ff97b":"#f94f4f",l.font="10px JetBrains Mono",l.fillText(x>=4.5?"\u2713 WCAG AA Pass":"\u2717 WCAG AA Fail",e/2,t/2+44);const a=4+2*Math.sin(o);x>=4.5&&(l.fillStyle="rgba(79, 249, 123, 0.15)",l.beginPath(),l.arc(e/2,t/2-12,50+a,0,Math.PI*2),l.fill())})},aureo:function(i,d,h,x){this._stopLoop(i);const l=this.initCanvas(i),e=i.width/(window.devicePixelRatio||1),t=i.height/(window.devicePixelRatio||1);let o=0;this._startLoop(i,()=>{l.clearRect(0,0,e,t);const a=l.createRadialGradient(e/2,t/2,5,e/2,t/2,e*.5);a.addColorStop(0,"rgba(79, 156, 249, 0.05)"),a.addColorStop(1,"rgba(10, 11, 14, 0)"),l.fillStyle=a,l.fillRect(0,0,e,t),o+=.02;const n=d+h,r=Math.min((e-40)/n,(t-60)/h*.8),f=d*r,s=h*r,c=t/2;l.fillStyle="#4f9cf9",l.shadowColor="#4f9cf9",l.shadowBlur=6,l.fillRect(20,c-f/2,f,f),l.shadowBlur=0,l.fillStyle="#4ff97b",l.shadowColor="#4ff97b",l.shadowBlur=6,l.fillRect(20+f,c-s/2,s,s),l.shadowBlur=0,l.strokeStyle="rgba(255,255,255,0.15)",l.lineWidth=1,l.setLineDash([3,3]),l.strokeRect(20+f,c-s/2,s,s),l.setLineDash([]),l.fillStyle="#fff",l.font="bold 12px JetBrains Mono",l.textAlign="left";const b=.8+.2*Math.sin(o);l.globalAlpha=b,l.fillText("\u03C6 = "+x.toFixed(4),20,c-f/2-10),l.globalAlpha=1,l.fillStyle="#4a5570",l.font="9px JetBrains Mono",l.fillText(d.toFixed(0)+" \xD7 \u03C6 = "+h.toFixed(1),20,c+Math.max(f,s)/2+20)})},escala_grafica:function(i,d,h,x){this._stopLoop(i);const l=this.initCanvas(i),e=i.width/(window.devicePixelRatio||1),t=i.height/(window.devicePixelRatio||1);let o=0;this._startLoop(i,()=>{l.clearRect(0,0,e,t);const a=l.createRadialGradient(e/2,t/2,5,e/2,t/2,e*.5);a.addColorStop(0,"rgba(79, 156, 249, 0.04)"),a.addColorStop(1,"rgba(10, 11, 14, 0)"),l.fillStyle=a,l.fillRect(0,0,e,t),o+=.03;const n=t/2-10,r=e-40,f=Math.min(x,r);l.fillStyle="#1a1f2e",l.beginPath(),l.roundRect(20,n,r,20,4),l.fill(),l.fillStyle="#4f9cf9",l.shadowColor="#4f9cf9",l.shadowBlur=4,l.beginPath(),l.roundRect(20,n,f,20,[4,0,0,4]),l.fill(),l.shadowBlur=0,l.fillStyle="#fff",l.font="bold 9px JetBrains Mono",l.textAlign="center",l.fillText(x.toFixed(1)+" mm",20+f/2,n+14),l.fillStyle="#4a5570",l.font="8px JetBrains Mono",l.textAlign="left",l.fillText("0",20,n+35),l.textAlign="right",l.fillText(x.toFixed(1)+" mm",20+f,n+35),l.fillStyle="#fff",l.font="bold 10px JetBrains Mono",l.textAlign="left",l.fillText("1:"+h+" | Real: "+(d/10).toFixed(1)+" cm",20,25)})},regla_tercios:function(i,d,h,x,l,e,t){this._stopLoop(i);const o=this.initCanvas(i),a=i.width/(window.devicePixelRatio||1),n=i.height/(window.devicePixelRatio||1);let r=0;this._startLoop(i,()=>{o.clearRect(0,0,a,n);const f=o.createRadialGradient(a/2,n/2,5,a/2,n/2,a*.5);f.addColorStop(0,"rgba(79, 156, 249, 0.04)"),f.addColorStop(1,"rgba(10, 11, 14, 0)"),o.fillStyle=f,o.fillRect(0,0,a,n),r+=.03;const s=d/h,c=a-40,b=Math.min(c/s,n-40),S=c,p=b,g=(a-S)/2,w=(n-p)/2;o.fillStyle="#1a1f2e",o.fillRect(g,w,S,p),o.strokeStyle="#374151",o.lineWidth=1,o.strokeRect(g,w,S,p),o.strokeStyle="rgba(249, 199, 79, 0.4)",o.lineWidth=1;const R=g+S/3,y=g+2*S/3,M=w+p/3,m=w+2*p/3;o.beginPath(),o.moveTo(R,w),o.lineTo(R,w+p),o.moveTo(y,w),o.lineTo(y,w+p),o.moveTo(g,M),o.lineTo(g+S,M),o.moveTo(g,m),o.lineTo(g+S,m),o.stroke(),[[R,M],[y,M],[R,m],[y,m]].forEach((u,T)=>{o.shadowColor="#f9c74f",o.shadowBlur=8+4*Math.sin(r+T*1.5),o.fillStyle="#f9c74f",o.beginPath(),o.arc(u[0],u[1],4,0,Math.PI*2),o.fill(),o.shadowBlur=0}),o.fillStyle="#fff",o.font="bold 9px JetBrains Mono",o.textAlign="center",o.fillText("Regla de Tercios | "+Math.round(d)+"\xD7"+Math.round(h),a/2,n-8)})},tipometria:function(i,d,h,x,l,e){this._stopLoop(i);const t=this.initCanvas(i),o=i.width/(window.devicePixelRatio||1),a=i.height/(window.devicePixelRatio||1);let n=0;this._startLoop(i,()=>{t.clearRect(0,0,o,a);const r=t.createRadialGradient(o/2,a/2,5,o/2,a/2,o*.5);r.addColorStop(0,"rgba(79, 156, 249, 0.04)"),r.addColorStop(1,"rgba(10, 11, 14, 0)"),t.fillStyle=r,t.fillRect(0,0,o,a),n+=.03;const f=[e*.75,e,e*1.25,e*1.5],s=["sm (0.75rem)","base (1rem)","h3 (1.25rem)","h2 (1.5rem)"],c=30,b=Math.min((a-40)/f.length,50);f.forEach((p,g)=>{const w=c+g*b;t.fillStyle="#fff",t.font=Math.round(p)+'px "Segoe UI", system-ui',t.textAlign="left",t.textBaseline="middle",t.fillText("Texto "+s[g],20,w),t.fillStyle="#4a5570",t.font="8px JetBrains Mono",t.textAlign="right",t.fillText(Math.round(p)+"px ("+(p/e).toFixed(2)+"rem)",o-20,w)}),t.fillStyle="#4f9cf9",t.font="bold 9px JetBrains Mono",t.textAlign="center";const S=.7+.3*Math.sin(n);t.globalAlpha=S,t.fillText(d+" "+h.replace("_t","")+" = "+l.toFixed(2)+" "+x.replace("_t",""),o/2,a-10),t.globalAlpha=1})},gama_cromatica:function(i,d,h,x){this._stopLoop(i);const l=this.initCanvas(i),e=i.width/(window.devicePixelRatio||1),t=i.height/(window.devicePixelRatio||1);let o=0;this._startLoop(i,()=>{l.clearRect(0,0,e,t);const a=l.createRadialGradient(e/2,t/2,5,e/2,t/2,e*.5);a.addColorStop(0,"rgba(79, 156, 249, 0.04)"),a.addColorStop(1,"rgba(10, 11, 14, 0)"),l.fillStyle=a,l.fillRect(0,0,e,t),o+=.02;const n=e/2,r=t/2,f=Math.min(e,t)*.3;for(let s=0;s<360;s++){const c=s*Math.PI/180,b=n+Math.cos(c)*f,S=r+Math.sin(c)*f;l.strokeStyle="hsl("+s+", 80%, 60%)",l.lineWidth=2,l.beginPath(),l.moveTo(n,r),l.lineTo(b,S),l.stroke()}x.forEach((s,c)=>{const b=s.h*Math.PI/180,S=n+Math.cos(b)*f,p=r+Math.sin(b)*f,g=o+c*2;l.shadowColor="hsl("+s.h+", 80%, 60%)",l.shadowBlur=12+6*Math.sin(g),l.fillStyle="hsl("+s.h+", 80%, 60%)",l.beginPath(),l.arc(S,p,8+3*Math.sin(g),0,Math.PI*2),l.fill(),l.shadowBlur=0,l.fillStyle="#fff",l.font="8px JetBrains Mono",l.textAlign="center",l.fillText(Math.round(s.h)+"\xB0 "+s.l,S,p+18)}),l.fillStyle="#fff",l.font="bold 10px JetBrains Mono",l.textAlign="center",l.fillText(h.charAt(0).toUpperCase()+h.slice(1)+" | Base: "+Math.round(d)+"\xB0",e/2,t-10)})},kerning_tracking:function(i,d,h,x){this._stopLoop(i);const l=this.initCanvas(i),e=i.width/(window.devicePixelRatio||1),t=i.height/(window.devicePixelRatio||1);let o=0;this._startLoop(i,()=>{l.clearRect(0,0,e,t);const a=l.createRadialGradient(e/2,t/2,5,e/2,t/2,e*.5);a.addColorStop(0,"rgba(79, 156, 249, 0.04)"),a.addColorStop(1,"rgba(10, 11, 14, 0)"),l.fillStyle=a,l.fillRect(0,0,e,t),o+=.03;const n="AVAVAVAVAV".split("").slice(0,Math.min(h,10)),r=24,f=d*16,s=n.length*r*.7+(n.length-1)*f,c=(e-s)/2,b=t/2-10;n.forEach((S,p)=>{const g=c+p*(r*.7+f)+Math.sin(o+p)*2;if(l.fillStyle="#fff",l.font="bold "+r+'px "Segoe UI", system-ui',l.textAlign="left",l.textBaseline="middle",l.fillText(S,g,b),p>0){l.strokeStyle="rgba(79, 156, 249, 0.3)",l.lineWidth=1;const w=g-f/2;l.beginPath(),l.moveTo(w,b-15),l.lineTo(w,b+15),l.stroke()}}),l.fillStyle="#4f9cf9",l.font="9px JetBrains Mono",l.textAlign="center",l.fillText("Kerning: "+(d*1e3).toFixed(0)+"\u2030 em | Tracking total: "+(x*1e3).toFixed(0)+"\u2030 em",e/2,t-15),l.fillStyle="#fff",l.font="bold 10px JetBrains Mono",l.fillText('"'+n.join("")+'"',e/2,22)})},peso_visual:function(i,d,h,x,l){this._stopLoop(i);const e=this.initCanvas(i),t=i.width/(window.devicePixelRatio||1),o=i.height/(window.devicePixelRatio||1);let a=0;this._startLoop(i,()=>{e.clearRect(0,0,t,o);const n=e.createRadialGradient(t/2,o/2,5,t/2,o/2,t*.5);n.addColorStop(0,"rgba(79, 156, 249, 0.04)"),n.addColorStop(1,"rgba(10, 11, 14, 0)"),e.fillStyle=n,e.fillRect(0,0,t,o),a+=.03;const r=30+l*80,f=t/2,s=o/2-10;e.shadowColor="#f97b4f",e.shadowBlur=8+4*Math.sin(a),e.fillStyle="#f97b4f",e.beginPath(),e.arc(f,s,r,0,Math.PI*2),e.fill(),e.shadowBlur=0,e.fillStyle="#fff",e.font="bold 11px JetBrains Mono",e.textAlign="center",e.textBaseline="middle",e.fillText((l*100).toFixed(1)+"%",f,s),[{label:"\xC1rea",val:d+"%",x:f-80},{label:"Densidad",val:h+"/10",x:f},{label:"Contraste",val:x+"/10",x:f+80}].forEach(c=>{e.fillStyle="#4a5570",e.font="8px JetBrains Mono",e.textBaseline="top",e.fillText(c.label,c.x-15,s+r+12),e.fillStyle="#fff",e.font="bold 9px JetBrains Mono",e.fillText(c.val,c.x-15,s+r+24)}),e.fillStyle="#fff",e.font="bold 10px JetBrains Mono",e.textBaseline="bottom",e.fillText("Peso Visual",t/2,20)})},reticula:function(i,d,h,x,l,e){this._stopLoop(i);const t=this.initCanvas(i),o=i.width/(window.devicePixelRatio||1),a=i.height/(window.devicePixelRatio||1);let n=0;this._startLoop(i,()=>{t.clearRect(0,0,o,a);const r=t.createRadialGradient(o/2,a/2,5,o/2,a/2,o*.5);r.addColorStop(0,"rgba(79, 156, 249, 0.04)"),r.addColorStop(1,"rgba(10, 11, 14, 0)"),t.fillStyle=r,t.fillRect(0,0,o,a),n+=.02;const f=(a-60)/d,s=d*f,c=(o-s)/2,b=40,S=e*f,p=x*f,g=l*f;t.fillStyle="#1a1f2e",t.fillRect(c,b,s,40);for(let w=0;w<h;w++){const R=c+g+w*(S+p),y=.4+.2*Math.sin(n+w*.8);t.fillStyle="rgba(79, 156, 249, "+y+")",t.fillRect(R,b,S,40),t.fillStyle="#fff",t.font="8px JetBrains Mono",t.textAlign="center",t.textBaseline="middle",t.fillText(w+1+"",R+S/2,b+20)}t.fillStyle="#4a5570",t.font="7px JetBrains Mono",t.textAlign="center",t.fillText(x+"px gutter",c+g+h*(S+p)-p/2,b+50),t.fillText(l+"px margin",c+g/2,b+50),t.fillStyle="#fff",t.font="bold 10px JetBrains Mono",t.textAlign="left",t.fillText(h+" columnas \xD7 "+e.toFixed(1)+"px",15,18)})},legibilidad:function(i,d,h,x){this._stopLoop(i);const l=this.initCanvas(i),e=i.width/(window.devicePixelRatio||1),t=i.height/(window.devicePixelRatio||1);let o=0;this._startLoop(i,()=>{l.clearRect(0,0,e,t);const a=l.createRadialGradient(e/2,t/2,5,e/2,t/2,e*.5);a.addColorStop(0,"rgba(79, 156, 249, 0.04)"),a.addColorStop(1,"rgba(10, 11, 14, 0)"),l.fillStyle=a,l.fillRect(0,0,e,t),o+=.03;const n=Math.min(h,e-40),r=(e-n)/2,f=d*1.5,s=4,c=(t-s*f)/2,b="Este es un texto de muestra para evaluar la legibilidad tipogr\xE1fica en pantalla. ";for(let p=0;p<s;p++)l.fillStyle="#fff",l.font=d+'px "Segoe UI", system-ui',l.textAlign="left",l.textBaseline="top",l.fillText(b.repeat(3).substring(0,x*2),r,c+p*f);l.strokeStyle="rgba(79, 156, 249, 0.2)",l.lineWidth=1,l.beginPath(),l.moveTo(r+x*d*.5,c-5),l.lineTo(r+x*d*.5,c+s*f+5),l.stroke(),l.fillStyle="#4f9cf9",l.font="bold 11px JetBrains Mono",l.textAlign="center";const S=.7+.3*Math.sin(o);l.globalAlpha=S,l.fillText(x+" cpp | "+d+"px | "+h+"px",e/2,t-12),l.globalAlpha=1})},sangria_margenes:function(i,d,h,x,l,e,t,o,a){this._stopLoop(i);const n=this.initCanvas(i),r=i.width/(window.devicePixelRatio||1),f=i.height/(window.devicePixelRatio||1);let s=0;this._startLoop(i,()=>{n.clearRect(0,0,r,f);const c=n.createRadialGradient(r/2,f/2,5,r/2,f/2,r*.5);c.addColorStop(0,"rgba(79, 156, 249, 0.04)"),c.addColorStop(1,"rgba(10, 11, 14, 0)"),n.fillStyle=c,n.fillRect(0,0,r,f),s+=.03;const b=d/h;let S=f*.6,p=S/b;p>f*.7&&(p=f*.7,S=p*b);const g=(r-S)/2,w=(f-p)/2;n.fillStyle="#f5f5f0",n.fillRect(g,w,S,p);const R=S/d,y=g+e*R,M=w+x*R,m=o*R,u=a*R;n.fillStyle="#fff",n.fillRect(y,M,m,u),n.strokeStyle="rgba(249, 79, 79, 0.3)",n.lineWidth=1,n.setLineDash([3,3]),n.strokeRect(y,M,m,u),n.setLineDash([]),n.fillStyle="#f94f4f",n.font="7px JetBrains Mono",n.textAlign="center",n.fillText("Sup: "+x+"mm",g+S/2,w+x*R/2),n.fillText("Inf: "+l+"mm",g+S/2,w+p-l*R/2),n.fillText("Int: "+e+"mm",g+e*R/2,w+p/2),n.fillText("Ext: "+t+"mm",g+S-t*R/2,w+p/2),n.fillStyle="#fff",n.font="bold 10px JetBrains Mono",n.textAlign="center",n.fillText(o.toFixed(0)+"\xD7"+a.toFixed(0)+" mm (mancha de texto)",r/2,f-8)})}};DisenoVisual.rgb_hex=function(i,d,h,x,l){this._stopLoop(i);const e=this.initCanvas(i),t=i.width/(window.devicePixelRatio||1),o=i.height/(window.devicePixelRatio||1);let a=0;this._startLoop(i,()=>{e.clearRect(0,0,t,o),a+=.03;const n=e.createRadialGradient(t/2,o/2,5,t/2,o/2,t*.5);n.addColorStop(0,"rgba(79, 156, 249, 0.05)"),n.addColorStop(1,"rgba(10, 11, 14, 0)"),e.fillStyle=n,e.fillRect(0,0,t,o),e.fillStyle=l,e.shadowColor=l,e.shadowBlur=20+5*Math.sin(a),e.beginPath(),e.roundRect(t/2-50,o/2-50,100,100,12),e.fill(),e.shadowBlur=0,e.fillStyle="#fff",e.font="bold 13px JetBrains Mono",e.textAlign="center",e.textBaseline="middle",e.fillText(l,t/2,o/2+70),e.fillStyle="#4a5570",e.font="9px JetBrains Mono",e.fillText(`RGB(${d}, ${h}, ${x})`,t/2,o/2+86),e.fillStyle=`rgb(${d}, ${h}, ${x})`,e.font="bold 14px JetBrains Mono",e.fillText("\u25A0",t/2,o/2-10)})},DisenoVisual.rgb_cmyk=function(i,d,h,x,l,e,t,o){this._stopLoop(i);const a=this.initCanvas(i),n=i.width/(window.devicePixelRatio||1),r=i.height/(window.devicePixelRatio||1);let f=0;this._startLoop(i,()=>{a.clearRect(0,0,n,r),f+=.03;const s=a.createRadialGradient(n/2,r/2,5,n/2,r/2,n*.5);s.addColorStop(0,"rgba(249, 199, 79, 0.05)"),s.addColorStop(1,"rgba(10, 11, 14, 0)"),a.fillStyle=s,a.fillRect(0,0,n,r);const c=[{label:"C",pct:l,color:"#00d4ff"},{label:"M",pct:e,color:"#ff00a0"},{label:"Y",pct:t,color:"#ffd700"},{label:"K",pct:o,color:"#222"}],b=(n-40)/4;c.forEach((S,p)=>{const g=20+p*b,w=Math.max(4,S.pct/100*(r-60));a.fillStyle="#1a1f2e",a.beginPath(),a.roundRect(g,r-20-w,b-6,w,4),a.fill(),a.fillStyle=S.color,a.shadowColor=S.color,a.shadowBlur=4,a.beginPath(),a.roundRect(g,r-20-w,b-6,w,[4,4,0,0]),a.fill(),a.shadowBlur=0,a.fillStyle="#fff",a.font="bold 9px JetBrains Mono",a.textAlign="center",a.fillText(S.label,g+(b-6)/2,r-4),a.fillStyle="#4a5570",a.font="8px JetBrains Mono",a.fillText(S.pct.toFixed(1)+"%",g+(b-6)/2,r-20-w-4)}),a.fillStyle=`rgb(${d},${h},${x})`,a.shadowColor=`rgb(${d},${h},${x})`,a.shadowBlur=10,a.beginPath(),a.arc(n/2,25,10,0,Math.PI*2),a.fill(),a.shadowBlur=0})},DisenoVisual.dpi_ppi=function(i,d,h,x,l){this._stopLoop(i);const e=this.initCanvas(i),t=i.width/(window.devicePixelRatio||1),o=i.height/(window.devicePixelRatio||1);let a=0;this._startLoop(i,()=>{e.clearRect(0,0,t,o),a+=.03;const n=e.createRadialGradient(t/2,o/2,5,t/2,o/2,t*.5);n.addColorStop(0,"rgba(79, 249, 123, 0.05)"),n.addColorStop(1,"rgba(10, 11, 14, 0)"),e.fillStyle=n,e.fillRect(0,0,t,o);const r=d/h,f=Math.min((t-40)/d,(o-80)/h,1),s=d*f*.6,c=h*f*.6,b=(t-s)/2,S=(o-c)/2;e.strokeStyle="#4f9cf9",e.lineWidth=2,e.strokeRect(b,S,s,c);const p=Math.min(20,Math.round(l/15));for(let g=0;g<p&&g<15;g++){const w=b+5+(g*7+Math.floor(a*2))%Math.max(1,s-10),R=S+5+g*13%Math.max(1,c-10);e.fillStyle="rgba(79, 249, 123, 0.6)",e.beginPath(),e.arc(w,R,1.5,0,Math.PI*2),e.fill()}e.fillStyle="#fff",e.font="bold 13px JetBrains Mono",e.textAlign="center",e.fillText(`${l.toFixed(1)} PPI`,t/2,o-8),e.fillStyle="#4a5570",e.font="8px JetBrains Mono",e.fillText(`${d}\xD7${h} @ ${x}"`,t/2,16)})},DisenoVisual.tamano_imagen=function(i,d,h,x,l,e){this._stopLoop(i);const t=this.initCanvas(i),o=i.width/(window.devicePixelRatio||1),a=i.height/(window.devicePixelRatio||1);let n=0;this._startLoop(i,()=>{t.clearRect(0,0,o,a),n+=.03;const r=t.createRadialGradient(o/2,a/2,5,o/2,a/2,o*.5);r.addColorStop(0,"rgba(79, 156, 249, 0.05)"),r.addColorStop(1,"rgba(10, 11, 14, 0)"),t.fillStyle=r,t.fillRect(0,0,o,a);const f=Math.max(l,e,1),s=o-40,c=18,b=a/2-20,S=a/2+12;t.fillStyle="#1a1f2e",t.beginPath(),t.roundRect(20,b,s,c,4),t.fill(),t.fillStyle="#f94f4f";const p=Math.min(1,l/f*n);t.beginPath(),t.roundRect(20,b,s*Math.min(1,l/f)*Math.min(1,n),c,[4,0,0,4]),t.fill(),t.fillStyle="#1a1f2e",t.beginPath(),t.roundRect(20,S,s,c,4),t.fill(),t.fillStyle="#4ff97b",t.shadowColor="#4ff97b",t.shadowBlur=4,t.beginPath(),t.roundRect(20,S,s*Math.min(1,e/f)*Math.min(1,n),c,[4,0,0,4]),t.fill(),t.shadowBlur=0,t.fillStyle="#fff",t.font="bold 9px JetBrains Mono",t.textAlign="left",t.fillText(`Raw: ${l.toFixed(2)} MB`,20,b-4),t.fillStyle="#4ff97b",t.fillText(`Comprimido: ${e.toFixed(2)} MB`,20,S+c+14)})},DisenoVisual.bitrate_video=function(i,d,h,x,l,e){this._stopLoop(i);const t=this.initCanvas(i),o=i.width/(window.devicePixelRatio||1),a=i.height/(window.devicePixelRatio||1);let n=0;this._startLoop(i,()=>{t.clearRect(0,0,o,a),n+=.04;const r=t.createRadialGradient(o/2,a/2,5,o/2,a/2,o*.5);r.addColorStop(0,"rgba(249, 79, 79, 0.05)"),r.addColorStop(1,"rgba(10, 11, 14, 0)"),t.fillStyle=r,t.fillRect(0,0,o,a);const f=o-40,s=20,c=a/2-s/2,b=200;t.fillStyle="#1a1f2e",t.beginPath(),t.roundRect(20,c,f,s,6),t.fill();const S=Math.min(1,e/b),p=t.createLinearGradient(20,0,20+f,0);p.addColorStop(0,"#4f9cf9"),p.addColorStop(1,"#f94f4f"),t.fillStyle=p,t.shadowColor="#f94f4f",t.shadowBlur=6,t.beginPath(),t.roundRect(20,c,f*Math.min(1,n)*S,s,[6,0,0,6]),t.fill(),t.shadowBlur=0;const g=.5+.5*Math.sin(n*4);for(let w=0;w<Math.min(x,12);w++){const R=20+w/x*f,y=6+6*Math.sin(n*3+w);t.fillStyle=`rgba(255,255,255,${.2+.3*g})`,t.fillRect(R,c-12,3,y)}t.fillStyle="#fff",t.font="bold 13px JetBrains Mono",t.textAlign="center",t.fillText(`${e.toFixed(1)} Mbps`,o/2,c-16),t.fillStyle="#4a5570",t.font="8px JetBrains Mono",t.fillText(`${d}\xD7${h} @ ${x} fps`,o/2,c+s+16)})};
+const DisenoVisual = {
+    initCanvas: function(canvas) {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return ctx;
+    },
+
+    _loop: {},
+    _startLoop: function(canvas, fn) {
+        if (this._loop[canvas.id]) cancelAnimationFrame(this._loop[canvas.id]);
+        const animate = () => { fn(); this._loop[canvas.id] = requestAnimationFrame(animate); };
+        animate();
+    },
+    _stopLoop: function(canvas) {
+        if (this._loop[canvas.id]) { cancelAnimationFrame(this._loop[canvas.id]); delete this._loop[canvas.id]; }
+    },
+
+    conv: function(canvas, val, from, to, res) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(79, 156, 249, 0.05)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.strokeStyle = '#2a3345';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(20, h / 2 + 12);
+            ctx.lineTo(w - 20, h / 2 + 12);
+            ctx.stroke();
+
+            for (let i = 20; i < w - 20; i += 12) {
+                const isMajor = i % 48 === 20;
+                ctx.strokeStyle = isMajor ? '#4a5570' : '#2a3345';
+                ctx.lineWidth = isMajor ? 2 : 1;
+                ctx.beginPath();
+                ctx.moveTo(i, h / 2 + 12);
+                ctx.lineTo(i, h / 2 + (isMajor ? 0 : 6));
+                ctx.stroke();
+            }
+
+            const pct = Math.min(val / 100, 1) || 0.3;
+            const pos = 20 + pct * (w - 40);
+            ctx.fillStyle = '#4f9cf9';
+            ctx.shadowColor = '#4f9cf9';
+            ctx.shadowBlur = 10 + 5 * Math.sin(phase);
+            ctx.beginPath();
+            ctx.arc(pos, h / 2 + 6, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${val} ${from} → ${res.toFixed(1)} ${to}`, w / 2, h / 2 - 18);
+
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText(`${from}`, 20, h / 2 + 28);
+            ctx.textAlign = 'right';
+            ctx.fillText(`${to}`, w - 20, h / 2 + 28);
+        });
+    },
+
+    resolucion: function(canvas, wMM, hMM, bMM, wPx, hPx) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 20;
+        const maxDim = Math.max(wMM + bMM * 2, hMM + bMM * 2);
+        const scale = Math.min((w - 2 * pad) / maxDim, (h - 2 * pad) / maxDim);
+        const bW = (wMM + bMM * 2) * scale;
+        const bH = (hMM + bMM * 2) * scale;
+        const nW = wMM * scale;
+        const nH = hMM * scale;
+        const sx = (w - bW) / 2;
+        const sy = (h - bH) / 2;
+
+        ctx.clearRect(0, 0, w, h);
+
+        const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+        grad.addColorStop(0, 'rgba(249, 79, 79, 0.04)');
+        grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.strokeStyle = '#f94f4f';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([5, 4]);
+        ctx.strokeRect(sx, sy, bW, bH);
+        ctx.setLineDash([]);
+
+        const iw = sx + bMM * scale;
+        const ih = sy + bMM * scale;
+        ctx.fillStyle = 'rgba(79, 156, 249, 0.12)';
+        ctx.fillRect(iw, ih, nW, nH);
+        ctx.strokeStyle = '#4f9cf9';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(iw, ih, nW, nH);
+
+        ctx.strokeStyle = '#2a3345';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(sx - 5, sy + bH / 2);
+        ctx.lineTo(sx, sy + bH / 2);
+        ctx.moveTo(sx + bW, sy + bH / 2);
+        ctx.lineTo(sx + bW + 5, sy + bH / 2);
+        ctx.moveTo(sx + bW / 2, sy - 5);
+        ctx.lineTo(sx + bW / 2, sy);
+        ctx.moveTo(sx + bW / 2, sy + bH);
+        ctx.lineTo(sx + bW / 2, sy + bH + 5);
+        ctx.stroke();
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 10px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Lienzo final: ${wPx} × ${hPx} px`, w / 2, h - 6);
+
+        ctx.fillStyle = '#4a5570';
+        ctx.font = '7px JetBrains Mono';
+        ctx.fillText(`${wMM}×${hMM}mm + ${bMM}mm bleed`, w / 2, h - 18);
+    },
+
+    typeScale: function(canvas, base, h1, h2, h3, sm) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.02;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = `bold ${Math.min(h1 * 0.6, 26)}px "Segoe UI", system-ui`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('Encabezado H1', 15, 32);
+
+            const h1w = ctx.measureText('Encabezado H1').width;
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText(`${Math.round(h1)}px`, 20 + h1w + 5, 32);
+
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = `bold ${Math.min(h2 * 0.6, 20)}px "Segoe UI", system-ui`;
+            ctx.fillText('Encabezado H2', 15, 62);
+            const h2w = ctx.measureText('Encabezado H2').width;
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText(`${Math.round(h2)}px`, 20 + h2w + 5, 62);
+
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = `${Math.min(base * 0.8, 14)}px "Segoe UI", system-ui`;
+            ctx.fillText(`Texto Cuerpo (${base}px)`, 15, 90);
+
+            ctx.fillStyle = '#627284';
+            ctx.font = `${Math.min(sm * 0.8, 11)}px "Segoe UI", system-ui`;
+            ctx.fillText(`Texto pequeño (${sm.toFixed(1)}px)`, 15, 112);
+
+            ctx.strokeStyle = `rgba(79, 156, 249, ${0.1 + 0.05 * Math.sin(phase)})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(15, 22 + Math.sin(phase) * 2);
+            ctx.lineTo(w - 15, 22 + Math.sin(phase) * 2);
+            ctx.stroke();
+        });
+    },
+
+    aspectRatio: function(canvas, wo, ho, targetRatio, letterbox, pillarbox) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(249, 79, 79, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            const iw = w - 40, ih = h - 40;
+            ctx.fillStyle = '#1b1f2b';
+            ctx.fillRect(20, 20, iw, ih);
+            ctx.strokeStyle = '#374151';
+            ctx.strokeRect(20, 20, iw, ih);
+
+            ctx.fillStyle = `rgba(249, 79, 79, ${0.25 + 0.1 * Math.sin(phase)})`;
+            if (letterbox > 0) {
+                const off = (letterbox / ho) * ih;
+                ctx.fillRect(20, 20, iw, off);
+                ctx.fillRect(20, 20 + ih - off, iw, off);
+            } else if (pillarbox > 0) {
+                const off = (pillarbox / wo) * iw;
+                ctx.fillRect(20, 20, off, ih);
+                ctx.fillRect(20 + iw - off, 20, off, ih);
+            }
+
+            ctx.fillStyle = '#fff';
+            ctx.font = '10px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Original: ${wo}×${ho}`, w / 2, h - 6);
+        });
+    },
+
+    color: function(canvas, textHex, bgHex, ratio) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+
+            ctx.fillStyle = bgHex;
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.shadowColor = textHex;
+            ctx.shadowBlur = 20;
+            ctx.fillStyle = textHex;
+            ctx.font = 'bold 20px "Segoe UI", system-ui';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('Texto de Prueba', w / 2, h / 2 - 12);
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px JetBrains Mono';
+            ctx.fillText(`Contraste: ${ratio.toFixed(1)}:1`, w / 2, h / 2 + 25);
+
+            ctx.fillStyle = ratio >= 4.5 ? '#4ff97b' : '#f94f4f';
+            ctx.font = '10px JetBrains Mono';
+            ctx.fillText(ratio >= 4.5 ? '✓ WCAG AA Pass' : '✗ WCAG AA Fail', w / 2, h / 2 + 44);
+
+            const r = 4 + 2 * Math.sin(phase);
+            if (ratio >= 4.5) {
+                ctx.fillStyle = 'rgba(79, 249, 123, 0.15)';
+                ctx.beginPath();
+                ctx.arc(w / 2, h / 2 - 12, 50 + r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        });
+    },
+
+    aureo: function(canvas, base, mayor, phi) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(79, 156, 249, 0.05)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            phase += 0.02;
+
+            const total = base + mayor;
+            const scale = Math.min((w - 40) / total, (h - 60) / mayor * 0.8);
+            const bw = base * scale;
+            const mw = mayor * scale;
+            const cy = h / 2;
+
+            ctx.fillStyle = '#4f9cf9';
+            ctx.shadowColor = '#4f9cf9';
+            ctx.shadowBlur = 6;
+            ctx.fillRect(20, cy - bw / 2, bw, bw);
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#4ff97b';
+            ctx.shadowColor = '#4ff97b';
+            ctx.shadowBlur = 6;
+            ctx.fillRect(20 + bw, cy - mw / 2, mw, mw);
+            ctx.shadowBlur = 0;
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([3, 3]);
+            ctx.strokeRect(20 + bw, cy - mw / 2, mw, mw);
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 12px JetBrains Mono';
+            ctx.textAlign = 'left';
+            const pulse = 0.8 + 0.2 * Math.sin(phase);
+            ctx.globalAlpha = pulse;
+            ctx.fillText('φ = ' + phi.toFixed(4), 20, cy - bw / 2 - 10);
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '9px JetBrains Mono';
+            ctx.fillText(base.toFixed(0) + ' × φ = ' + mayor.toFixed(1), 20, cy + Math.max(bw, mw) / 2 + 20);
+        });
+    },
+
+    escala_grafica: function(canvas, real, escala, dibujo) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(79, 156, 249, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            phase += 0.03;
+            const barY = h / 2 - 10;
+            const maxW = w - 40;
+            const barW = Math.min(dibujo, maxW);
+
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(20, barY, maxW, 20, 4);
+            ctx.fill();
+
+            ctx.fillStyle = '#4f9cf9';
+            ctx.shadowColor = '#4f9cf9';
+            ctx.shadowBlur = 4;
+            ctx.beginPath();
+            ctx.roundRect(20, barY, barW, 20, [4, 0, 0, 4]);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(dibujo.toFixed(1) + ' mm', 20 + barW / 2, barY + 14);
+
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '8px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText('0', 20, barY + 35);
+            ctx.textAlign = 'right';
+            ctx.fillText(dibujo.toFixed(1) + ' mm', 20 + barW, barY + 35);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText('1:' + escala + ' | Real: ' + (real / 10).toFixed(1) + ' cm', 20, 25);
+        });
+    },
+
+    regla_tercios: function(canvas, aw, ah, x1, x2, y1, y2) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(79, 156, 249, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            phase += 0.03;
+
+            const ratio = aw / ah;
+            const frameW = w - 40;
+            const frameH = Math.min(frameW / ratio, h - 40);
+            const fw = frameW;
+            const fh = frameH;
+            const fx = (w - fw) / 2;
+            const fy = (h - fh) / 2;
+
+            ctx.fillStyle = '#1a1f2e';
+            ctx.fillRect(fx, fy, fw, fh);
+            ctx.strokeStyle = '#374151';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(fx, fy, fw, fh);
+
+            ctx.strokeStyle = 'rgba(249, 199, 79, 0.4)';
+            ctx.lineWidth = 1;
+            const tx1 = fx + fw / 3;
+            const tx2 = fx + 2 * fw / 3;
+            const ty1 = fy + fh / 3;
+            const ty2 = fy + 2 * fh / 3;
+
+            ctx.beginPath();
+            ctx.moveTo(tx1, fy); ctx.lineTo(tx1, fy + fh);
+            ctx.moveTo(tx2, fy); ctx.lineTo(tx2, fy + fh);
+            ctx.moveTo(fx, ty1); ctx.lineTo(fx + fw, ty1);
+            ctx.moveTo(fx, ty2); ctx.lineTo(fx + fw, ty2);
+            ctx.stroke();
+
+            const points = [[tx1, ty1], [tx2, ty1], [tx1, ty2], [tx2, ty2]];
+            points.forEach((p, i) => {
+                ctx.shadowColor = '#f9c74f';
+                ctx.shadowBlur = 8 + 4 * Math.sin(phase + i * 1.5);
+                ctx.fillStyle = '#f9c74f';
+                ctx.beginPath();
+                ctx.arc(p[0], p[1], 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            });
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('Regla de Tercios | ' + Math.round(aw) + '×' + Math.round(ah), w / 2, h - 8);
+        });
+    },
+
+    tipometria: function(canvas, val, from, to, res, base) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(79, 156, 249, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            phase += 0.03;
+
+            const sizes = [base * 0.75, base, base * 1.25, base * 1.5];
+            const labels = ['sm (0.75rem)', 'base (1rem)', 'h3 (1.25rem)', 'h2 (1.5rem)'];
+            const startY = 30;
+            const stepY = Math.min((h - 40) / sizes.length, 50);
+
+            sizes.forEach((sz, i) => {
+                const y = startY + i * stepY;
+                ctx.fillStyle = '#fff';
+                ctx.font = Math.round(sz) + 'px "Segoe UI", system-ui';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Texto ' + labels[i], 20, y);
+
+                ctx.fillStyle = '#4a5570';
+                ctx.font = '8px JetBrains Mono';
+                ctx.textAlign = 'right';
+                ctx.fillText(Math.round(sz) + 'px (' + (sz / base).toFixed(2) + 'rem)', w - 20, y);
+            });
+
+            ctx.fillStyle = '#4f9cf9';
+            ctx.font = 'bold 9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            const pulse = 0.7 + 0.3 * Math.sin(phase);
+            ctx.globalAlpha = pulse;
+            ctx.fillText(val + ' ' + from.replace('_t', '') + ' = ' + res.toFixed(2) + ' ' + to.replace('_t', ''), w / 2, h - 10);
+            ctx.globalAlpha = 1;
+        });
+    },
+
+    gama_cromatica: function(canvas, hue, armonia, colores) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(79, 156, 249, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            phase += 0.02;
+            const cx = w / 2;
+            const cy = h / 2;
+            const radius = Math.min(w, h) * 0.3;
+
+            for (let deg = 0; deg < 360; deg++) {
+                const rad = deg * Math.PI / 180;
+                const x = cx + Math.cos(rad) * radius;
+                const y = cy + Math.sin(rad) * radius;
+                ctx.strokeStyle = 'hsl(' + deg + ', 80%, 60%)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+
+            colores.forEach((c, i) => {
+                const rad = c.h * Math.PI / 180;
+                const x = cx + Math.cos(rad) * radius;
+                const y = cy + Math.sin(rad) * radius;
+                const angle = phase + i * 2;
+
+                ctx.shadowColor = 'hsl(' + c.h + ', 80%, 60%)';
+                ctx.shadowBlur = 12 + 6 * Math.sin(angle);
+                ctx.fillStyle = 'hsl(' + c.h + ', 80%, 60%)';
+                ctx.beginPath();
+                ctx.arc(x, y, 8 + 3 * Math.sin(angle), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '8px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.fillText(Math.round(c.h) + '° ' + c.l, x, y + 18);
+            });
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(armonia.charAt(0).toUpperCase() + armonia.slice(1) + ' | Base: ' + Math.round(hue) + '°', w / 2, h - 10);
+        });
+    },
+
+    kerning_tracking: function(canvas, kern, chars, tracking) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(79, 156, 249, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            phase += 0.03;
+            const letters = 'AVAVAVAVAV'.split('').slice(0, Math.min(chars, 10));
+            const baseSize = 24;
+            const kernPx = kern * 16;
+            const totalW = letters.length * baseSize * 0.7 + (letters.length - 1) * kernPx;
+            const startX = (w - totalW) / 2;
+            const cy = h / 2 - 10;
+
+            letters.forEach((ch, i) => {
+                const x = startX + i * (baseSize * 0.7 + kernPx) + Math.sin(phase + i) * 2;
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold ' + baseSize + 'px "Segoe UI", system-ui';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(ch, x, cy);
+
+                if (i > 0) {
+                    ctx.strokeStyle = 'rgba(79, 156, 249, 0.3)';
+                    ctx.lineWidth = 1;
+                    const px = x - kernPx / 2;
+                    ctx.beginPath();
+                    ctx.moveTo(px, cy - 15);
+                    ctx.lineTo(px, cy + 15);
+                    ctx.stroke();
+                }
+            });
+
+            ctx.fillStyle = '#4f9cf9';
+            ctx.font = '9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('Kerning: ' + (kern * 1000).toFixed(0) + '‰ em | Tracking total: ' + (tracking * 1000).toFixed(0) + '‰ em', w / 2, h - 15);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px JetBrains Mono';
+            ctx.fillText('"' + letters.join('') + '"', w / 2, 22);
+        });
+    },
+
+    peso_visual: function(canvas, area, dens, cont, peso) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(79, 156, 249, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            phase += 0.03;
+
+            const size = 30 + peso * 80;
+            const cx = w / 2;
+            const cy = h / 2 - 10;
+
+            ctx.shadowColor = '#f97b4f';
+            ctx.shadowBlur = 8 + 4 * Math.sin(phase);
+            ctx.fillStyle = '#f97b4f';
+            ctx.beginPath();
+            ctx.arc(cx, cy, size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 11px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText((peso * 100).toFixed(1) + '%', cx, cy);
+
+            const metrics = [
+                { label: 'Área', val: area + '%', x: cx - 80 },
+                { label: 'Densidad', val: dens + '/10', x: cx },
+                { label: 'Contraste', val: cont + '/10', x: cx + 80 }
+            ];
+            metrics.forEach(m => {
+                ctx.fillStyle = '#4a5570';
+                ctx.font = '8px JetBrains Mono';
+                ctx.textBaseline = 'top';
+                ctx.fillText(m.label, m.x - 15, cy + size + 12);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 9px JetBrains Mono';
+                ctx.fillText(m.val, m.x - 15, cy + size + 24);
+            });
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px JetBrains Mono';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText('Peso Visual', w / 2, 20);
+        });
+    },
+
+    reticula: function(canvas, ancho, cols, gutter, margin, colW) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(79, 156, 249, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            phase += 0.02;
+
+            const scale = (h - 60) / ancho;
+            const gridW = ancho * scale;
+            const gridX = (w - gridW) / 2;
+            const gridY = 40;
+            const colWscaled = colW * scale;
+            const gutterScaled = gutter * scale;
+            const marginScaled = margin * scale;
+
+            ctx.fillStyle = '#1a1f2e';
+            ctx.fillRect(gridX, gridY, gridW, 40);
+
+            for (let i = 0; i < cols; i++) {
+                const x = gridX + marginScaled + i * (colWscaled + gutterScaled);
+                const alpha = 0.4 + 0.2 * Math.sin(phase + i * 0.8);
+                ctx.fillStyle = 'rgba(79, 156, 249, ' + alpha + ')';
+                ctx.fillRect(x, gridY, colWscaled, 40);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '8px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText((i + 1) + '', x + colWscaled / 2, gridY + 20);
+            }
+
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '7px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(gutter + 'px gutter', gridX + marginScaled + cols * (colWscaled + gutterScaled) - gutterScaled / 2, gridY + 50);
+            ctx.fillText(margin + 'px margin', gridX + marginScaled / 2, gridY + 50);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText(cols + ' columnas × ' + colW.toFixed(1) + 'px', 15, 18);
+        });
+    },
+
+    legibilidad: function(canvas, sz, lw, cpl) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(79, 156, 249, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            phase += 0.03;
+
+            const lineW = Math.min(lw, w - 40);
+            const x0 = (w - lineW) / 2;
+            const lineH = sz * 1.5;
+            const lines = 4;
+            const startY = (h - lines * lineH) / 2;
+
+            const sampleText = 'Este es un texto de muestra para evaluar la legibilidad tipográfica en pantalla. ';
+            for (let l = 0; l < lines; l++) {
+                ctx.fillStyle = '#fff';
+                ctx.font = sz + 'px "Segoe UI", system-ui';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillText(sampleText.repeat(3).substring(0, cpl * 2), x0, startY + l * lineH);
+            }
+
+            ctx.strokeStyle = 'rgba(79, 156, 249, 0.2)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(x0 + cpl * sz * 0.5, startY - 5);
+            ctx.lineTo(x0 + cpl * sz * 0.5, startY + lines * lineH + 5);
+            ctx.stroke();
+
+            ctx.fillStyle = '#4f9cf9';
+            ctx.font = 'bold 11px JetBrains Mono';
+            ctx.textAlign = 'center';
+            const pulse = 0.7 + 0.3 * Math.sin(phase);
+            ctx.globalAlpha = pulse;
+            ctx.fillText(cpl + ' cpp | ' + sz + 'px | ' + lw + 'px', w / 2, h - 12);
+            ctx.globalAlpha = 1;
+        });
+    },
+
+    sangria_margenes: function(canvas, pw, ph, ms, mi, mint, mext, anchoUtil, altoUtil) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(79, 156, 249, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            phase += 0.03;
+
+            const ratio = pw / ph;
+            let pageW = h * 0.6;
+            let pageH = pageW / ratio;
+            if (pageH > h * 0.7) { pageH = h * 0.7; pageW = pageH * ratio; }
+            const px2 = (w - pageW) / 2;
+            const py = (h - pageH) / 2;
+
+            ctx.fillStyle = '#f5f5f0';
+            ctx.fillRect(px2, py, pageW, pageH);
+
+            const sc = pageW / pw;
+            const ux = px2 + mint * sc;
+            const uy = py + ms * sc;
+            const uw = anchoUtil * sc;
+            const uh = altoUtil * sc;
+
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(ux, uy, uw, uh);
+
+            ctx.strokeStyle = 'rgba(249, 79, 79, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([3, 3]);
+            ctx.strokeRect(ux, uy, uw, uh);
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = '#f94f4f';
+            ctx.font = '7px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('Sup: ' + ms + 'mm', px2 + pageW / 2, py + ms * sc / 2);
+            ctx.fillText('Inf: ' + mi + 'mm', px2 + pageW / 2, py + pageH - mi * sc / 2);
+            ctx.fillText('Int: ' + mint + 'mm', px2 + mint * sc / 2, py + pageH / 2);
+            ctx.fillText('Ext: ' + mext + 'mm', px2 + pageW - mext * sc / 2, py + pageH / 2);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(anchoUtil.toFixed(0) + '×' + altoUtil.toFixed(0) + ' mm (mancha de texto)', w / 2, h - 8);
+        });
+    }
+};
+
+DisenoVisual.rgb_hex = function(canvas, r, g, b, hex) {
+    this._stopLoop(canvas);
+    const ctx = this.initCanvas(canvas);
+    const w = canvas.width / (window.devicePixelRatio || 1);
+    const h = canvas.height / (window.devicePixelRatio || 1);
+    let phase = 0;
+
+    this._startLoop(canvas, () => {
+        ctx.clearRect(0, 0, w, h);
+        phase += 0.03;
+
+        const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+        grad.addColorStop(0, 'rgba(79, 156, 249, 0.05)');
+        grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.fillStyle = hex;
+        ctx.shadowColor = hex;
+        ctx.shadowBlur = 20 + 5 * Math.sin(phase);
+        ctx.beginPath();
+        ctx.roundRect(w / 2 - 50, h / 2 - 50, 100, 100, 12);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 13px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(hex, w / 2, h / 2 + 70);
+        ctx.fillStyle = '#4a5570';
+        ctx.font = '9px JetBrains Mono';
+        ctx.fillText(`RGB(${r}, ${g}, ${b})`, w / 2, h / 2 + 86);
+
+        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+        ctx.font = 'bold 14px JetBrains Mono';
+        ctx.fillText('■', w / 2, h / 2 - 10);
+    });
+};
+
+DisenoVisual.rgb_cmyk = function(canvas, r, g, b, c, m, y, k) {
+    this._stopLoop(canvas);
+    const ctx = this.initCanvas(canvas);
+    const w = canvas.width / (window.devicePixelRatio || 1);
+    const h = canvas.height / (window.devicePixelRatio || 1);
+    let phase = 0;
+
+    this._startLoop(canvas, () => {
+        ctx.clearRect(0, 0, w, h);
+        phase += 0.03;
+
+        const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+        grad.addColorStop(0, 'rgba(249, 199, 79, 0.05)');
+        grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        const colors = [
+            { label: 'C', pct: c, color: '#00d4ff' },
+            { label: 'M', pct: m, color: '#ff00a0' },
+            { label: 'Y', pct: y, color: '#ffd700' },
+            { label: 'K', pct: k, color: '#222' }
+        ];
+        const barW = (w - 40) / 4;
+        colors.forEach((clr, i) => {
+            const x = 20 + i * barW;
+            const bh = Math.max(4, (clr.pct / 100) * (h - 60));
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(x, h - 20 - bh, barW - 6, bh, 4);
+            ctx.fill();
+            ctx.fillStyle = clr.color;
+            ctx.shadowColor = clr.color;
+            ctx.shadowBlur = 4;
+            ctx.beginPath();
+            ctx.roundRect(x, h - 20 - bh, barW - 6, bh, [4, 4, 0, 0]);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(clr.label, x + (barW - 6) / 2, h - 4);
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText(clr.pct.toFixed(1) + '%', x + (barW - 6) / 2, h - 20 - bh - 4);
+        });
+
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.shadowColor = `rgb(${r},${g},${b})`;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(w / 2, 25, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    });
+};
+
+DisenoVisual.dpi_ppi = function(canvas, wPx, hPx, diag, ppi) {
+    this._stopLoop(canvas);
+    const ctx = this.initCanvas(canvas);
+    const w = canvas.width / (window.devicePixelRatio || 1);
+    const h = canvas.height / (window.devicePixelRatio || 1);
+    let phase = 0;
+
+    this._startLoop(canvas, () => {
+        ctx.clearRect(0, 0, w, h);
+        phase += 0.03;
+
+        const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.5);
+        grad.addColorStop(0, 'rgba(79, 249, 123, 0.05)');
+        grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        const aspect = wPx / hPx;
+        const sc = Math.min((w - 40) / wPx, (h - 80) / hPx, 1);
+        const sw = wPx * sc * 0.6;
+        const sh = hPx * sc * 0.6;
+        const sx = (w - sw) / 2;
+        const sy = (h - sh) / 2;
+
+        ctx.strokeStyle = '#4f9cf9';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(sx, sy, sw, sh);
+
+        const dots = Math.min(20, Math.round(ppi / 15));
+        for (let i = 0; i < dots && i < 15; i++) {
+            const px = sx + 5 + ((i * 7 + Math.floor(phase * 2)) % Math.max(1, sw - 10));
+            const py = sy + 5 + ((i * 13) % Math.max(1, sh - 10));
+            ctx.fillStyle = 'rgba(79, 249, 123, 0.6)';
+            ctx.beginPath();
+            ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 13px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${ppi.toFixed(1)} PPI`, w / 2, h - 8);
+        ctx.fillStyle = '#4a5570';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText(`${wPx}×${hPx} @ ${diag}"`, w / 2, 16);
+    });
+};
+
+DisenoVisual.tamano_imagen = function(canvas, w, h, bpp, rawMB, compMB) {
+    this._stopLoop(canvas);
+    const ctx = this.initCanvas(canvas);
+    const cw = canvas.width / (window.devicePixelRatio || 1);
+    const ch = canvas.height / (window.devicePixelRatio || 1);
+    let phase = 0;
+
+    this._startLoop(canvas, () => {
+        ctx.clearRect(0, 0, cw, ch);
+        phase += 0.03;
+
+        const grad = ctx.createRadialGradient(cw / 2, ch / 2, 5, cw / 2, ch / 2, cw * 0.5);
+        grad.addColorStop(0, 'rgba(79, 156, 249, 0.05)');
+        grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, cw, ch);
+
+        const maxMB = Math.max(rawMB, compMB, 1);
+        const barW = cw - 40;
+        const bh = 18;
+        const cy1 = ch / 2 - 20;
+        const cy2 = ch / 2 + 12;
+
+        ctx.fillStyle = '#1a1f2e';
+        ctx.beginPath();
+        ctx.roundRect(20, cy1, barW, bh, 4);
+        ctx.fill();
+        ctx.fillStyle = '#f94f4f';
+        const anim1 = Math.min(1, (rawMB / maxMB) * phase);
+        ctx.beginPath();
+        ctx.roundRect(20, cy1, barW * Math.min(1, rawMB / maxMB) * Math.min(1, phase), bh, [4, 0, 0, 4]);
+        ctx.fill();
+
+        ctx.fillStyle = '#1a1f2e';
+        ctx.beginPath();
+        ctx.roundRect(20, cy2, barW, bh, 4);
+        ctx.fill();
+        ctx.fillStyle = '#4ff97b';
+        ctx.shadowColor = '#4ff97b';
+        ctx.shadowBlur = 4;
+        ctx.beginPath();
+        ctx.roundRect(20, cy2, barW * Math.min(1, compMB / maxMB) * Math.min(1, phase), bh, [4, 0, 0, 4]);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 9px JetBrains Mono';
+        ctx.textAlign = 'left';
+        ctx.fillText(`Raw: ${rawMB.toFixed(2)} MB`, 20, cy1 - 4);
+        ctx.fillStyle = '#4ff97b';
+        ctx.fillText(`Comprimido: ${compMB.toFixed(2)} MB`, 20, cy2 + bh + 14);
+    });
+};
+
+DisenoVisual.bitrate_video = function(canvas, w, h, fps, bpp, bitrateMbps) {
+    this._stopLoop(canvas);
+    const ctx = this.initCanvas(canvas);
+    const cw = canvas.width / (window.devicePixelRatio || 1);
+    const ch = canvas.height / (window.devicePixelRatio || 1);
+    let phase = 0;
+
+    this._startLoop(canvas, () => {
+        ctx.clearRect(0, 0, cw, ch);
+        phase += 0.04;
+
+        const grad = ctx.createRadialGradient(cw / 2, ch / 2, 5, cw / 2, ch / 2, cw * 0.5);
+        grad.addColorStop(0, 'rgba(249, 79, 79, 0.05)');
+        grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, cw, ch);
+
+        const barW = cw - 40;
+        const barH = 20;
+        const cy = ch / 2 - barH / 2;
+        const maxB = 200;
+
+        ctx.fillStyle = '#1a1f2e';
+        ctx.beginPath();
+        ctx.roundRect(20, cy, barW, barH, 6);
+        ctx.fill();
+
+        const fillPct = Math.min(1, bitrateMbps / maxB);
+        const g = ctx.createLinearGradient(20, 0, 20 + barW, 0);
+        g.addColorStop(0, '#4f9cf9');
+        g.addColorStop(1, '#f94f4f');
+        ctx.fillStyle = g;
+        ctx.shadowColor = '#f94f4f';
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        ctx.roundRect(20, cy, barW * Math.min(1, phase) * fillPct, barH, [6, 0, 0, 6]);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        const fpsBlink = 0.5 + 0.5 * Math.sin(phase * 4);
+        for (let i = 0; i < Math.min(fps, 12); i++) {
+            const fx = 20 + (i / fps) * barW;
+            const fh = 6 + 6 * Math.sin(phase * 3 + i);
+            ctx.fillStyle = `rgba(255,255,255,${0.2 + 0.3 * fpsBlink})`;
+            ctx.fillRect(fx, cy - 12, 3, fh);
+        }
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 13px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${bitrateMbps.toFixed(1)} Mbps`, cw / 2, cy - 16);
+        ctx.fillStyle = '#4a5570';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText(`${w}×${h} @ ${fps} fps`, cw / 2, cy + barH + 16);
+    });
+};

@@ -1,1 +1,954 @@
-const NutricionVisual={initCanvas:function(e){const d=window.devicePixelRatio||1,l=e.getBoundingClientRect();e.width=l.width*d,e.height=l.height*d;const t=e.getContext("2d");return t.scale(d,d),t},_loop:{},_startLoop:function(e,d){this._loop[e.id]&&cancelAnimationFrame(this._loop[e.id]);const l=()=>{d(),this._loop[e.id]=requestAnimationFrame(l)};l()},_stopLoop:function(e){this._loop[e.id]&&(cancelAnimationFrame(this._loop[e.id]),delete this._loop[e.id])},macros:function(e,d,l,t){this._stopLoop(e);const i=this.initCanvas(e),o=e.width/(window.devicePixelRatio||1),a=e.height/(window.devicePixelRatio||1),n=o/2,f=a/2,c=Math.max(Math.min(o,a)/2-25,10),s=[{value:Math.max(0,d||0),color:"#4f9cf9",label:"Prote\xEDnas"},{value:Math.max(0,l||0),color:"#f9c74f",label:"Carboh."},{value:Math.max(0,t||0),color:"#f94f4f",label:"Grasas"}],r=s.reduce((x,g)=>x+g.value,0);if(r<=0)return;let h=0;this._startLoop(e,()=>{i.clearRect(0,0,o,a),h+=.02;const x=i.createRadialGradient(n,f,5,n,f,c+20);x.addColorStop(0,"rgba(79, 156, 249, 0.04)"),x.addColorStop(1,"rgba(10, 11, 14, 0)"),i.fillStyle=x,i.fillRect(0,0,o,a),i.shadowColor="rgba(0,0,0,0.3)",i.shadowBlur=10;let g=-Math.PI/2;s.forEach(p=>{const b=p.value/r*2*Math.PI;i.beginPath(),i.arc(n,f,c,g,g+b),i.lineTo(n,f),i.fillStyle=p.color,i.fill(),i.strokeStyle="#111318",i.lineWidth=2,i.stroke();const M=g+b/2,w=n+c*.65*Math.cos(M),S=f+c*.65*Math.sin(M);b>.3&&(i.fillStyle="#111318",i.font="bold 9px JetBrains Mono",i.textAlign="center",i.textBaseline="middle",i.fillText(p.label,w,S)),g+=b}),i.shadowBlur=0,i.shadowColor="#4f9cf9",i.shadowBlur=8,i.fillStyle="#111318",i.beginPath(),i.arc(n,f,c*.35,0,Math.PI*2),i.fill(),i.shadowBlur=0,i.fillStyle="#fff",i.font="bold 12px JetBrains Mono",i.textAlign="center",i.textBaseline="middle",i.fillText(`${Math.round(d+l+t)}`,n,f-4),i.fillStyle="#4a5570",i.font="7px JetBrains Mono",i.fillText("kcal",n,f+8),i.fillStyle="#4a5570",i.font="8px JetBrains Mono",i.textBaseline="alphabetic",i.fillText(`P:${Math.round(d)}  C:${Math.round(l)}  G:${Math.round(t)}`,o/2,a-6)})},mifflin:function(e,d,l){this._stopLoop(e);const t=this.initCanvas(e),i=e.width/(window.devicePixelRatio||1),o=e.height/(window.devicePixelRatio||1),a=25,n=i-2*a,f=4e3;let c=0;this._startLoop(e,()=>{t.clearRect(0,0,i,o),c+=.03;const s=t.createRadialGradient(i/2,o/2,5,i/2,o/2,i*.4);s.addColorStop(0,"rgba(167, 139, 250, 0.04)"),s.addColorStop(1,"rgba(10, 11, 14, 0)"),t.fillStyle=s,t.fillRect(0,0,i,o);const r=Math.min(d/f,1),h=Math.min(l/f,1),x=o/2-20,g=o/2+16,p=Math.min(1,c*2),b=Math.min(1,(c-.5)*2);t.fillStyle="#1a1f2e",t.beginPath(),t.roundRect(a,x,n,14,4),t.fill();const M=t.createLinearGradient(a,0,a+n,0);M.addColorStop(0,"#a78bfa"),M.addColorStop(1,"#7c3aed"),t.fillStyle=M,t.beginPath(),t.roundRect(a,x,n*r*p,14,[4,0,0,4]),t.fill(),t.fillStyle="#1a1f2e",t.beginPath(),t.roundRect(a,g,n,14,4),t.fill();const w=t.createLinearGradient(a,0,a+n,0);w.addColorStop(0,"#4f9cf9"),w.addColorStop(1,"#2563eb"),t.fillStyle=w,t.beginPath(),t.roundRect(a,g,n*h*b,14,[4,0,0,4]),t.fill(),t.fillStyle="#fff",t.font="bold 10px JetBrains Mono",t.textAlign="left",t.fillText(`TMB: ${Math.round(d)} kcal`,a,x-4),t.fillStyle="#8a99ad",t.fillText(`GET: ${Math.round(l)} kcal`,a,g+22)})},balance:function(e,d,l){this._stopLoop(e);const t=this.initCanvas(e),i=e.width/(window.devicePixelRatio||1),o=e.height/(window.devicePixelRatio||1),a=25,n=i-2*a,f=16,c=Math.max(d,l)*1.3;let s=0;this._startLoop(e,()=>{t.clearRect(0,0,i,o),s+=.03;const r=t.createRadialGradient(i/2,o/2,5,i/2,o/2,i*.4);r.addColorStop(0,"rgba(249, 123, 79, 0.04)"),r.addColorStop(1,"rgba(10, 11, 14, 0)"),t.fillStyle=r,t.fillRect(0,0,i,o);const h=o/2-f/2,x=Math.min(s,1);t.fillStyle="#1a1f2e",t.beginPath(),t.roundRect(a,h,n,f,6),t.fill();const g=Math.min(l/c,1)*n*x,p=l<d?"#f97b4f":"#4f9cf9";t.fillStyle=p,t.beginPath(),t.roundRect(a,h,g,f,[6,0,0,6]),t.fill();const b=a+d/c*n;t.strokeStyle="#fff",t.lineWidth=1.5,t.setLineDash([3,3]),t.beginPath(),t.moveTo(b,h-4),t.lineTo(b,h+f+4),t.stroke(),t.setLineDash([]),t.fillStyle="#fff",t.font="bold 10px JetBrains Mono",t.textAlign="center",t.fillText(`Obj: ${Math.round(l)} kcal`,a+g/2,h-6),t.fillStyle="#8a99ad",t.fillText(`Mant: ${Math.round(d)} kcal`,b,h+f+16)})},imc:function(e,d){this._stopLoop(e);const l=this.initCanvas(e),t=e.width/(window.devicePixelRatio||1),i=e.height/(window.devicePixelRatio||1),o=20,a=t-2*o,n=14,f=[{min:15,max:18.5,color:"#4f9cf9",label:"Bajo"},{min:18.5,max:25,color:"#4ff97b",label:"Normal"},{min:25,max:30,color:"#f9c74f",label:"Sobre"},{min:30,max:40,color:"#f94f4f",label:"Obeso"}];let c=0;this._startLoop(e,()=>{l.clearRect(0,0,t,i),c+=.03;const s=i/2-n/2;f.forEach(h=>{const x=o+(h.min-15)/25*a,g=o+(h.max-15)/25*a;l.fillStyle=h.color+"44",l.beginPath(),l.roundRect(x,s,g-x,n,4),l.fill(),l.fillStyle="#8a99ad",l.font="7px JetBrains Mono",l.textAlign="left",l.fillText(h.label,x+3,s-3)});const r=o+(Math.min(d,40)-15)/25*a;l.shadowColor="#fff",l.shadowBlur=10+5*Math.sin(c),l.strokeStyle="#fff",l.lineWidth=2.5,l.beginPath(),l.moveTo(r,s-6),l.lineTo(r,s+n+6),l.stroke(),l.shadowBlur=0,l.fillStyle="#fff",l.font="bold 13px JetBrains Mono",l.textAlign="center",l.fillText(`IMC: ${d.toFixed(1)}`,t/2,s+n+22)})},carga_g:function(e,d){this._stopLoop(e);const l=this.initCanvas(e),t=e.width/(window.devicePixelRatio||1),i=e.height/(window.devicePixelRatio||1),o=20,a=t-2*o,n=16;let f=0;this._startLoop(e,()=>{l.clearRect(0,0,t,i),f+=.035;const c=i/2-n/2,s=d<10?"#4ff97b":d<20?"#f9c74f":"#f94f4f",r=Math.min(f,Math.min(1,d/30)),h=Math.min(1,d/30)*a;l.fillStyle="#1a1f2e",l.beginPath(),l.roundRect(o,c,a,n,6),l.fill(),l.fillStyle=s,l.shadowColor=s,l.shadowBlur=6,l.beginPath(),l.roundRect(o,c,a*r,n,[6,0,0,6]),l.fill(),l.shadowBlur=0,l.fillStyle="#fff",l.font="11px JetBrains Mono",l.textAlign="left",l.fillText(`Carga: ${d.toFixed(1)}`,o,c-7);const x=d<10?"Bajo":d<20?"Medio":"Alto";l.fillStyle=s,l.font="8px JetBrains Mono",l.textAlign="right",l.fillText(x,o+a,c-7)})},calorias_alimento:function(e,d,l,t,i){this._stopLoop(e);const o=this.initCanvas(e),a=e.width/(window.devicePixelRatio||1),n=e.height/(window.devicePixelRatio||1),f=20,c=a-2*f,s=12;let r=0;this._startLoop(e,()=>{o.clearRect(0,0,a,n),r+=.03;const h=Math.max(1,d+l+t);[{val:d,color:"#4f9cf9",label:"Prote\xEDnas"},{val:l,color:"#f9c74f",label:"Carbos"},{val:t,color:"#f94f4f",label:"Grasas"}].forEach((x,g)=>{const p=f+g*(s+6),b=x.val/h;o.fillStyle="#1a1f2e",o.beginPath(),o.roundRect(f,p,c,s,3),o.fill();const M=Math.min(1,r*(1+g*.3));o.fillStyle=x.color,o.shadowColor=x.color,o.shadowBlur=4,o.beginPath(),o.roundRect(f,p,c*b*M,s,[3,0,0,3]),o.fill(),o.shadowBlur=0,o.fillStyle="#fff",o.font="8px JetBrains Mono",o.textAlign="left",o.fillText(`${x.label}: ${x.val.toFixed(1)}g`,f,p-3),o.fillStyle="#4a5570",o.textAlign="right",o.fillText(`${(x.val*4).toFixed(0)} kcal`,f+c,p-3)}),o.fillStyle="#4a5570",o.font="9px JetBrains Mono",o.textAlign="center",o.fillText(`Total: ${i.toFixed(1)} kcal (P:${(d*4/i*100).toFixed(0)}% C:${(l*4/i*100).toFixed(0)}% G:${(t*9/i*100).toFixed(0)}%)`,a/2,n-5)})},agua_diaria:function(e,d,l){this._stopLoop(e);const t=this.initCanvas(e),i=e.width/(window.devicePixelRatio||1),o=e.height/(window.devicePixelRatio||1),a=i/2,n=o/2,f=50,c=90;let s=0;this._startLoop(e,()=>{t.clearRect(0,0,i,o),s+=.02;const r=t.createRadialGradient(a,n,5,a,n,i*.4);r.addColorStop(0,"rgba(79, 156, 249, 0.04)"),r.addColorStop(1,"rgba(10, 11, 14, 0)"),t.fillStyle=r,t.fillRect(0,0,i,o);const h=Math.min(.95,Math.max(.1,l/4e3));t.strokeStyle="#2a3345",t.lineWidth=2.5,t.beginPath(),t.moveTo(a-f/2,n-c/2),t.lineTo(a-f/2,n+c/2),t.lineTo(a+f/2,n+c/2),t.lineTo(a+f/2,n-c/2),t.stroke();const x=c*h,g=Math.sin(s*3)*2;t.fillStyle="rgba(56, 189, 248, 0.5)",t.beginPath(),t.moveTo(a-f/2+1,n+c/2);for(let p=a-f/2+1;p<=a+f/2-1;p++)t.lineTo(p,n+c/2-x+Math.sin(p*.15+s*4)*2+g);t.lineTo(a+f/2-1,n+c/2),t.closePath(),t.fill(),t.fillStyle="#4f9cf9",t.font="bold 11px JetBrains Mono",t.textAlign="center",t.fillText(`${Math.round(l)} mL`,a,n+c/2+18),t.fillStyle="#4a5570",t.font="8px JetBrains Mono",t.fillText(`${(l/1e3).toFixed(1)}L para ${d} kg`,a,n+c/2+32)})},grasa_corporal:function(e,d){this._stopLoop(e);const l=this.initCanvas(e),t=e.width/(window.devicePixelRatio||1),i=e.height/(window.devicePixelRatio||1),o=t/2,a=i/2;let n=0;this._startLoop(e,()=>{l.clearRect(0,0,t,i),n+=.03;const f=l.createRadialGradient(o,a,5,o,a,t*.4);f.addColorStop(0,"rgba(249, 199, 79, 0.04)"),f.addColorStop(1,"rgba(10, 11, 14, 0)"),l.fillStyle=f,l.fillRect(0,0,t,i);const c=Math.min(t,i)*.25,s=Math.min(1,d/50);l.strokeStyle="#2a3345",l.lineWidth=2,l.beginPath(),l.arc(o,a,c,0,Math.PI*2),l.stroke();const r=Math.min(1,n*2);l.fillStyle=s>.5?"rgba(249, 79, 79, 0.3)":"rgba(249, 199, 79, 0.3)",l.beginPath(),l.arc(o,a,c,-Math.PI/2,-Math.PI/2+Math.PI*2*s*r),l.lineTo(o,a),l.closePath(),l.fill(),l.fillStyle="#fff",l.font="bold 20px JetBrains Mono",l.textAlign="center",l.textBaseline="middle",l.fillText(`${d.toFixed(1)}%`,o,a),l.fillStyle="#4a5570",l.font="8px JetBrains Mono",l.fillText("Grasa Corporal",o,a+c+16)})},cintura_cadera:function(e,d){this._stopLoop(e);const l=this.initCanvas(e),t=e.width/(window.devicePixelRatio||1),i=e.height/(window.devicePixelRatio||1),o=25,a=t-2*o,n=16;let f=0;this._startLoop(e,()=>{l.clearRect(0,0,t,i),f+=.03;const c=i/2-n/2,s=Math.min(1,d/1.2);l.fillStyle="#1a1f2e",l.beginPath(),l.roundRect(o,c,a,n,6),l.fill();const r=d>.9?"#f94f4f":d>.85?"#f9c74f":"#4ff97b";l.fillStyle=r,l.shadowColor=r,l.shadowBlur=6,l.beginPath(),l.roundRect(o,c,a*Math.min(1,f)*s,n,[6,0,0,6]),l.fill(),l.shadowBlur=0,l.fillStyle="#fff",l.font="bold 14px JetBrains Mono",l.textAlign="center",l.fillText(`ICC: ${d.toFixed(2)}`,t/2,c-10),l.fillStyle="#4a5570",l.font="8px JetBrains Mono",l.fillText("Cintura / Cadera",t/2,c+n+14)})},cintura_altura:function(e,d){this._stopLoop(e);const l=this.initCanvas(e),t=e.width/(window.devicePixelRatio||1),i=e.height/(window.devicePixelRatio||1),o=25,a=t-2*o,n=16;let f=0;this._startLoop(e,()=>{l.clearRect(0,0,t,i),f+=.03;const c=i/2-n/2,s=Math.min(1,d/.8);l.fillStyle="#1a1f2e",l.beginPath(),l.roundRect(o,c,a,n,6),l.fill();const r=d>.6?"#f94f4f":d>.5?"#f9c74f":"#4ff97b";l.fillStyle=r,l.shadowColor=r,l.shadowBlur=6,l.beginPath(),l.roundRect(o,c,a*Math.min(1,f)*s,n,[6,0,0,6]),l.fill(),l.shadowBlur=0,l.fillStyle="#fff",l.font="bold 14px JetBrains Mono",l.textAlign="center",l.fillText(`ICT: ${d.toFixed(2)}`,t/2,c-10),l.fillStyle="#4a5570",l.font="8px JetBrains Mono",l.fillText("Cintura / Altura",t/2,c+n+14)})},proteina_peso:function(e,d,l,t){this._stopLoop(e);const i=this.initCanvas(e),o=e.width/(window.devicePixelRatio||1),a=e.height/(window.devicePixelRatio||1),n=25,f=o-2*n,c=14;let s=0;this._startLoop(e,()=>{i.clearRect(0,0,o,a),s+=.03;const r=Math.max(t,200),h=Math.min(1,t/r);i.fillStyle="#1a1f2e",i.beginPath(),i.roundRect(n,a/2-c/2,f,c,6),i.fill();const x=i.createLinearGradient(n,0,n+f,0);x.addColorStop(0,"#4f9cf9"),x.addColorStop(1,"#4ff97b"),i.fillStyle=x,i.shadowColor="#4ff97b",i.shadowBlur=5,i.beginPath(),i.roundRect(n,a/2-c/2,f*Math.min(1,s)*h,c,[6,0,0,6]),i.fill(),i.shadowBlur=0,i.fillStyle="#fff",i.font="bold 13px JetBrains Mono",i.textAlign="center",i.fillText(`${t.toFixed(1)} g/d\xEDa`,o/2,a/2-c/2-8),i.fillStyle="#4a5570",i.font="8px JetBrains Mono",i.fillText(`${d} kg \xD7 ${l} g/kg`,o/2,a/2+c/2+14)})},peso_ideal_nutri:function(e,d,l){this._stopLoop(e);const t=this.initCanvas(e),i=e.width/(window.devicePixelRatio||1),o=e.height/(window.devicePixelRatio||1),a=i/2,n=o/2;let f=0;this._startLoop(e,()=>{t.clearRect(0,0,i,o),f+=.03;const c=t.createRadialGradient(a,n,5,a,n,i*.4);c.addColorStop(0,"rgba(79, 249, 123, 0.04)"),c.addColorStop(1,"rgba(10, 11, 14, 0)"),t.fillStyle=c,t.fillRect(0,0,i,o),t.strokeStyle="#2a3345",t.lineWidth=2,t.beginPath(),t.moveTo(a-50,n+5),t.lineTo(a+50,n+5),t.stroke(),t.strokeStyle="#2a3345",t.lineWidth=1.5,t.beginPath(),t.moveTo(a,n+5),t.lineTo(a,n+15),t.stroke(),t.strokeStyle="#2a3345",t.lineWidth=1,t.beginPath(),t.moveTo(a-55,n+5),t.lineTo(a-55,n+12),t.stroke(),t.beginPath(),t.moveTo(a+55,n+5),t.lineTo(a+55,n+12),t.stroke();const s=Math.sin(f*2)*3;t.fillStyle="#4f9cf9",t.font="bold 14px JetBrains Mono",t.textAlign="center",t.fillText(`${d.toFixed(1)} kg`,a,n-18+s),t.fillStyle="#4a5570",t.font="8px JetBrains Mono",t.fillText(`Peso Ideal (${l==="M"?"M":"F"})`,a,n+24)})},deficit_calorico:function(e,d,l,t){this._stopLoop(e);const i=this.initCanvas(e),o=e.width/(window.devicePixelRatio||1),a=e.height/(window.devicePixelRatio||1),n=20;let f=0;this._startLoop(e,()=>{i.clearRect(0,0,o,a),f+=.03;const c=Math.max(d,l)*1.2,s=o-2*n,r=14,h=a/3,x=a/3+30,g=Math.min(1,f);i.fillStyle="#1a1f2e",i.beginPath(),i.roundRect(n,h,s,r,4),i.fill(),i.fillStyle="#4f9cf9",i.beginPath(),i.roundRect(n,h,s*Math.min(1,d/c)*g,r,[4,0,0,4]),i.fill(),i.fillStyle="#1a1f2e",i.beginPath(),i.roundRect(n,x,s,r,4),i.fill(),i.fillStyle="#f9c74f",i.beginPath(),i.roundRect(n,x,s*Math.min(1,l/c)*g,r,[4,0,0,4]),i.fill(),i.fillStyle="#fff",i.font="9px JetBrains Mono",i.textAlign="left",i.fillText(`GET: ${Math.round(d)} kcal`,n,h-4),i.fillText(`Ingesta: ${Math.round(l)} kcal`,n,x-4);const p=t>0?"#4ff97b":t<0?"#f94f4f":"#f9c74f";i.fillStyle=p,i.font="bold 11px JetBrains Mono",i.textAlign="center",i.fillText(`Balance: ${t>0?"+":""}${Math.round(t)} kcal`,o/2,a-6)})},frecuencia_cardiaca:function(e,d,l){this._stopLoop(e);const t=this.initCanvas(e),i=e.width/(window.devicePixelRatio||1),o=e.height/(window.devicePixelRatio||1),a=20,n=i-2*a,f=18;let c=0;this._startLoop(e,()=>{t.clearRect(0,0,i,o),c+=.04;const s=[{name:"Rec.",min:.5,max:.6,color:"#4f9cf9"},{name:"Grasa",min:.6,max:.7,color:"#4ff97b"},{name:"Cardio",min:.7,max:.8,color:"#f9c74f"},{name:"Anaerobic",min:.8,max:.9,color:"#f97b4f"},{name:"M\xE1x",min:.9,max:1,color:"#f94f4f"}];s.forEach((r,h)=>{const x=a+n*r.min,g=a+n*r.max,p=a+h*(f+3);t.fillStyle=r.color+"33",t.beginPath(),t.roundRect(x,p,g-x,f,3),t.fill(),t.fillStyle=r.color,t.font="7px JetBrains Mono",t.textAlign="center",t.fillText(r.name,(x+g)/2,p+f/2+2.5);const b=Math.round(d*r.min),M=Math.round(d*r.max);t.fillStyle="#4a5570",t.font="6px JetBrains Mono",t.textAlign="left",h===0&&t.fillText(`${b}-${M}`,a+2,p-2),h===s.length-1&&t.fillText(`${b}-${M}`,a+n-16,p-2)}),t.fillStyle="#fff",t.font="bold 12px JetBrains Mono",t.textAlign="center",t.fillText(`FCM: ${d} lpm`,i/2,o-6)})},met_actividad:function(e,d,l,t,i){this._stopLoop(e);const o=this.initCanvas(e),a=e.width/(window.devicePixelRatio||1),n=e.height/(window.devicePixelRatio||1),f=a/2,c=n/2;let s=0;this._startLoop(e,()=>{o.clearRect(0,0,a,n),s+=.03;const r=o.createRadialGradient(f,c,5,f,c,a*.4);r.addColorStop(0,"rgba(249, 123, 79, 0.04)"),r.addColorStop(1,"rgba(10, 11, 14, 0)"),o.fillStyle=r,o.fillRect(0,0,a,n);const h=Math.min(a,n)*.2,x=.5+.5*Math.sin(s*2);o.fillStyle="#f97b4f",o.shadowColor="#f97b4f",o.shadowBlur=15*x,o.beginPath(),o.moveTo(f,c-h),o.quadraticCurveTo(f+h*x,c-h*.3,f,c+h*.8),o.quadraticCurveTo(f-h*x,c-h*.3,f,c-h),o.fill(),o.shadowBlur=0,o.fillStyle="#fff",o.font="bold 14px JetBrains Mono",o.textAlign="center",o.fillText(`${i.toFixed(1)} kcal`,f,c+h+18),o.fillStyle="#4a5570",o.font="8px JetBrains Mono",o.fillText(`MET ${d} \xD7 ${l} kg \xD7 ${t} h`,f,c+h+32)})}};NutricionVisual.imc_infantil=function(e,d,l,t){this._stopLoop(e);const i=this.initCanvas(e),o=e.width/(window.devicePixelRatio||1),a=e.height/(window.devicePixelRatio||1);let n=0;this._startLoop(e,()=>{i.clearRect(0,0,o,a),n+=.03;const f=i.createRadialGradient(o/2,a/2,5,o/2,a/2,o*.4);f.addColorStop(0,"rgba(79, 249, 123, 0.04)"),f.addColorStop(1,"rgba(10, 11, 14, 0)"),i.fillStyle=f,i.fillRect(0,0,o,a);const c=20,s=o-2*c,r=a/2-5,h=Math.min(1,l/100),x=l<5?"#4f9cf9":l<85?"#4ff97b":l<95?"#f9c74f":"#f94f4f";i.fillStyle="#1a1f2e",i.beginPath(),i.roundRect(c,r,s,16,6),i.fill(),i.fillStyle=x,i.shadowColor=x,i.shadowBlur=6,i.beginPath(),i.roundRect(c,r,s*Math.min(1,n)*h,16,[6,0,0,6]),i.fill(),i.shadowBlur=0,i.fillStyle="#fff",i.font="bold 13px JetBrains Mono",i.textAlign="center",i.fillText(`IMC: ${d.toFixed(1)} | P${Math.round(l)}`,o/2,r-10),i.fillStyle=x,i.font="bold 10px JetBrains Mono",i.fillText(t,o/2,r+24)})},NutricionVisual.tdee=function(e,d,l,t){this._stopLoop(e);const i=this.initCanvas(e),o=e.width/(window.devicePixelRatio||1),a=e.height/(window.devicePixelRatio||1);let n=0;this._startLoop(e,()=>{i.clearRect(0,0,o,a),n+=.03;const f=i.createRadialGradient(o/2,a/2,5,o/2,a/2,o*.4);f.addColorStop(0,"rgba(79, 156, 249, 0.04)"),f.addColorStop(1,"rgba(10, 11, 14, 0)"),i.fillStyle=f,i.fillRect(0,0,o,a);const c=Math.max(d,l)*1.2,s=25,r=o-2*s,h=14,x=a/2-18,g=a/2+10;i.fillStyle="#1a1f2e",i.beginPath(),i.roundRect(s,x,r,h,4),i.fill(),i.fillStyle="#4f9cf9",i.beginPath(),i.roundRect(s,x,r*Math.min(1,d/c)*Math.min(1,n),h,[4,0,0,4]),i.fill(),i.fillStyle="#1a1f2e",i.beginPath(),i.roundRect(s,g,r,h,4),i.fill(),i.fillStyle="#f97b4f",i.shadowColor="#f97b4f",i.shadowBlur=4,i.beginPath(),i.roundRect(s,g,r*Math.min(1,l/c)*Math.min(1,n),h,[4,0,0,4]),i.fill(),i.shadowBlur=0,i.fillStyle="#fff",i.font="9px JetBrains Mono",i.textAlign="left",i.fillText(`TMB: ${Math.round(d)} kcal`,s,x-4),i.fillStyle="#f97b4f",i.fillText(`TDEE: ${Math.round(l)} kcal (\xD7${t})`,s,g+h+10)})},NutricionVisual.ffmi=function(e,d,l){this._stopLoop(e);const t=this.initCanvas(e),i=e.width/(window.devicePixelRatio||1),o=e.height/(window.devicePixelRatio||1),a=i/2,n=o/2;let f=0;this._startLoop(e,()=>{t.clearRect(0,0,i,o),f+=.03;const c=t.createRadialGradient(a,n,5,a,n,i*.4);c.addColorStop(0,"rgba(79, 156, 249, 0.04)"),c.addColorStop(1,"rgba(10, 11, 14, 0)"),t.fillStyle=c,t.fillRect(0,0,i,o);const s=Math.min(i,o)*.25,r=Math.min(1,d/25);t.strokeStyle="#2a3345",t.lineWidth=2,t.beginPath(),t.arc(a,n,s,0,Math.PI*2),t.stroke();const h=d<16.5?"#f9c74f":d<20?"#4f9cf9":d<22?"#4ff97b":"#f94f4f";t.fillStyle=h+"44",t.beginPath(),t.arc(a,n,s,-Math.PI/2,-Math.PI/2+Math.PI*2*r*Math.min(1,f)),t.lineTo(a,n),t.closePath(),t.fill(),t.fillStyle="#fff",t.font="bold 18px JetBrains Mono",t.textAlign="center",t.textBaseline="middle",t.fillText(d.toFixed(1),a,n-4),t.fillStyle=h,t.font="8px JetBrains Mono",t.fillText(l,a,n+16),t.fillStyle="#4a5570",t.font="7px JetBrains Mono",t.fillText("FFMI",a,n+s+14)})},NutricionVisual.bai=function(e,d,l){this._stopLoop(e);const t=this.initCanvas(e),i=e.width/(window.devicePixelRatio||1),o=e.height/(window.devicePixelRatio||1);let a=0;this._startLoop(e,()=>{t.clearRect(0,0,i,o),a+=.03;const n=t.createRadialGradient(i/2,o/2,5,i/2,o/2,i*.4);n.addColorStop(0,"rgba(249, 199, 79, 0.04)"),n.addColorStop(1,"rgba(10, 11, 14, 0)"),t.fillStyle=n,t.fillRect(0,0,i,o);const f=25,c=i-2*f,s=16,r=o/2-s/2,h=Math.min(1,d/40),x=d<18?"#4f9cf9":d<25?"#4ff97b":d<30?"#f9c74f":"#f94f4f";t.fillStyle="#1a1f2e",t.beginPath(),t.roundRect(f,r,c,s,6),t.fill(),t.fillStyle=x,t.shadowColor=x,t.shadowBlur=6,t.beginPath(),t.roundRect(f,r,c*Math.min(1,a)*h,s,[6,0,0,6]),t.fill(),t.shadowBlur=0,t.fillStyle="#fff",t.font="bold 14px JetBrains Mono",t.textAlign="center",t.fillText(`BAI: ${d.toFixed(1)}%`,i/2,r-10),t.fillStyle=x,t.font="9px JetBrains Mono",t.fillText(l,i/2,r+s+14)})},NutricionVisual.calorias_receta=function(e,d,l,t){this._stopLoop(e);const i=this.initCanvas(e),o=e.width/(window.devicePixelRatio||1),a=e.height/(window.devicePixelRatio||1);let n=0;this._startLoop(e,()=>{i.clearRect(0,0,o,a),n+=.03;const f=i.createRadialGradient(o/2,a/2,5,o/2,a/2,o*.4);f.addColorStop(0,"rgba(79, 249, 123, 0.04)"),f.addColorStop(1,"rgba(10, 11, 14, 0)"),i.fillStyle=f,i.fillRect(0,0,o,a);const c=Math.max(...d.map(g=>g.sub),1),s=20,r=14,h=["#4f9cf9","#f9c74f","#f94f4f"];d.forEach((g,p)=>{const b=s+p*(r+8),M=o-2*s,w=M*Math.min(1,g.sub/c);i.fillStyle="#1a1f2e",i.beginPath(),i.roundRect(s,b,M,r,4),i.fill(),i.fillStyle=h[p%h.length],i.shadowColor=h[p%h.length],i.shadowBlur=4,i.beginPath(),i.roundRect(s,b,w*Math.min(1,n),r,[4,0,0,4]),i.fill(),i.shadowBlur=0,i.fillStyle="#fff",i.font="8px JetBrains Mono",i.textAlign="left",i.fillText(`Ing${p+1}: ${g.sub.toFixed(0)} kcal`,s+4,b+r/2+3)});const x=s+d.length*(r+8)+6;i.fillStyle="#fff",i.font="bold 11px JetBrains Mono",i.textAlign="center",i.fillText(`Total: ${Math.round(l)} kcal | Porci\xF3n: ${Math.round(t)} kcal`,o/2,x+12)})};
+﻿const NutricionVisual = {
+    initCanvas: function(canvas) {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return ctx;
+    },
+
+    _loop: {},
+    _startLoop: function(canvas, fn) {
+        if (this._loop[canvas.id]) cancelAnimationFrame(this._loop[canvas.id]);
+        const animate = () => { fn(); this._loop[canvas.id] = requestAnimationFrame(animate); };
+        animate();
+    },
+    _stopLoop: function(canvas) {
+        if (this._loop[canvas.id]) { cancelAnimationFrame(this._loop[canvas.id]); delete this._loop[canvas.id]; }
+    },
+
+    macros: function(canvas, p, c, g) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const cx = w / 2, cy = h / 2;
+        const radius = Math.max(Math.min(w, h) / 2 - 25, 10);
+        const data = [
+            { value: Math.max(0, p || 0), color: '#4f9cf9', label: 'Proteínas' },
+            { value: Math.max(0, c || 0), color: '#f9c74f', label: 'Carboh.' },
+            { value: Math.max(0, g || 0), color: '#f94f4f', label: 'Grasas' }
+        ];
+        const total = data.reduce((s, item) => s + item.value, 0);
+        if (total <= 0) return;
+
+        let phase = 0;
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.02;
+
+            const grad = ctx.createRadialGradient(cx, cy, 5, cx, cy, radius + 20);
+            grad.addColorStop(0, 'rgba(79, 156, 249, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx.shadowBlur = 10;
+            let startAngle = -Math.PI / 2;
+            data.forEach(item => {
+                const sliceAngle = (item.value / total) * 2 * Math.PI;
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
+                ctx.lineTo(cx, cy);
+                ctx.fillStyle = item.color;
+                ctx.fill();
+                ctx.strokeStyle = '#111318';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                const mid = startAngle + sliceAngle / 2;
+                const lx = cx + radius * 0.65 * Math.cos(mid);
+                const ly = cy + radius * 0.65 * Math.sin(mid);
+                if (sliceAngle > 0.3) {
+                    ctx.fillStyle = '#111318';
+                    ctx.font = 'bold 9px JetBrains Mono';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(item.label, lx, ly);
+                }
+                startAngle += sliceAngle;
+            });
+            ctx.shadowBlur = 0;
+
+            ctx.shadowColor = '#4f9cf9';
+            ctx.shadowBlur = 8;
+            ctx.fillStyle = '#111318';
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius * 0.35, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 12px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${Math.round(p + c + g)}`, cx, cy - 4);
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '7px JetBrains Mono';
+            ctx.fillText('kcal', cx, cy + 8);
+
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '8px JetBrains Mono';
+            ctx.textBaseline = 'alphabetic';
+            ctx.fillText(`P:${Math.round(p)}  C:${Math.round(c)}  G:${Math.round(g)}`, w / 2, h - 6);
+        });
+    },
+
+    mifflin: function(canvas, tmb, get) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 25, bw = w - 2 * pad, maxK = 4000;
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.4);
+            grad.addColorStop(0, 'rgba(167, 139, 250, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            const p1 = Math.min(tmb / maxK, 1);
+            const p2 = Math.min(get / maxK, 1);
+            const cy1 = h / 2 - 20, cy2 = h / 2 + 16;
+            const anim1 = Math.min(1, phase * 2);
+            const anim2 = Math.min(1, (phase - 0.5) * 2);
+
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(pad, cy1, bw, 14, 4);
+            ctx.fill();
+            const g1 = ctx.createLinearGradient(pad, 0, pad + bw, 0);
+            g1.addColorStop(0, '#a78bfa');
+            g1.addColorStop(1, '#7c3aed');
+            ctx.fillStyle = g1;
+            ctx.beginPath();
+            ctx.roundRect(pad, cy1, bw * p1 * anim1, 14, [4, 0, 0, 4]);
+            ctx.fill();
+
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(pad, cy2, bw, 14, 4);
+            ctx.fill();
+            const g2 = ctx.createLinearGradient(pad, 0, pad + bw, 0);
+            g2.addColorStop(0, '#4f9cf9');
+            g2.addColorStop(1, '#2563eb');
+            ctx.fillStyle = g2;
+            ctx.beginPath();
+            ctx.roundRect(pad, cy2, bw * p2 * anim2, 14, [4, 0, 0, 4]);
+            ctx.fill();
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText(`TMB: ${Math.round(tmb)} kcal`, pad, cy1 - 4);
+            ctx.fillStyle = '#8a99ad';
+            ctx.fillText(`GET: ${Math.round(get)} kcal`, pad, cy2 + 22);
+        });
+    },
+
+    balance: function(canvas, get, target) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 25, bw = w - 2 * pad, bh = 16;
+        const maxK = Math.max(get, target) * 1.3;
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.4);
+            grad.addColorStop(0, 'rgba(249, 123, 79, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            const cy = h / 2 - bh / 2;
+            const pctA = Math.min(phase, 1);
+
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, bw, bh, 6);
+            ctx.fill();
+
+            const barW = Math.min(target / maxK, 1) * bw * pctA;
+            const color = target < get ? '#f97b4f' : '#4f9cf9';
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, barW, bh, [6, 0, 0, 6]);
+            ctx.fill();
+
+            const eqX = pad + (get / maxK) * bw;
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(eqX, cy - 4);
+            ctx.lineTo(eqX, cy + bh + 4);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Obj: ${Math.round(target)} kcal`, pad + barW / 2, cy - 6);
+            ctx.fillStyle = '#8a99ad';
+            ctx.fillText(`Mant: ${Math.round(get)} kcal`, eqX, cy + bh + 16);
+        });
+    },
+
+    imc: function(canvas, imc) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 20, barW = w - 2 * pad, barH = 14;
+        const rangos = [
+            { min: 15, max: 18.5, color: '#4f9cf9', label: 'Bajo' },
+            { min: 18.5, max: 25, color: '#4ff97b', label: 'Normal' },
+            { min: 25, max: 30, color: '#f9c74f', label: 'Sobre' },
+            { min: 30, max: 40, color: '#f94f4f', label: 'Obeso' },
+        ];
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+
+            const cy = h / 2 - barH / 2;
+
+            rangos.forEach(r => {
+                const x1 = pad + ((r.min - 15) / 25) * barW;
+                const x2 = pad + ((r.max - 15) / 25) * barW;
+                ctx.fillStyle = r.color + '44';
+                ctx.beginPath();
+                ctx.roundRect(x1, cy, x2 - x1, barH, 4);
+                ctx.fill();
+                ctx.fillStyle = '#8a99ad';
+                ctx.font = '7px JetBrains Mono';
+                ctx.textAlign = 'left';
+                ctx.fillText(r.label, x1 + 3, cy - 3);
+            });
+
+            const mx = pad + ((Math.min(imc, 40) - 15) / 25) * barW;
+            ctx.shadowColor = '#fff';
+            ctx.shadowBlur = 10 + 5 * Math.sin(phase);
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(mx, cy - 6);
+            ctx.lineTo(mx, cy + barH + 6);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 13px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(`IMC: ${imc.toFixed(1)}`, w / 2, cy + barH + 22);
+        });
+    },
+
+    carga_g: function(canvas, cg) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 20, bw = w - 2 * pad, bh = 16;
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.035;
+
+            const cy = h / 2 - bh / 2;
+            const color = cg < 10 ? '#4ff97b' : cg < 20 ? '#f9c74f' : '#f94f4f';
+            const pct = Math.min(phase, Math.min(1, cg / 30));
+            const animW = Math.min(1, cg / 30) * bw;
+
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, bw, bh, 6);
+            ctx.fill();
+
+            ctx.fillStyle = color;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 6;
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, bw * pct, bh, [6, 0, 0, 6]);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = '11px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Carga: ${cg.toFixed(1)}`, pad, cy - 7);
+
+            const label = cg < 10 ? 'Bajo' : cg < 20 ? 'Medio' : 'Alto';
+            ctx.fillStyle = color;
+            ctx.font = '8px JetBrains Mono';
+            ctx.textAlign = 'right';
+            ctx.fillText(label, pad + bw, cy - 7);
+        });
+    },
+
+    calorias_alimento: function(canvas, p, c, g, kcal) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 20, bw = w - 2 * pad, bh = 12;
+        let phase = 0;
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+            const total = Math.max(1, p + c + g);
+            const items = [
+                { val: p, color: '#4f9cf9', label: 'Proteínas' },
+                { val: c, color: '#f9c74f', label: 'Carbos' },
+                { val: g, color: '#f94f4f', label: 'Grasas' }
+            ];
+            items.forEach((item, i) => {
+                const y = pad + i * (bh + 6);
+                const pct = item.val / total;
+                ctx.fillStyle = '#1a1f2e';
+                ctx.beginPath();
+                ctx.roundRect(pad, y, bw, bh, 3);
+                ctx.fill();
+                const anim = Math.min(1, phase * (1 + i * 0.3));
+                ctx.fillStyle = item.color;
+                ctx.shadowColor = item.color;
+                ctx.shadowBlur = 4;
+                ctx.beginPath();
+                ctx.roundRect(pad, y, bw * pct * anim, bh, [3, 0, 0, 3]);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#fff';
+                ctx.font = '8px JetBrains Mono';
+                ctx.textAlign = 'left';
+                ctx.fillText(`${item.label}: ${item.val.toFixed(1)}g`, pad, y - 3);
+                ctx.fillStyle = '#4a5570';
+                ctx.textAlign = 'right';
+                ctx.fillText(`${(item.val*4).toFixed(0)} kcal`, pad + bw, y - 3);
+            });
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Total: ${kcal.toFixed(1)} kcal (P:${(p*4/kcal*100).toFixed(0)}% C:${(c*4/kcal*100).toFixed(0)}% G:${(g*9/kcal*100).toFixed(0)}%)`, w / 2, h - 5);
+        });
+    },
+
+    agua_diaria: function(canvas, peso, agua) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const cx = w / 2, cy = h / 2;
+        const glassW = 50, glassH = 90;
+        let phase = 0;
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.02;
+            const grad = ctx.createRadialGradient(cx, cy, 5, cx, cy, w * 0.4);
+            grad.addColorStop(0, 'rgba(79, 156, 249, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            const fill = Math.min(0.95, Math.max(0.1, agua / 4000));
+            ctx.strokeStyle = '#2a3345';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(cx - glassW / 2, cy - glassH / 2);
+            ctx.lineTo(cx - glassW / 2, cy + glassH / 2);
+            ctx.lineTo(cx + glassW / 2, cy + glassH / 2);
+            ctx.lineTo(cx + glassW / 2, cy - glassH / 2);
+            ctx.stroke();
+            const waterH = glassH * fill;
+            const wave = Math.sin(phase * 3) * 2;
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.5)';
+            ctx.beginPath();
+            ctx.moveTo(cx - glassW / 2 + 1, cy + glassH / 2);
+            for (let x = cx - glassW / 2 + 1; x <= cx + glassW / 2 - 1; x++) {
+                ctx.lineTo(x, cy + glassH / 2 - waterH + Math.sin(x * 0.15 + phase * 4) * 2 + wave);
+            }
+            ctx.lineTo(cx + glassW / 2 - 1, cy + glassH / 2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = '#4f9cf9';
+            ctx.font = 'bold 11px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${Math.round(agua)} mL`, cx, cy + glassH / 2 + 18);
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText(`${(agua/1000).toFixed(1)}L para ${peso} kg`, cx, cy + glassH / 2 + 32);
+        });
+    },
+
+    grasa_corporal: function(canvas, grasa) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const cx = w / 2, cy = h / 2;
+        let phase = 0;
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+            const grad = ctx.createRadialGradient(cx, cy, 5, cx, cy, w * 0.4);
+            grad.addColorStop(0, 'rgba(249, 199, 79, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            const r = Math.min(w, h) * 0.25;
+            const pct = Math.min(1, grasa / 50);
+            ctx.strokeStyle = '#2a3345';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.stroke();
+            const anim = Math.min(1, phase * 2);
+            ctx.fillStyle = pct > 0.5 ? 'rgba(249, 79, 79, 0.3)' : 'rgba(249, 199, 79, 0.3)';
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2) * pct * anim);
+            ctx.lineTo(cx, cy);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 20px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${grasa.toFixed(1)}%`, cx, cy);
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText('Grasa Corporal', cx, cy + r + 16);
+        });
+    },
+
+    cintura_cadera: function(canvas, icc) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 25, bw = w - 2 * pad, bh = 16;
+        let phase = 0;
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+            const cy = h / 2 - bh / 2;
+            const pct = Math.min(1, icc / 1.2);
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, bw, bh, 6);
+            ctx.fill();
+            const color = icc > 0.90 ? '#f94f4f' : icc > 0.85 ? '#f9c74f' : '#4ff97b';
+            ctx.fillStyle = color;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 6;
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, bw * Math.min(1, phase) * pct, bh, [6, 0, 0, 6]);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(`ICC: ${icc.toFixed(2)}`, w / 2, cy - 10);
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText('Cintura / Cadera', w / 2, cy + bh + 14);
+        });
+    },
+
+    cintura_altura: function(canvas, ict) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 25, bw = w - 2 * pad, bh = 16;
+        let phase = 0;
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+            const cy = h / 2 - bh / 2;
+            const pct = Math.min(1, ict / 0.8);
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, bw, bh, 6);
+            ctx.fill();
+            const color = ict > 0.6 ? '#f94f4f' : ict > 0.5 ? '#f9c74f' : '#4ff97b';
+            ctx.fillStyle = color;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 6;
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, bw * Math.min(1, phase) * pct, bh, [6, 0, 0, 6]);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(`ICT: ${ict.toFixed(2)}`, w / 2, cy - 10);
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText('Cintura / Altura', w / 2, cy + bh + 14);
+        });
+    },
+
+    proteina_peso: function(canvas, peso, factor, prot) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 25, bw = w - 2 * pad, bh = 14;
+        let phase = 0;
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+            const maxProt = Math.max(prot, 200);
+            const pct = Math.min(1, prot / maxProt);
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(pad, h / 2 - bh / 2, bw, bh, 6);
+            ctx.fill();
+            const g = ctx.createLinearGradient(pad, 0, pad + bw, 0);
+            g.addColorStop(0, '#4f9cf9');
+            g.addColorStop(1, '#4ff97b');
+            ctx.fillStyle = g;
+            ctx.shadowColor = '#4ff97b';
+            ctx.shadowBlur = 5;
+            ctx.beginPath();
+            ctx.roundRect(pad, h / 2 - bh / 2, bw * Math.min(1, phase) * pct, bh, [6, 0, 0, 6]);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 13px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${prot.toFixed(1)} g/día`, w / 2, h / 2 - bh / 2 - 8);
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText(`${peso} kg × ${factor} g/kg`, w / 2, h / 2 + bh / 2 + 14);
+        });
+    },
+
+    peso_ideal_nutri: function(canvas, peso, sexo) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const cx = w / 2, cy = h / 2;
+        let phase = 0;
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+            const grad = ctx.createRadialGradient(cx, cy, 5, cx, cy, w * 0.4);
+            grad.addColorStop(0, 'rgba(79, 249, 123, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            ctx.strokeStyle = '#2a3345';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(cx - 50, cy + 5);
+            ctx.lineTo(cx + 50, cy + 5);
+            ctx.stroke();
+            ctx.strokeStyle = '#2a3345';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy + 5);
+            ctx.lineTo(cx, cy + 15);
+            ctx.stroke();
+            ctx.strokeStyle = '#2a3345';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(cx - 55, cy + 5);
+            ctx.lineTo(cx - 55, cy + 12);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(cx + 55, cy + 5);
+            ctx.lineTo(cx + 55, cy + 12);
+            ctx.stroke();
+            const osc = Math.sin(phase * 2) * 3;
+            ctx.fillStyle = '#4f9cf9';
+            ctx.font = 'bold 14px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${peso.toFixed(1)} kg`, cx, cy - 18 + osc);
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText(`Peso Ideal (${sexo === 'M' ? 'M' : 'F'})`, cx, cy + 24);
+        });
+    },
+
+    deficit_calorico: function(canvas, get, ing, balance) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 20;
+        let phase = 0;
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+            const maxV = Math.max(get, ing) * 1.2;
+            const bw = w - 2 * pad, bh = 14;
+            const cy1 = h / 3, cy2 = h / 3 + 30;
+            const anim = Math.min(1, phase);
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(pad, cy1, bw, bh, 4);
+            ctx.fill();
+            ctx.fillStyle = '#4f9cf9';
+            ctx.beginPath();
+            ctx.roundRect(pad, cy1, bw * Math.min(1, get / maxV) * anim, bh, [4, 0, 0, 4]);
+            ctx.fill();
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(pad, cy2, bw, bh, 4);
+            ctx.fill();
+            ctx.fillStyle = '#f9c74f';
+            ctx.beginPath();
+            ctx.roundRect(pad, cy2, bw * Math.min(1, ing / maxV) * anim, bh, [4, 0, 0, 4]);
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = '9px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText(`GET: ${Math.round(get)} kcal`, pad, cy1 - 4);
+            ctx.fillText(`Ingesta: ${Math.round(ing)} kcal`, pad, cy2 - 4);
+            const deficitColor = balance > 0 ? '#4ff97b' : balance < 0 ? '#f94f4f' : '#f9c74f';
+            ctx.fillStyle = deficitColor;
+            ctx.font = 'bold 11px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Balance: ${balance > 0 ? '+' : ''}${Math.round(balance)} kcal`, w / 2, h - 6);
+        });
+    },
+
+    frecuencia_cardiaca: function(canvas, fcm, edad) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 20, bw = w - 2 * pad, bh = 18;
+        let phase = 0;
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.04;
+            const zonas = [
+                { name: 'Rec.', min: 0.5, max: 0.6, color: '#4f9cf9' },
+                { name: 'Grasa', min: 0.6, max: 0.7, color: '#4ff97b' },
+                { name: 'Cardio', min: 0.7, max: 0.8, color: '#f9c74f' },
+                { name: 'Anaerobic', min: 0.8, max: 0.9, color: '#f97b4f' },
+                { name: 'Máx', min: 0.9, max: 1.0, color: '#f94f4f' }
+            ];
+            zonas.forEach((z, i) => {
+                const x1 = pad + bw * z.min;
+                const x2 = pad + bw * z.max;
+                const y = pad + i * (bh + 3);
+                ctx.fillStyle = z.color + '33';
+                ctx.beginPath();
+                ctx.roundRect(x1, y, x2 - x1, bh, 3);
+                ctx.fill();
+                ctx.fillStyle = z.color;
+                ctx.font = '7px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.fillText(z.name, (x1 + x2) / 2, y + bh / 2 + 2.5);
+                const lo = Math.round(fcm * z.min);
+                const hi = Math.round(fcm * z.max);
+                ctx.fillStyle = '#4a5570';
+                ctx.font = '6px JetBrains Mono';
+                ctx.textAlign = 'left';
+                if (i === 0) ctx.fillText(`${lo}-${hi}`, pad + 2, y - 2);
+                if (i === zonas.length - 1) ctx.fillText(`${lo}-${hi}`, pad + bw - 16, y - 2);
+            });
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 12px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(`FCM: ${fcm} lpm`, w / 2, h - 6);
+        });
+    },
+
+    met_actividad: function(canvas, met, peso, horas, gasto) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const cx = w / 2, cy = h / 2;
+        let phase = 0;
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+            const grad = ctx.createRadialGradient(cx, cy, 5, cx, cy, w * 0.4);
+            grad.addColorStop(0, 'rgba(249, 123, 79, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            const r = Math.min(w, h) * 0.2;
+            const fire = 0.5 + 0.5 * Math.sin(phase * 2);
+            ctx.fillStyle = '#f97b4f';
+            ctx.shadowColor = '#f97b4f';
+            ctx.shadowBlur = 15 * fire;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - r);
+            ctx.quadraticCurveTo(cx + r * fire, cy - r * 0.3, cx, cy + r * 0.8);
+            ctx.quadraticCurveTo(cx - r * fire, cy - r * 0.3, cx, cy - r);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${gasto.toFixed(1)} kcal`, cx, cy + r + 18);
+            ctx.fillStyle = '#4a5570';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText(`MET ${met} × ${peso} kg × ${horas} h`, cx, cy + r + 32);
+        });
+    }
+};
+
+NutricionVisual.imc_infantil = function(canvas, imc, pct, cat) {
+    this._stopLoop(canvas);
+    const ctx = this.initCanvas(canvas);
+    const w = canvas.width / (window.devicePixelRatio || 1);
+    const h = canvas.height / (window.devicePixelRatio || 1);
+    let phase = 0;
+
+    this._startLoop(canvas, () => {
+        ctx.clearRect(0, 0, w, h);
+        phase += 0.03;
+
+        const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.4);
+        grad.addColorStop(0, 'rgba(79, 249, 123, 0.04)');
+        grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        const pad = 20;
+        const bw = w - 2 * pad;
+        const cy = h / 2 - 5;
+        const pctNorm = Math.min(1, pct / 100);
+        const color = pct < 5 ? '#4f9cf9' : pct < 85 ? '#4ff97b' : pct < 95 ? '#f9c74f' : '#f94f4f';
+
+        ctx.fillStyle = '#1a1f2e';
+        ctx.beginPath();
+        ctx.roundRect(pad, cy, bw, 16, 6);
+        ctx.fill();
+
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        ctx.roundRect(pad, cy, bw * Math.min(1, phase) * pctNorm, 16, [6, 0, 0, 6]);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 13px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(`IMC: ${imc.toFixed(1)} | P${Math.round(pct)}`, w / 2, cy - 10);
+        ctx.fillStyle = color;
+        ctx.font = 'bold 10px JetBrains Mono';
+        ctx.fillText(cat, w / 2, cy + 24);
+    });
+};
+
+NutricionVisual.tdee = function(canvas, tmb, tdee, act) {
+    this._stopLoop(canvas);
+    const ctx = this.initCanvas(canvas);
+    const w = canvas.width / (window.devicePixelRatio || 1);
+    const h = canvas.height / (window.devicePixelRatio || 1);
+    let phase = 0;
+
+    this._startLoop(canvas, () => {
+        ctx.clearRect(0, 0, w, h);
+        phase += 0.03;
+
+        const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.4);
+        grad.addColorStop(0, 'rgba(79, 156, 249, 0.04)');
+        grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        const maxK = Math.max(tmb, tdee) * 1.2;
+        const pad = 25, bw = w - 2 * pad, bh = 14;
+        const cy1 = h / 2 - 18, cy2 = h / 2 + 10;
+
+        ctx.fillStyle = '#1a1f2e';
+        ctx.beginPath();
+        ctx.roundRect(pad, cy1, bw, bh, 4);
+        ctx.fill();
+        ctx.fillStyle = '#4f9cf9';
+        ctx.beginPath();
+        ctx.roundRect(pad, cy1, bw * Math.min(1, tmb / maxK) * Math.min(1, phase), bh, [4, 0, 0, 4]);
+        ctx.fill();
+
+        ctx.fillStyle = '#1a1f2e';
+        ctx.beginPath();
+        ctx.roundRect(pad, cy2, bw, bh, 4);
+        ctx.fill();
+        ctx.fillStyle = '#f97b4f';
+        ctx.shadowColor = '#f97b4f';
+        ctx.shadowBlur = 4;
+        ctx.beginPath();
+        ctx.roundRect(pad, cy2, bw * Math.min(1, tdee / maxK) * Math.min(1, phase), bh, [4, 0, 0, 4]);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#fff';
+        ctx.font = '9px JetBrains Mono';
+        ctx.textAlign = 'left';
+        ctx.fillText(`TMB: ${Math.round(tmb)} kcal`, pad, cy1 - 4);
+        ctx.fillStyle = '#f97b4f';
+        ctx.fillText(`TDEE: ${Math.round(tdee)} kcal (×${act})`, pad, cy2 + bh + 10);
+    });
+};
+
+NutricionVisual.ffmi = function(canvas, ffmi, cat) {
+    this._stopLoop(canvas);
+    const ctx = this.initCanvas(canvas);
+    const w = canvas.width / (window.devicePixelRatio || 1);
+    const h = canvas.height / (window.devicePixelRatio || 1);
+    const cx = w / 2, cy = h / 2;
+    let phase = 0;
+
+    this._startLoop(canvas, () => {
+        ctx.clearRect(0, 0, w, h);
+        phase += 0.03;
+
+        const grad = ctx.createRadialGradient(cx, cy, 5, cx, cy, w * 0.4);
+        grad.addColorStop(0, 'rgba(79, 156, 249, 0.04)');
+        grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        const r = Math.min(w, h) * 0.25;
+        const maxFFMI = 25;
+        const pct = Math.min(1, ffmi / maxFFMI);
+
+        ctx.strokeStyle = '#2a3345';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+
+        const color = ffmi < 16.5 ? '#f9c74f' : ffmi < 20 ? '#4f9cf9' : ffmi < 22 ? '#4ff97b' : '#f94f4f';
+        ctx.fillStyle = color + '44';
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2) * pct * Math.min(1, phase));
+        ctx.lineTo(cx, cy);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 18px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(ffmi.toFixed(1), cx, cy - 4);
+        ctx.fillStyle = color;
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText(cat, cx, cy + 16);
+        ctx.fillStyle = '#4a5570';
+        ctx.font = '7px JetBrains Mono';
+        ctx.fillText('FFMI', cx, cy + r + 14);
+    });
+};
+
+NutricionVisual.bai = function(canvas, bai, cat) {
+    this._stopLoop(canvas);
+    const ctx = this.initCanvas(canvas);
+    const w = canvas.width / (window.devicePixelRatio || 1);
+    const h = canvas.height / (window.devicePixelRatio || 1);
+    let phase = 0;
+
+    this._startLoop(canvas, () => {
+        ctx.clearRect(0, 0, w, h);
+        phase += 0.03;
+
+        const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.4);
+        grad.addColorStop(0, 'rgba(249, 199, 79, 0.04)');
+        grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        const pad = 25, bw = w - 2 * pad, bh = 16;
+        const cy = h / 2 - bh / 2;
+        const pct = Math.min(1, bai / 40);
+        const color = bai < 18 ? '#4f9cf9' : bai < 25 ? '#4ff97b' : bai < 30 ? '#f9c74f' : '#f94f4f';
+
+        ctx.fillStyle = '#1a1f2e';
+        ctx.beginPath();
+        ctx.roundRect(pad, cy, bw, bh, 6);
+        ctx.fill();
+
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        ctx.roundRect(pad, cy, bw * Math.min(1, phase) * pct, bh, [6, 0, 0, 6]);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 14px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(`BAI: ${bai.toFixed(1)}%`, w / 2, cy - 10);
+        ctx.fillStyle = color;
+        ctx.font = '9px JetBrains Mono';
+        ctx.fillText(cat, w / 2, cy + bh + 14);
+    });
+};
+
+NutricionVisual.calorias_receta = function(canvas, ingredientes, total, porcion) {
+    this._stopLoop(canvas);
+    const ctx = this.initCanvas(canvas);
+    const w = canvas.width / (window.devicePixelRatio || 1);
+    const h = canvas.height / (window.devicePixelRatio || 1);
+    let phase = 0;
+
+    this._startLoop(canvas, () => {
+        ctx.clearRect(0, 0, w, h);
+        phase += 0.03;
+
+        const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.4);
+        grad.addColorStop(0, 'rgba(79, 249, 123, 0.04)');
+        grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        const maxVal = Math.max(...ingredientes.map(i => i.sub), 1);
+        const pad = 20, bh = 14;
+        const colors = ['#4f9cf9', '#f9c74f', '#f94f4f'];
+
+        ingredientes.forEach((ing, i) => {
+            const y = pad + i * (bh + 8);
+            const bw = w - 2 * pad;
+            const fillW = bw * Math.min(1, ing.sub / maxVal);
+
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(pad, y, bw, bh, 4);
+            ctx.fill();
+
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.shadowColor = colors[i % colors.length];
+            ctx.shadowBlur = 4;
+            ctx.beginPath();
+            ctx.roundRect(pad, y, fillW * Math.min(1, phase), bh, [4, 0, 0, 4]);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = '8px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Ing${i+1}: ${ing.sub.toFixed(0)} kcal`, pad + 4, y + bh / 2 + 3);
+        });
+
+        const totalY = pad + ingredientes.length * (bh + 8) + 6;
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 11px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Total: ${Math.round(total)} kcal | Porción: ${Math.round(porcion)} kcal`, w / 2, totalY + 12);
+    });
+};

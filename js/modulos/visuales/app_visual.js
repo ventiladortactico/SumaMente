@@ -1,1 +1,1212 @@
-let plotMinX=-10,plotMaxX=10,plotMinY=-10,plotMaxY=10,plotDragging=!1,plotLastX=0,plotLastY=0,currentPlotExpr="",currentPlotType="";function setDebugInfo(y){var M=document.getElementById("graph-debug");if(!M){M=document.createElement("div"),M.id="graph-debug",M.style.cssText="font-size:10px;color:#ff6b6b;background:var(--surface);border:1px solid #ff6b6b;border-radius:6px;padding:6px 10px;margin-top:6px;white-space:pre-wrap;word-break:break-all;font-family:monospace";var v=document.getElementById("chart-canvas-general");v&&v.parentElement&&v.parentElement.appendChild(M)}M.textContent=y,M.style.display="block"}function genPlotFunc(y,M){const v=document.getElementById("chart-canvas-general");if(!v)return;const a=v.getContext("2d");var n=v.parentElement&&v.parentElement.clientWidth||window.innerWidth||320;const S=Math.max(n-28,200),l=250,s=window.devicePixelRatio||1,h=40,o=S-h*2,d=l-h*2;let g=plotMinX,T=plotMaxX,f=plotMinY,m=plotMaxY;const B=[],E=400;for(let e=0;e<=E;e++){const c=g+(T-g)*e/E;try{const k=safeMathEval(y,{x:c});isFinite(k)?B.push({x:c,y:k}):B.push({x:c,y:null})}catch(k){B.push({x:c,y:null}),e===0&&setDebugInfo("Error en x="+c+": "+(k.message||k))}}const R=B.filter(e=>e.y!==null).map(e=>e.y);if(M)f=plotMinY,m=plotMaxY;else if(R.length>0){const e=[...R].sort((b,W)=>b-W),c=Math.floor(e.length*.02),k=Math.ceil(e.length*.98);f=e[c],m=e[k-1];const r=m-f||1;f-=r*.12,m+=r*.12,plotMinY=f,plotMaxY=m}v.style.display="block",v.style.width=S+"px",v.style.height=l+"px",v.width=Math.round(S*s),v.height=Math.round(l*s),a.setTransform(1,0,0,1,0,0),a.scale(s,s),a.clearRect(0,0,S,l);const u=e=>h+(e-g)/(T-g)*o,p=e=>h+(m-e)/(m-f)*d;a.fillStyle="rgba(30, 32, 40, 0.8)",a.fillRect(0,0,S,l);const I=T-g,Y=m-f,P=Math.pow(10,Math.floor(Math.log10(I/5))),w=Math.pow(10,Math.floor(Math.log10(Y/5)));a.strokeStyle="rgba(74, 85, 112, 0.3)",a.lineWidth=.5;for(let e=Math.ceil(g/P)*P;e<=T;e+=P/2){const c=u(e);a.beginPath(),a.moveTo(c,h),a.lineTo(c,h+d),a.stroke()}for(let e=Math.ceil(f/w)*w;e<=m;e+=w/2){const c=p(e);a.beginPath(),a.moveTo(h,c),a.lineTo(h+o,c),a.stroke()}a.strokeStyle="rgba(74, 85, 112, 0.6)",a.lineWidth=1;for(let e=Math.ceil(g/P)*P;e<=T;e+=P){const c=u(e);a.beginPath(),a.moveTo(c,h),a.lineTo(c,h+d),a.stroke()}for(let e=Math.ceil(f/w)*w;e<=m;e+=w){const c=p(e);a.beginPath(),a.moveTo(h,c),a.lineTo(h+o,c),a.stroke()}if(a.strokeStyle="#8a97b0",a.lineWidth=2,f<=0&&m>=0){const e=p(0);a.beginPath(),a.moveTo(h,e),a.lineTo(h+o,e),a.stroke()}if(g<=0&&T>=0){const e=u(0);a.beginPath(),a.moveTo(e,h),a.lineTo(e,h+d),a.stroke()}a.fillStyle="#8a97b0",a.font="10px JetBrains Mono",a.textAlign="center",a.textBaseline="top";for(let e=Math.ceil(g/P)*P;e<=T;e+=P){if(Math.abs(e)<.001)continue;const c=u(e),k=f<=0&&m>=0?p(0):h+d;a.fillText(parseFloat(e.toPrecision(3)).toString(),c,k+5)}a.textAlign="right",a.textBaseline="middle";for(let e=Math.ceil(f/w)*w;e<=m;e+=w){if(Math.abs(e)<.001)continue;const c=p(e),k=g<=0&&T>=0?u(0):h;a.fillText(parseFloat(e.toPrecision(3)).toString(),k-5,c)}g<=0&&T>=0&&f<=0&&m>=0&&a.fillText("0",u(0)-5,p(0)+5),a.fillStyle="#4f9cf9",a.font="bold 12px JetBrains Mono",a.textAlign="right",a.fillText("x",S-h,p(0)-10),a.textAlign="left",a.fillText("y",u(0)+10,h+10),a.strokeStyle="#4f9cf9",a.lineWidth=2.5,a.beginPath();let C=!1;for(const e of B){if(e.y===null){C=!1;continue}const c=u(e.x),k=p(e.y);C?a.lineTo(c,k):(a.moveTo(c,k),C=!0)}a.stroke(),currentPlotExpr=y,currentPlotType="function",setupCanvasInteractivity(v,y),document.getElementById("graph-controls").style.display="flex"}function setupCanvasInteractivity(y,M){y.onwheel=null,y.onmousedown=null,y.onmousemove=null,y.onmouseup=null,y.onmouseleave=null,y.onwheel=n=>{n.preventDefault();const S=y.getBoundingClientRect(),l=n.clientX-S.left,s=n.clientY-S.top,h=y.width/(window.devicePixelRatio||1),o=y.height/(window.devicePixelRatio||1),d=40,g=h-d*2,T=o-d*2,f=plotMinX+(l-d)/g*(plotMaxX-plotMinX),m=plotMaxY-(s-d)/T*(plotMaxY-plotMinY),B=n.deltaY>0?1.1:.9,E=(plotMaxX-plotMinX)*B,R=(plotMaxY-plotMinY)*B;plotMinX=f-(f-plotMinX)*B,plotMaxX=plotMinX+E,plotMinY=m-(m-plotMinY)*B,plotMaxY=plotMinY+R,redrawCurrentPlot(!0)},y.onmousedown=n=>{plotDragging=!0,plotLastX=n.clientX,plotLastY=n.clientY,y.style.cursor="grabbing"},y.onmousemove=n=>{const S=y.getBoundingClientRect(),l=n.clientX-S.left,s=n.clientY-S.top,h=y.width/(window.devicePixelRatio||1),o=y.height/(window.devicePixelRatio||1),d=40,g=h-d*2,T=o-d*2;if(l>=d&&l<=h-d&&s>=d&&s<=o-d){const R=plotMinX+(l-d)/g*(plotMaxX-plotMinX),u=plotMaxY-(s-d)/T*(plotMaxY-plotMinY);document.getElementById("graph-coords").textContent=`x: ${R.toFixed(2)}, y: ${u.toFixed(2)}`}if(!plotDragging)return;const f=n.clientX-plotLastX,m=n.clientY-plotLastY,B=-f/g*(plotMaxX-plotMinX),E=m/T*(plotMaxY-plotMinY);plotMinX+=B,plotMaxX+=B,plotMinY+=E,plotMaxY+=E,plotLastX=n.clientX,plotLastY=n.clientY,redrawCurrentPlot(!0)},y.onmouseup=()=>{plotDragging=!1,y.style.cursor="default"},y.onmouseleave=()=>{plotDragging=!1,y.style.cursor="default"};let v=0,a=!1;y.ontouchstart=n=>{n.touches.length===1?(a=!0,plotDragging=!0,plotLastX=n.touches[0].clientX,plotLastY=n.touches[0].clientY):n.touches.length===2&&(a=!1,v=Math.hypot(n.touches[0].clientX-n.touches[1].clientX,n.touches[0].clientY-n.touches[1].clientY))},y.ontouchmove=n=>{if(n.touches.length===1&&a){n.preventDefault();const S=n.touches[0].clientX-plotLastX,l=n.touches[0].clientY-plotLastY,s=y.width/(window.devicePixelRatio||1),h=y.height/(window.devicePixelRatio||1),o=40,d=s-o*2,g=h-o*2,T=-S/d*(plotMaxX-plotMinX),f=l/g*(plotMaxY-plotMinY);plotMinX+=T,plotMaxX+=T,plotMinY+=f,plotMaxY+=f,plotLastX=n.touches[0].clientX,plotLastY=n.touches[0].clientY,redrawCurrentPlot(!0)}else if(n.touches.length===2){n.preventDefault();const S=Math.hypot(n.touches[0].clientX-n.touches[1].clientX,n.touches[0].clientY-n.touches[1].clientY);if(v>0){const l=v/S,s=(plotMinX+plotMaxX)/2,h=(plotMinY+plotMaxY)/2,o=(plotMaxX-plotMinX)*l,d=(plotMaxY-plotMinY)*l;plotMinX=s-o/2,plotMaxX=s+o/2,plotMinY=h-d/2,plotMaxY=h+d/2,redrawCurrentPlot(!0)}v=S}},y.ontouchend=()=>{plotDragging=!1,a=!1,v=0}}function redrawCurrentPlot(y){if(currentPlotType==="equation")genPlotEquation(currentPlotExpr,y);else if(currentPlotType==="system"){const M=currentPlotExpr.split(",").map(v=>v.trim());M.length===2&&genPlotSystem2x2(M[0],M[1],y)}else if(currentPlotType==="inequality"){const M=currentPlotExpr.match(/(>=|<=|>|<)/);M&&genPlotInequality(currentPlotExpr,M[1],y)}else if(currentPlotType==="parametric"){const M=currentPlotExpr.split(",").map(v=>v.trim());if(M.length===2){const v=M[0].replace(/^x\s*=\s*/,"").trim(),a=M[1].replace(/^y\s*=\s*/,"").trim();v&&a&&genPlotParametric(v,a,y)}}else genPlotFunc(currentPlotExpr,y)}function genPlotSystem2x2(y,M,v){const a=parseLinearEq(y),n=parseLinearEq(M);if(!a||!n)return;const S=document.getElementById("chart-canvas-general");if(!S)return;const l=S.getContext("2d");var s=S.parentElement&&S.parentElement.clientWidth||window.innerWidth||320;const h=Math.max(s-28,200),o=250,d=40,g=h-d*2,T=o-d*2,f=[],m=[],B=400;for(let e=0;e<=B;e++){const c=plotMinX+(plotMaxX-plotMinX)*e/B,k=a.b!==0?(a.c-a.a*c)/a.b:NaN,r=n.b!==0?(n.c-n.a*c)/n.b:NaN;isFinite(k)&&f.push({x:c,y:k}),isFinite(r)&&m.push({x:c,y:r})}const E=e=>{const c=[],k=e.c/e.a;if(!isFinite(k))return c;const r=plotMaxY-plotMinY||1;for(let b=0;b<=B;b++){const W=plotMinY+r*b/B;c.push({x:k,y:W})}return c};if(a.b===0&&a.a!==0&&(f.length=0,f.push(...E(a))),n.b===0&&n.a!==0&&(m.length=0,m.push(...E(n))),!v){const e=[...f,...m].filter(c=>isFinite(c.y)).map(c=>c.y);if(e.length>0){let c=Math.min(...e),k=Math.max(...e);const r=k-c||1;c-=r*.1,k+=r*.1,plotMinY=c,plotMaxY=k}}var R=window.devicePixelRatio||1;S.style.display="block",S.style.width=h+"px",S.style.height=o+"px",S.width=Math.round(h*R),S.height=Math.round(o*R),l.setTransform(1,0,0,1,0,0),l.scale(R,R),l.clearRect(0,0,h,o);const u=e=>d+(e-plotMinX)/(plotMaxX-plotMinX)*g,p=e=>d+(plotMaxY-e)/(plotMaxY-plotMinY)*T;l.fillStyle="rgba(30, 32, 40, 0.8)",l.fillRect(0,0,h,o);const I=plotMaxX-plotMinX,Y=plotMaxY-plotMinY,P=Math.pow(10,Math.floor(Math.log10(I/5))),w=Math.pow(10,Math.floor(Math.log10(Y/5)));l.strokeStyle="rgba(74, 85, 112, 0.3)",l.lineWidth=.5;for(let e=Math.ceil(plotMinX/P)*P;e<=plotMaxX;e+=P/2){const c=u(e);l.beginPath(),l.moveTo(c,d),l.lineTo(c,d+T),l.stroke()}for(let e=Math.ceil(plotMinY/w)*w;e<=plotMaxY;e+=w/2){const c=p(e);l.beginPath(),l.moveTo(d,c),l.lineTo(d+g,c),l.stroke()}l.strokeStyle="rgba(74, 85, 112, 0.6)",l.lineWidth=1;for(let e=Math.ceil(plotMinX/P)*P;e<=plotMaxX;e+=P){const c=u(e);l.beginPath(),l.moveTo(c,d),l.lineTo(c,d+T),l.stroke()}for(let e=Math.ceil(plotMinY/w)*w;e<=plotMaxY;e+=w){const c=p(e);l.beginPath(),l.moveTo(d,c),l.lineTo(d+g,c),l.stroke()}if(l.strokeStyle="#8a97b0",l.lineWidth=2,plotMinY<=0&&plotMaxY>=0){const e=p(0);l.beginPath(),l.moveTo(d,e),l.lineTo(d+g,e),l.stroke()}if(plotMinX<=0&&plotMaxX>=0){const e=u(0);l.beginPath(),l.moveTo(e,d),l.lineTo(e,d+T),l.stroke()}l.fillStyle="#8a97b0",l.font="10px JetBrains Mono",l.textAlign="center",l.textBaseline="top";for(let e=Math.ceil(plotMinX/P)*P;e<=plotMaxX;e+=P)Math.abs(e)<.001||l.fillText(parseFloat(e.toPrecision(3)).toString(),u(e),(plotMinY<=0&&plotMaxY>=0?p(0):d+T)+5);l.textAlign="right",l.textBaseline="middle";for(let e=Math.ceil(plotMinY/w)*w;e<=plotMaxY;e+=w)Math.abs(e)<.001||l.fillText(parseFloat(e.toPrecision(3)).toString(),(plotMinX<=0&&plotMaxX>=0?u(0):d)-5,p(e));if(plotMinX<=0&&plotMaxX>=0&&plotMinY<=0&&plotMaxY>=0&&(l.textAlign="right",l.textBaseline="top",l.fillText("0",u(0)-5,p(0)+5)),l.fillStyle="#4f9cf9",l.font="bold 12px JetBrains Mono",l.textAlign="right",l.fillText("x",d+g,(plotMinY<=0&&plotMaxY>=0?p(0):d+T)-10),l.textAlign="left",l.fillText("y",(plotMinX<=0&&plotMaxX>=0?u(0):d)+10,d+10),f.length>1){l.strokeStyle="#4f9cf9",l.lineWidth=2.5,l.beginPath();let e=!1;for(const c of f)e?l.lineTo(u(c.x),p(c.y)):(l.moveTo(u(c.x),p(c.y)),e=!0);l.stroke(),l.fillStyle="#4f9cf9",l.font="11px monospace",l.fillText("\u2460",u(0)+30,p(1)+2)}if(m.length>1){l.strokeStyle="#f9c74f",l.lineWidth=2.5,l.beginPath();let e=!1;for(const c of m)e?l.lineTo(u(c.x),p(c.y)):(l.moveTo(u(c.x),p(c.y)),e=!0);l.stroke(),l.fillStyle="#f9c74f",l.font="11px monospace",l.fillText("\u2461",u(0)+30,p(-1)+18)}const C=a.a*n.b-n.a*a.b;if(Math.abs(C)>=1e-12){const e=(a.c*n.b-n.c*a.b)/C,c=(a.a*n.c-n.a*a.c)/C,k=u(e),r=p(c);l.beginPath(),l.arc(k,r,6,0,Math.PI*2),l.fillStyle="rgba(79, 252, 124, 0.5)",l.fill(),l.strokeStyle="#4ffc7c",l.lineWidth=2,l.stroke(),l.fillStyle="#4ffc7c",l.font="bold 11px monospace",l.fillText(`(${e.toFixed(2)}, ${c.toFixed(2)})`,k+10,r-5)}currentPlotExpr=y+", "+M,currentPlotType="system",setupCanvasInteractivity(S,currentPlotExpr),document.getElementById("graph-controls").style.display="flex"}function genPlotEquation(y,M){const v=y.split("=");if(v.length!==2)return;const a=v[0].trim(),n=v[1].trim(),S=t=>/^-\d+(\.\d+)?$/.test(t)?"("+t+")":t,l=S(a),s=S(n),h=document.getElementById("chart-canvas-general");if(!h)return;const o=h.getContext("2d");var d=h.parentElement&&h.parentElement.clientWidth||window.innerWidth||320;const g=Math.max(d-28,200),T=250,f=40,m=g-f*2,B=T-f*2;let E=plotMinX,R=plotMaxX,u=plotMinY,p=plotMaxY;const I=[],Y=[],P=400;for(let t=0;t<=P;t++){const i=parseFloat((E+(R-E)*t/P).toPrecision(10));try{const x=safeMathEval(l,{x:i}),X=safeMathEval(s,{x:i});isFinite(x)?I.push({x:i,y:x}):I.push({x:i,y:null}),isFinite(X)?Y.push({x:i,y:X}):Y.push({x:i,y:null})}catch(x){I.push({x:i,y:null}),Y.push({x:i,y:null}),t===0&&setDebugInfo("Error eq x="+i+": "+(x.message||x))}}if(!M){const t=[...I,...Y].filter(i=>i.y!==null).map(i=>i.y);if(t.length>0){if(t.length>10){const x=[...t].sort(($,q)=>$-q),X=Math.floor(x.length*.05),A=Math.ceil(x.length*.95);u=x[X],p=x[A-1]}else u=Math.min(...t),p=Math.max(...t);const i=p-u||1;u-=i*.1,p+=i*.1}}var w=window.devicePixelRatio||1;h.style.display="block",h.style.width=g+"px",h.style.height=T+"px",h.width=Math.round(g*w),h.height=Math.round(T*w),o.setTransform(1,0,0,1,0,0),o.scale(w,w),o.clearRect(0,0,g,T);const C=t=>f+(t-E)/(R-E)*m,e=t=>f+(p-t)/(p-u)*B;o.fillStyle="rgba(30, 32, 40, 0.8)",o.fillRect(0,0,g,T);const c=R-E,k=p-u,r=Math.pow(10,Math.floor(Math.log10(c/5))),b=Math.pow(10,Math.floor(Math.log10(k/5)));o.strokeStyle="rgba(74, 85, 112, 0.3)",o.lineWidth=.5;for(let t=Math.ceil(E/r)*r;t<=R;t+=r/2){const i=C(t);o.beginPath(),o.moveTo(i,f),o.lineTo(i,f+B),o.stroke()}for(let t=Math.ceil(u/b)*b;t<=p;t+=b/2){const i=e(t);o.beginPath(),o.moveTo(f,i),o.lineTo(f+m,i),o.stroke()}o.strokeStyle="rgba(74, 85, 112, 0.6)",o.lineWidth=1;for(let t=Math.ceil(E/r)*r;t<=R;t+=r){const i=C(t);o.beginPath(),o.moveTo(i,f),o.lineTo(i,f+B),o.stroke()}for(let t=Math.ceil(u/b)*b;t<=p;t+=b){const i=e(t);o.beginPath(),o.moveTo(f,i),o.lineTo(f+m,i),o.stroke()}if(o.strokeStyle="#8a97b0",o.lineWidth=2,u<=0&&p>=0){const t=e(0);o.beginPath(),o.moveTo(f,t),o.lineTo(f+m,t),o.stroke()}if(E<=0&&R>=0){const t=C(0);o.beginPath(),o.moveTo(t,f),o.lineTo(t,f+B),o.stroke()}o.fillStyle="#8a97b0",o.font="10px JetBrains Mono",o.textAlign="center",o.textBaseline="top";for(let t=Math.ceil(E/r)*r;t<=R;t+=r){if(Math.abs(t)<.001)continue;const i=C(t),x=u<=0&&p>=0?e(0):f+B;o.fillText(parseFloat(t.toPrecision(3)).toString(),i,x+5)}o.textAlign="right",o.textBaseline="middle";for(let t=Math.ceil(u/b)*b;t<=p;t+=b){if(Math.abs(t)<.001)continue;const i=e(t),x=E<=0&&R>=0?C(0):f;o.fillText(parseFloat(t.toPrecision(3)).toString(),x-5,i)}o.fillStyle="#4f9cf9",o.font="bold 12px JetBrains Mono",o.textAlign="right",o.fillText("x",g-f,e(0)-10),o.textAlign="left",o.fillText("y",C(0)+10,f+10),o.strokeStyle="#4f9cf9",o.lineWidth=2.5,o.beginPath();let W=!1;for(const t of I){if(t.y===null){W=!1;continue}const i=C(t.x),x=e(t.y);W?o.lineTo(i,x):(o.moveTo(i,x),W=!0)}o.stroke(),o.strokeStyle="#f97b4f",o.beginPath(),W=!1;for(const t of Y){if(t.y===null){W=!1;continue}const i=C(t.x),x=e(t.y);W?o.lineTo(i,x):(o.moveTo(i,x),W=!0)}o.stroke();let F=null;for(let t=0;t<I.length-1;t++){const i=I[t],x=I[t+1],X=Y[t],A=Y[t+1];if(i.y!==null&&x.y!==null&&X.y!==null&&A.y!==null&&(i.y-X.y)*(x.y-A.y)<=0){const $=x.y-i.y-(A.y-X.y);if(Math.abs($)<1e-12)continue;const q=(X.y-i.y)/$,N=i.x+q*(x.x-i.x),D=i.y+q*(x.y-i.y);F={x:N,y:D};break}}if(F){const t=C(F.x),i=e(F.y);o.fillStyle="#4ff97b",o.beginPath(),o.arc(t,i,8,0,Math.PI*2),o.fill(),o.fillStyle="#4ff97b",o.font="bold 11px JetBrains Mono",o.textAlign="left",o.fillText(`(${F.x.toFixed(2)}, ${F.y.toFixed(2)})`,t+12,i-5),genResult=`x = ${F.x.toFixed(3)} | Ecuaci\xF3n graficada`,document.getElementById("gen-result").textContent=genResult}else genResult="Ecuaci\xF3n graficada",document.getElementById("gen-result").textContent=genResult;o.fillStyle="#4f9cf9",o.fillRect(f,f-25,15,15),o.fillStyle="#8a97b0",o.font="10px JetBrains Mono",o.textAlign="left",o.fillText(a,f+20,f-15),o.fillStyle="#f97b4f",o.fillRect(f+150,f-25,15,15),o.fillStyle="#8a97b0",o.fillText(n,f+170,f-15),currentPlotExpr=y,currentPlotType="equation",setupCanvasInteractivity(h,y),document.getElementById("graph-controls").style.display="flex"}function genPlotInequality(y,M,v){const a=y.split(M==="<="?"<=":M===">="?">=":M);if(a.length!==2)return;const n=a[0].trim(),S=a[1].trim(),l=document.getElementById("chart-canvas-general");if(!l)return;const s=l.getContext("2d");var h=l.parentElement&&l.parentElement.clientWidth||window.innerWidth||320;const o=Math.max(h-28,200),d=250,g=40,T=o-g*2,f=d-g*2;let m=plotMinX,B=plotMaxX,E=plotMinY,R=plotMaxY;const u=400,p=[],I=[];for(let t=0;t<=u;t++){const i=parseFloat((m+(B-m)*t/u).toPrecision(10));try{const x=safeMathEval(n,{x:i}),X=safeMathEval(S,{x:i});p.push({x:i,y:isFinite(x)?x:null}),I.push({x:i,y:isFinite(X)?X:null})}catch{p.push({x:i,y:null}),I.push({x:i,y:null})}}if(!v){const t=[...p,...I].filter(i=>i.y!==null).map(i=>i.y);if(t.length>0){if(t.length>10){const x=[...t].sort((X,A)=>X-A);E=x[Math.floor(x.length*.02)],R=x[Math.ceil(x.length*.98)-1]}else E=Math.min(...t),R=Math.max(...t);const i=R-E||1;E-=i*.12,R+=i*.12}}var Y=window.devicePixelRatio||1;l.style.display="block",l.style.width=o+"px",l.style.height=d+"px",l.width=Math.round(o*Y),l.height=Math.round(d*Y),s.setTransform(1,0,0,1,0,0),s.scale(Y,Y),s.clearRect(0,0,o,d);const P=t=>g+(t-m)/(B-m)*T,w=t=>g+(R-t)/(R-E)*f;s.fillStyle="rgba(30, 32, 40, 0.8)",s.fillRect(0,0,o,d);const C=B-m,e=R-E,c=Math.pow(10,Math.floor(Math.log10(C/5))),k=Math.pow(10,Math.floor(Math.log10(e/5)));s.strokeStyle="rgba(74, 85, 112, 0.3)",s.lineWidth=.5;for(let t=Math.ceil(m/c)*c;t<=B;t+=c/2){const i=P(t);s.beginPath(),s.moveTo(i,g),s.lineTo(i,g+f),s.stroke()}for(let t=Math.ceil(E/k)*k;t<=R;t+=k/2){const i=w(t);s.beginPath(),s.moveTo(g,i),s.lineTo(g+T,i),s.stroke()}s.strokeStyle="rgba(74, 85, 112, 0.6)",s.lineWidth=1;for(let t=Math.ceil(m/c)*c;t<=B;t+=c){const i=P(t);s.beginPath(),s.moveTo(i,g),s.lineTo(i,g+f),s.stroke()}for(let t=Math.ceil(E/k)*k;t<=R;t+=k){const i=w(t);s.beginPath(),s.moveTo(g,i),s.lineTo(g+T,i),s.stroke()}if(s.strokeStyle="#8a97b0",s.lineWidth=2,E<=0&&R>=0){const t=w(0);s.beginPath(),s.moveTo(g,t),s.lineTo(g+T,t),s.stroke()}if(m<=0&&B>=0){const t=P(0);s.beginPath(),s.moveTo(t,g),s.lineTo(t,g+f),s.stroke()}const r=[];for(let t=0;t<=u;t++){const i=p[t];if(i.y!==null&&I[t].y!==null){const x=i.y-I[t].y,X=M===">"?x>0:M==="<"?x<0:M===">="?x>=0:x<=0;r.push({x:i.x,diff:x,satisfies:X,y1:i.y,y2:I[t].y})}else r.push({x:p[t]?p[t].x:i.x,diff:null,satisfies:!1,y1:null,y2:null})}let b=!1,W=0;s.fillStyle="rgba(79, 156, 249, 0.15)",s.strokeStyle="rgba(79, 156, 249, 0.3)",s.lineWidth=1;for(let t=0;t<r.length;t++)if(r[t].satisfies&&!b)b=!0,W=t;else if(!r[t].satisfies&&b){b=!1,s.beginPath(),s.moveTo(P(r[W].x),w(r[W].y1));for(let i=W;i<=t;i++)s.lineTo(P(r[i].x),w(r[i].y1));for(let i=t;i>=W;i--)s.lineTo(P(r[i].x),w(r[i].y2));s.closePath(),s.fill(),s.stroke()}if(b){s.beginPath(),s.moveTo(P(r[W].x),w(r[W].y1));for(let t=W;t<r.length;t++)s.lineTo(P(r[t].x),w(r[t].y1));for(let t=r.length-1;t>=W;t--)s.lineTo(P(r[t].x),w(r[t].y2));s.closePath(),s.fill(),s.stroke()}s.strokeStyle="#4f9cf9",s.lineWidth=2.5,s.beginPath();let F=!1;for(let t=0;t<p.length;t++){const i=p[t];if(i.y===null){F=!1;continue}const x=P(i.x),X=w(i.y);F?s.lineTo(x,X):(s.moveTo(x,X),F=!0)}s.stroke(),s.strokeStyle="#f97b4f",s.lineWidth=2.5,s.setLineDash([6,4]),s.beginPath(),F=!1;for(let t=0;t<I.length;t++){const i=I[t];if(i.y===null){F=!1;continue}const x=P(i.x),X=w(i.y);F?s.lineTo(x,X):(s.moveTo(x,X),F=!0)}s.stroke(),s.setLineDash([]),s.font="11px monospace",s.fillStyle="#4f9cf9",s.textAlign="left",s.fillText(n,g+5,g+16),s.fillStyle="#f97b4f",s.fillText(S,g+5,g+32),s.fillStyle="rgba(79, 156, 249, 0.3)",s.fillText("Regi\xF3n: "+M,g+5,g+48),currentPlotType="inequality",currentPlotExpr=y,document.getElementById("graph-controls").style.display="flex",setupCanvasInteractivity(l,y)}function genPlotParametric(y,M,v){const a=document.getElementById("chart-canvas-general");if(!a)return;const n=a.getContext("2d");var S=a.parentElement&&a.parentElement.clientWidth||window.innerWidth||320;const l=Math.max(S-28,200),s=250,h=40,o=l-h*2,d=s-h*2;let g=plotMinX,T=plotMaxX,f=plotMinY,m=plotMaxY;const B=400,E=-10,R=10,u=[],p=(r,b)=>{try{return safeMathEval(r,{t:b})}catch{return NaN}};for(let r=0;r<=B;r++){const b=E+(R-E)*r/B,W=p(y,b),F=p(M,b);isFinite(W)&&isFinite(F)&&u.push({x:W,y:F,t:b})}if(!v&&u.length>0){const r=u.map(t=>t.x),b=u.map(t=>t.y);if(u.length>10){const t=[...r].sort((x,X)=>x-X),i=[...b].sort((x,X)=>x-X);g=t[Math.floor(t.length*.02)],T=t[Math.ceil(t.length*.98)-1],f=i[Math.floor(i.length*.02)],m=i[Math.ceil(i.length*.98)-1]}else g=Math.min(...r),T=Math.max(...r),f=Math.min(...b),m=Math.max(...b);const W=T-g||1,F=m-f||1;g-=W*.1,T+=W*.1,f-=F*.1,m+=F*.1}var I=window.devicePixelRatio||1;a.style.display="block",a.style.width=l+"px",a.style.height=s+"px",a.width=Math.round(l*I),a.height=Math.round(s*I),n.setTransform(1,0,0,1,0,0),n.scale(I,I),n.clearRect(0,0,l,s);const Y=r=>h+(r-g)/(T-g)*o,P=r=>h+(m-r)/(m-f)*d;n.fillStyle="rgba(30, 32, 40, 0.8)",n.fillRect(0,0,l,s);const w=T-g,C=m-f,e=Math.pow(10,Math.floor(Math.log10(w/5))),c=Math.pow(10,Math.floor(Math.log10(C/5)));n.strokeStyle="rgba(74, 85, 112, 0.3)",n.lineWidth=.5;for(let r=Math.ceil(g/e)*e;r<=T;r+=e/2){const b=Y(r);n.beginPath(),n.moveTo(b,h),n.lineTo(b,h+d),n.stroke()}for(let r=Math.ceil(f/c)*c;r<=m;r+=c/2){const b=P(r);n.beginPath(),n.moveTo(h,b),n.lineTo(h+o,b),n.stroke()}n.strokeStyle="rgba(74, 85, 112, 0.6)",n.lineWidth=1;for(let r=Math.ceil(g/e)*e;r<=T;r+=e){const b=Y(r);n.beginPath(),n.moveTo(b,h),n.lineTo(b,h+d),n.stroke()}for(let r=Math.ceil(f/c)*c;r<=m;r+=c){const b=P(r);n.beginPath(),n.moveTo(h,b),n.lineTo(h+o,b),n.stroke()}if(n.strokeStyle="#8a97b0",n.lineWidth=2,f<=0&&m>=0){const r=P(0);n.beginPath(),n.moveTo(h,r),n.lineTo(h+o,r),n.stroke()}if(g<=0&&T>=0){const r=Y(0);n.beginPath(),n.moveTo(r,h),n.lineTo(r,h+d),n.stroke()}n.lineWidth=2.5;for(let r=1;r<u.length;r++){const b=u[r-1],W=u[r],F=(b.t-E)/(R-E),t=Math.round(79+170*F),i=Math.round(156+-33*F),x=Math.round(249+-170*F);n.strokeStyle=`rgb(${t}, ${i}, ${x})`,n.beginPath(),n.moveTo(Y(b.x),P(b.y)),n.lineTo(Y(W.x),P(W.y)),n.stroke()}if(u.length>1){const r=u[u.length-1],b=u[u.length-2],W=Y(r.x),F=P(r.y),t=Math.atan2(F-P(b.y),W-Y(b.x));n.fillStyle="#f97b4f",n.beginPath(),n.moveTo(W,F),n.lineTo(W-10*Math.cos(t-.4),F-10*Math.sin(t-.4)),n.lineTo(W-10*Math.cos(t+.4),F-10*Math.sin(t+.4)),n.closePath(),n.fill()}n.font="11px monospace";const k=u.length>0?u[Math.floor(u.length*.25)]:null;n.fillStyle="#4f9cf9",n.textAlign="left",n.fillText("x(t) = "+y,h+5,h+16),n.fillText("y(t) = "+M,h+5,h+32),k&&(n.fillStyle="#aaa",n.fillText("t\u2080 = "+formatNumber(k.t,2)+" \u2192 ("+formatNumber(k.x,2)+", "+formatNumber(k.y,2)+")",h+5,h+48)),currentPlotType="parametric",currentPlotExpr=y+", "+M,document.getElementById("graph-controls").style.display="flex",setupCanvasInteractivity(a,y+", "+M)}function resetGraphView(){if(plotMinX=-10,plotMaxX=10,plotMinY=-10,plotMaxY=10,document.getElementById("chart-canvas-general").style.display!=="none"){const y=currentPlotExpr||document.getElementById("gen-expr").textContent.replace("f(x) = ","").replace(" =","");if(currentPlotType==="inequality"){const M=y.match(/(>=|<=|>|<)/);M&&genPlotInequality(y,M[1])}else if(currentPlotType==="parametric"){const M=y.split(",").map(v=>v.trim());if(M.length===2){const v=M[0].replace(/^x\s*=\s*/,"").trim(),a=M[1].replace(/^y\s*=\s*/,"").trim();v&&a&&genPlotParametric(v,a)}}else if(y.includes(",")&&y.includes("=")){const M=y.split(",").map(v=>v.trim());M.length===2&&genPlotSystem2x2(M[0],M[1])}else y.includes("=")?genPlotEquation(y):y.includes("x")&&genPlotFunc(y)}}
+// ── Plotting state ──
+let plotMinX = -10, plotMaxX = 10;
+let plotMinY = -10, plotMaxY = 10;
+let plotDragging = false;
+let plotLastX = 0, plotLastY = 0;
+let currentPlotExpr = '';
+let currentPlotType = ''; // 'function' | 'equation' | 'system'
+
+function setDebugInfo(msg) {
+    var el = document.getElementById('graph-debug');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'graph-debug';
+        el.style.cssText = 'font-size:10px;color:#ff6b6b;background:var(--surface);border:1px solid #ff6b6b;border-radius:6px;padding:6px 10px;margin-top:6px;white-space:pre-wrap;word-break:break-all;font-family:monospace';
+        var canvas = document.getElementById('chart-canvas-general');
+        if (canvas && canvas.parentElement) canvas.parentElement.appendChild(el);
+    }
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+
+function genPlotFunc(expr, preserveView) {
+    const canvas = document.getElementById('chart-canvas-general');
+    if (!canvas) {
+        return;
+    }
+    const ctx = canvas.getContext('2d');
+    var pw = (canvas.parentElement && canvas.parentElement.clientWidth) || window.innerWidth || 320;
+    const w = Math.max(pw - 28, 200);
+    const h = 250;
+    const dpr = window.devicePixelRatio || 1;
+    const margin = 40;
+    const plotW = w - margin * 2;
+    const plotH = h - margin * 2;
+    let minX = plotMinX, maxX = plotMaxX;
+    let minY = plotMinY, maxY = plotMaxY;
+    
+    // Calcular puntos de la función
+    const points = [];
+    const steps = 400;
+    for (let i = 0; i <= steps; i++) {
+        const x = minX + (maxX - minX) * i / steps;
+        try {
+            const y = safeMathEval(expr, { x });
+            if (isFinite(y)) points.push({ x, y });
+            else points.push({ x, y: null });
+        } catch(e) { points.push({ x, y: null }); if (i === 0) setDebugInfo('Error en x=' + x + ': ' + (e.message || e)); }
+    }
+    
+    // Ajustar rango Y basado en los puntos (con recorte de outliers)
+    const allY = points.filter(p => p.y !== null).map(p => p.y);
+    if (preserveView) {
+        minY = plotMinY;
+        maxY = plotMaxY;
+    } else if (allY.length > 0) {
+        const sorted = [...allY].sort((a, b) => a - b);
+        const t0 = Math.floor(sorted.length * 0.02);
+        const t1 = Math.ceil(sorted.length * 0.98);
+        minY = sorted[t0];
+        maxY = sorted[t1 - 1];
+        const range = maxY - minY || 1;
+        minY -= range * 0.12;
+        maxY += range * 0.12;
+        plotMinY = minY;
+        plotMaxY = maxY;
+    }
+    
+    canvas.style.display = 'block';
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+    
+    // Funciones de conversión
+    const toCanvasX = (x) => margin + (x - minX) / (maxX - minX) * plotW;
+    const toCanvasY = (y) => margin + (maxY - y) / (maxY - minY) * plotH;
+    
+    // Dibujar fondo
+    ctx.fillStyle = 'rgba(30, 32, 40, 0.8)';
+    ctx.fillRect(0, 0, w, h);
+    
+    // Calcular paso para la grilla (1, 2, 5, 10, etc.)
+    const xRange = maxX - minX;
+    const yRange = maxY - minY;
+    const xStep = Math.pow(10, Math.floor(Math.log10(xRange / 5)));
+    const yStep = Math.pow(10, Math.floor(Math.log10(yRange / 5)));
+    
+    // Dibujar grilla menor
+    ctx.strokeStyle = 'rgba(74, 85, 112, 0.3)';
+    ctx.lineWidth = 0.5;
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep / 2) {
+        const cx = toCanvasX(x);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep / 2) {
+        const cy = toCanvasY(y);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    
+    // Dibujar grilla principal
+    ctx.strokeStyle = 'rgba(74, 85, 112, 0.6)';
+    ctx.lineWidth = 1;
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
+        const cx = toCanvasX(x);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
+        const cy = toCanvasY(y);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    
+    // Dibujar ejes principales
+    ctx.strokeStyle = '#8a97b0';
+    ctx.lineWidth = 2;
+    // Eje X (en y=0)
+    if (minY <= 0 && maxY >= 0) {
+        const cy = toCanvasY(0);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    // Eje Y (en x=0)
+    if (minX <= 0 && maxX >= 0) {
+        const cx = toCanvasX(0);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    
+    // Dibujar números en los ejes
+    ctx.fillStyle = '#8a97b0';
+    ctx.font = '10px JetBrains Mono';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
+        if (Math.abs(x) < 0.001) continue; // Saltar el origen
+        const cx = toCanvasX(x);
+        const cy = minY <= 0 && maxY >= 0 ? toCanvasY(0) : margin + plotH;
+        ctx.fillText(parseFloat(x.toPrecision(3)).toString(), cx, cy + 5);
+    }
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
+        if (Math.abs(y) < 0.001) continue; // Saltar el origen
+        const cy = toCanvasY(y);
+        const cx = minX <= 0 && maxX >= 0 ? toCanvasX(0) : margin;
+        ctx.fillText(parseFloat(y.toPrecision(3)).toString(), cx - 5, cy);
+    }
+    
+    // Dibujar origen
+    if (minX <= 0 && maxX >= 0 && minY <= 0 && maxY >= 0) {
+        ctx.fillText('0', toCanvasX(0) - 5, toCanvasY(0) + 5);
+    }
+    
+    // Dibujar etiquetas de ejes
+    ctx.fillStyle = '#4f9cf9';
+    ctx.font = 'bold 12px JetBrains Mono';
+    ctx.textAlign = 'right';
+    ctx.fillText('x', w - margin, toCanvasY(0) - 10);
+    ctx.textAlign = 'left';
+    ctx.fillText('y', toCanvasX(0) + 10, margin + 10);
+    
+    // Dibujar la función
+    ctx.strokeStyle = '#4f9cf9';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    let started = false;
+    for (const p of points) {
+        if (p.y === null) { started = false; continue; }
+        const cx = toCanvasX(p.x), cy = toCanvasY(p.y);
+        if (!started) { ctx.moveTo(cx, cy); started = true; }
+        else ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+    
+    // Setup event listeners for zoom and pan
+    currentPlotExpr = expr;
+    currentPlotType = 'function';
+    setupCanvasInteractivity(canvas, expr);
+    
+    // Mostrar controles
+    document.getElementById('graph-controls').style.display = 'flex';
+}
+
+function setupCanvasInteractivity(canvas, expr) {
+    // Remove existing listeners to avoid duplicates
+    canvas.onwheel = null;
+    canvas.onmousedown = null;
+    canvas.onmousemove = null;
+    canvas.onmouseup = null;
+    canvas.onmouseleave = null;
+    
+    // Zoom with mouse wheel
+    canvas.onwheel = (e) => {
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const margin = 40;
+        const plotW = w - margin * 2;
+        const plotH = h - margin * 2;
+        
+        // Convert mouse position to graph coordinates
+        const graphX = plotMinX + (mouseX - margin) / plotW * (plotMaxX - plotMinX);
+        const graphY = plotMaxY - (mouseY - margin) / plotH * (plotMaxY - plotMinY);
+        
+        // Zoom factor
+        const zoomFactor = e.deltaY > 0 ? 1.1 : 0.9;
+        
+        // Calculate new ranges keeping mouse point fixed
+        const newRangeX = (plotMaxX - plotMinX) * zoomFactor;
+        const newRangeY = (plotMaxY - plotMinY) * zoomFactor;
+        
+        plotMinX = graphX - (graphX - plotMinX) * zoomFactor;
+        plotMaxX = plotMinX + newRangeX;
+        plotMinY = graphY - (graphY - plotMinY) * zoomFactor;
+        plotMaxY = plotMinY + newRangeY;
+        
+        // Redibujar según el tipo de gráfico actual
+        redrawCurrentPlot(true);
+    };
+    
+    // Pan with mouse drag
+    canvas.onmousedown = (e) => {
+        plotDragging = true;
+        plotLastX = e.clientX;
+        plotLastY = e.clientY;
+        canvas.style.cursor = 'grabbing';
+    };
+    
+    canvas.onmousemove = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const margin = 40;
+        const plotW = w - margin * 2;
+        const plotH = h - margin * 2;
+        
+        // Update coordinates display
+        if (mouseX >= margin && mouseX <= w - margin && mouseY >= margin && mouseY <= h - margin) {
+            const graphX = plotMinX + (mouseX - margin) / plotW * (plotMaxX - plotMinX);
+            const graphY = plotMaxY - (mouseY - margin) / plotH * (plotMaxY - plotMinY);
+            document.getElementById('graph-coords').textContent = 
+                `x: ${graphX.toFixed(2)}, y: ${graphY.toFixed(2)}`;
+        }
+        
+        if (!plotDragging) return;
+        
+        const dx = e.clientX - plotLastX;
+        const dy = e.clientY - plotLastY;
+        
+        // Convert pixel movement to graph coordinates
+        const graphDx = -dx / plotW * (plotMaxX - plotMinX);
+        const graphDy = dy / plotH * (plotMaxY - plotMinY);
+        
+        plotMinX += graphDx;
+        plotMaxX += graphDx;
+        plotMinY += graphDy;
+        plotMaxY += graphDy;
+        
+        plotLastX = e.clientX;
+        plotLastY = e.clientY;
+        
+        // Redibujar según el tipo de gráfico actual
+        redrawCurrentPlot(true);
+    };
+    
+    canvas.onmouseup = () => {
+        plotDragging = false;
+        canvas.style.cursor = 'default';
+    };
+    
+    canvas.onmouseleave = () => {
+        plotDragging = false;
+        canvas.style.cursor = 'default';
+    };
+    
+    // Touch support for mobile (merged single-finger pan + two-finger pinch)
+    let lastPinchDist = 0;
+    let touchPanning = false;
+    canvas.ontouchstart = (e) => {
+        if (e.touches.length === 1) {
+            touchPanning = true;
+            plotDragging = true;
+            plotLastX = e.touches[0].clientX;
+            plotLastY = e.touches[0].clientY;
+        } else if (e.touches.length === 2) {
+            touchPanning = false;
+            lastPinchDist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+        }
+    };
+    
+    canvas.ontouchmove = (e) => {
+        if (e.touches.length === 1 && touchPanning) {
+            e.preventDefault();
+            const dx = e.touches[0].clientX - plotLastX;
+            const dy = e.touches[0].clientY - plotLastY;
+            
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            const margin = 40;
+            const plotW = w - margin * 2;
+            const plotH = h - margin * 2;
+            
+            const graphDx = -dx / plotW * (plotMaxX - plotMinX);
+            const graphDy = dy / plotH * (plotMaxY - plotMinY);
+            
+            plotMinX += graphDx;
+            plotMaxX += graphDx;
+            plotMinY += graphDy;
+            plotMaxY += graphDy;
+            
+            plotLastX = e.touches[0].clientX;
+            plotLastY = e.touches[0].clientY;
+            
+            redrawCurrentPlot(true);
+        } else if (e.touches.length === 2) {
+            e.preventDefault();
+            const dist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            
+            if (lastPinchDist > 0) {
+                const zoomFactor = lastPinchDist / dist;
+                const centerX = (plotMinX + plotMaxX) / 2;
+                const centerY = (plotMinY + plotMaxY) / 2;
+                
+                const newRangeX = (plotMaxX - plotMinX) * zoomFactor;
+                const newRangeY = (plotMaxY - plotMinY) * zoomFactor;
+                
+                plotMinX = centerX - newRangeX / 2;
+                plotMaxX = centerX + newRangeX / 2;
+                plotMinY = centerY - newRangeY / 2;
+                plotMaxY = centerY + newRangeY / 2;
+                
+                redrawCurrentPlot(true);
+            }
+            
+            lastPinchDist = dist;
+        }
+    };
+    
+    canvas.ontouchend = () => {
+        plotDragging = false;
+        touchPanning = false;
+        lastPinchDist = 0;
+    };
+}
+
+function redrawCurrentPlot(preserveView) {
+    if (currentPlotType === 'equation') {
+        genPlotEquation(currentPlotExpr, preserveView);
+    } else if (currentPlotType === 'system') {
+        const eqs = currentPlotExpr.split(',').map(s => s.trim());
+        if (eqs.length === 2) genPlotSystem2x2(eqs[0], eqs[1], preserveView);
+    } else if (currentPlotType === 'inequality') {
+        const ineqMatch = currentPlotExpr.match(/(>=|<=|>|<)/);
+        if (ineqMatch) genPlotInequality(currentPlotExpr, ineqMatch[1], preserveView);
+    } else if (currentPlotType === 'parametric') {
+        const parts = currentPlotExpr.split(',').map(s => s.trim());
+        if (parts.length === 2) {
+            const xE = parts[0].replace(/^x\s*=\s*/, '').trim();
+            const yE = parts[1].replace(/^y\s*=\s*/, '').trim();
+            if (xE && yE) genPlotParametric(xE, yE, preserveView);
+        }
+    } else {
+        genPlotFunc(currentPlotExpr, preserveView);
+    }
+}
+
+function genPlotSystem2x2(eq1, eq2, preserveView) {
+    const p1 = parseLinearEq(eq1);
+    const p2 = parseLinearEq(eq2);
+    if (!p1 || !p2) return;
+    
+    const canvas = document.getElementById('chart-canvas-general');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    var pw = (canvas.parentElement && canvas.parentElement.clientWidth) || window.innerWidth || 320;
+    const w = Math.max(pw - 28, 200);
+    const h = 250;
+    const margin = 40;
+    const plotW = w - margin * 2;
+    const plotH = h - margin * 2;
+    
+    // Compute points: y = (c - a*x) / b for each equation
+    const points1 = [], points2 = [];
+    const steps = 400;
+    for (let i = 0; i <= steps; i++) {
+        const x = plotMinX + (plotMaxX - plotMinX) * i / steps;
+        const y1 = p1.b !== 0 ? (p1.c - p1.a * x) / p1.b : NaN;
+        const y2 = p2.b !== 0 ? (p2.c - p2.a * x) / p2.b : NaN;
+        if (isFinite(y1)) points1.push({ x, y: y1 });
+        if (isFinite(y2)) points2.push({ x, y: y2 });
+    }
+    
+    // Handle vertical lines (b=0): x = c/a, swap x<->y roles
+    const genVerticalPoints = (p) => {
+        const pts = [];
+        const vx = p.c / p.a;
+        if (!isFinite(vx)) return pts;
+        const yRange = plotMaxY - plotMinY || 1;
+        for (let i = 0; i <= steps; i++) {
+            const y = plotMinY + yRange * i / steps;
+            pts.push({ x: vx, y });
+        }
+        return pts;
+    };
+    if (p1.b === 0 && p1.a !== 0) {
+        points1.length = 0;
+        points1.push(...genVerticalPoints(p1));
+    }
+    if (p2.b === 0 && p2.a !== 0) {
+        points2.length = 0;
+        points2.push(...genVerticalPoints(p2));
+    }
+    
+    if (!preserveView) {
+        const allY = [...points1, ...points2].filter(p => isFinite(p.y)).map(p => p.y);
+        if (allY.length > 0) {
+            let minY = Math.min(...allY), maxY = Math.max(...allY);
+            const range = maxY - minY || 1;
+            minY -= range * 0.1; maxY += range * 0.1;
+            plotMinY = minY; plotMaxY = maxY;
+        }
+    }
+    
+    var dpr = window.devicePixelRatio || 1;
+    canvas.style.display = 'block';
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+    
+    const toX = (x) => margin + (x - plotMinX) / (plotMaxX - plotMinX) * plotW;
+    const toY = (y) => margin + (plotMaxY - y) / (plotMaxY - plotMinY) * plotH;
+    
+    ctx.fillStyle = 'rgba(30, 32, 40, 0.8)';
+    ctx.fillRect(0, 0, w, h);
+    
+    // Calcular paso para la grilla
+    const xRange = plotMaxX - plotMinX;
+    const yRange = plotMaxY - plotMinY;
+    const xStep = Math.pow(10, Math.floor(Math.log10(xRange / 5)));
+    const yStep = Math.pow(10, Math.floor(Math.log10(yRange / 5)));
+    
+    // Grilla menor
+    ctx.strokeStyle = 'rgba(74, 85, 112, 0.3)';
+    ctx.lineWidth = 0.5;
+    for (let x = Math.ceil(plotMinX / xStep) * xStep; x <= plotMaxX; x += xStep / 2) {
+        const cx = toX(x);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    for (let y = Math.ceil(plotMinY / yStep) * yStep; y <= plotMaxY; y += yStep / 2) {
+        const cy = toY(y);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    
+    // Grilla principal
+    ctx.strokeStyle = 'rgba(74, 85, 112, 0.6)';
+    ctx.lineWidth = 1;
+    for (let x = Math.ceil(plotMinX / xStep) * xStep; x <= plotMaxX; x += xStep) {
+        const cx = toX(x);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    for (let y = Math.ceil(plotMinY / yStep) * yStep; y <= plotMaxY; y += yStep) {
+        const cy = toY(y);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    
+    // Ejes principales
+    ctx.strokeStyle = '#8a97b0';
+    ctx.lineWidth = 2;
+    if (plotMinY <= 0 && plotMaxY >= 0) {
+        const cy = toY(0);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    if (plotMinX <= 0 && plotMaxX >= 0) {
+        const cx = toX(0);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    
+    // Números en los ejes
+    ctx.fillStyle = '#8a97b0';
+    ctx.font = '10px JetBrains Mono';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let x = Math.ceil(plotMinX / xStep) * xStep; x <= plotMaxX; x += xStep) {
+        if (Math.abs(x) < 0.001) continue;
+        ctx.fillText(parseFloat(x.toPrecision(3)).toString(), toX(x), (plotMinY <= 0 && plotMaxY >= 0 ? toY(0) : margin + plotH) + 5);
+    }
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let y = Math.ceil(plotMinY / yStep) * yStep; y <= plotMaxY; y += yStep) {
+        if (Math.abs(y) < 0.001) continue;
+        ctx.fillText(parseFloat(y.toPrecision(3)).toString(), (plotMinX <= 0 && plotMaxX >= 0 ? toX(0) : margin) - 5, toY(y));
+    }
+    if (plotMinX <= 0 && plotMaxX >= 0 && plotMinY <= 0 && plotMaxY >= 0) {
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'top';
+        ctx.fillText('0', toX(0) - 5, toY(0) + 5);
+    }
+    
+    // Etiquetas de ejes
+    ctx.fillStyle = '#4f9cf9';
+    ctx.font = 'bold 12px JetBrains Mono';
+    ctx.textAlign = 'right';
+    ctx.fillText('x', margin + plotW, (plotMinY <= 0 && plotMaxY >= 0 ? toY(0) : margin + plotH) - 10);
+    ctx.textAlign = 'left';
+    ctx.fillText('y', (plotMinX <= 0 && plotMaxX >= 0 ? toX(0) : margin) + 10, margin + 10);
+    
+    // Plot line 1
+    if (points1.length > 1) {
+        ctx.strokeStyle = '#4f9cf9';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        let started = false;
+        for (const p of points1) {
+            if (!started) { ctx.moveTo(toX(p.x), toY(p.y)); started = true; }
+            else ctx.lineTo(toX(p.x), toY(p.y));
+        }
+        ctx.stroke();
+        ctx.fillStyle = '#4f9cf9';
+        ctx.font = '11px monospace';
+        ctx.fillText('①', toX(0) + 30, toY(1)+2);
+    }
+    
+    // Plot line 2
+    if (points2.length > 1) {
+        ctx.strokeStyle = '#f9c74f';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        let started = false;
+        for (const p of points2) {
+            if (!started) { ctx.moveTo(toX(p.x), toY(p.y)); started = true; }
+            else ctx.lineTo(toX(p.x), toY(p.y));
+        }
+        ctx.stroke();
+        ctx.fillStyle = '#f9c74f';
+        ctx.font = '11px monospace';
+        ctx.fillText('②', toX(0) + 30, toY(-1)+18);
+    }
+    
+    // Mark intersection
+    const det = p1.a * p2.b - p2.a * p1.b;
+    if (Math.abs(det) >= 1e-12) {
+        const xS = (p1.c * p2.b - p2.c * p1.b) / det;
+        const yS = (p1.a * p2.c - p2.a * p1.c) / det;
+        const cx = toX(xS), cy = toY(yS);
+        ctx.beginPath();
+        ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(79, 252, 124, 0.5)';
+        ctx.fill();
+        ctx.strokeStyle = '#4ffc7c';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = '#4ffc7c';
+        ctx.font = 'bold 11px monospace';
+        ctx.fillText(`(${xS.toFixed(2)}, ${yS.toFixed(2)})`, cx + 10, cy - 5);
+    }
+    
+    // Setup interactivity
+    currentPlotExpr = eq1 + ', ' + eq2;
+    currentPlotType = 'system';
+    setupCanvasInteractivity(canvas, currentPlotExpr);
+    
+    // Mostrar controles
+    document.getElementById('graph-controls').style.display = 'flex';
+}
+
+function genPlotEquation(equation, preserveView) {
+    // Separar la ecuación en izquierda y derecha
+    const parts = equation.split('=');
+    if (parts.length !== 2) {
+        return;
+    }
+    
+    const leftExpr = parts[0].trim();
+    const rightExpr = parts[1].trim();
+    
+    // Wrap negative-only expressions so safeMathEval's tokenizer doesn't choke on unary minus
+    const wrap = (s) => /^-\d+(\.\d+)?$/.test(s) ? '(' + s + ')' : s;
+    const leftWrapped = wrap(leftExpr);
+    const rightWrapped = wrap(rightExpr);
+    
+    const canvas = document.getElementById('chart-canvas-general');
+    if (!canvas) {
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    var pw = (canvas.parentElement && canvas.parentElement.clientWidth) || window.innerWidth || 320;
+    const w = Math.max(pw - 28, 200);
+    const h = 250;
+    const margin = 40;
+    const plotW = w - margin * 2;
+    const plotH = h - margin * 2;
+    let minX = plotMinX, maxX = plotMaxX;
+    let minY = plotMinY, maxY = plotMaxY;
+    
+    // Calcular puntos para ambas funciones
+    const leftPoints = [];
+    const rightPoints = [];
+    const steps = 400;
+    
+    for (let i = 0; i <= steps; i++) {
+        const x = parseFloat((minX + (maxX - minX) * i / steps).toPrecision(10));
+        try {
+            const y1 = safeMathEval(leftWrapped, { x });
+            const y2 = safeMathEval(rightWrapped, { x });
+            if (isFinite(y1)) leftPoints.push({ x, y: y1 });
+            else leftPoints.push({ x, y: null });
+            if (isFinite(y2)) rightPoints.push({ x, y: y2 });
+            else rightPoints.push({ x, y: null });
+        } catch(e) {
+            leftPoints.push({ x, y: null });
+            rightPoints.push({ x, y: null });
+            if (i === 0) setDebugInfo('Error eq x=' + x + ': ' + (e.message || e));
+        }
+    }
+    
+    // Ajustar rango Y basado en todos los puntos (con recorte de outliers)
+    if (!preserveView) {
+        const allY = [...leftPoints, ...rightPoints].filter(p => p.y !== null).map(p => p.y);
+        if (allY.length > 0) {
+            if (allY.length > 10) {
+                const sorted = [...allY].sort((a, b) => a - b);
+                const trimStart = Math.floor(sorted.length * 0.05);
+                const trimEnd = Math.ceil(sorted.length * 0.95);
+                minY = sorted[trimStart];
+                maxY = sorted[trimEnd - 1];
+            } else {
+                minY = Math.min(...allY);
+                maxY = Math.max(...allY);
+            }
+            const range = maxY - minY || 1;
+            minY -= range * 0.1;
+            maxY += range * 0.1;
+        }
+    }
+    
+    var dpr = window.devicePixelRatio || 1;
+    canvas.style.display = 'block';
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+    
+    const toCanvasX = (x) => margin + (x - minX) / (maxX - minX) * plotW;
+    const toCanvasY = (y) => margin + (maxY - y) / (maxY - minY) * plotH;
+    
+    // Fondo
+    ctx.fillStyle = 'rgba(30, 32, 40, 0.8)';
+    ctx.fillRect(0, 0, w, h);
+    
+    // Grilla
+    const xRange = maxX - minX;
+    const yRange = maxY - minY;
+    const xStep = Math.pow(10, Math.floor(Math.log10(xRange / 5)));
+    const yStep = Math.pow(10, Math.floor(Math.log10(yRange / 5)));
+    
+    ctx.strokeStyle = 'rgba(74, 85, 112, 0.3)';
+    ctx.lineWidth = 0.5;
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep / 2) {
+        const cx = toCanvasX(x);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep / 2) {
+        const cy = toCanvasY(y);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    
+    ctx.strokeStyle = 'rgba(74, 85, 112, 0.6)';
+    ctx.lineWidth = 1;
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
+        const cx = toCanvasX(x);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
+        const cy = toCanvasY(y);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    
+    // Ejes
+    ctx.strokeStyle = '#8a97b0';
+    ctx.lineWidth = 2;
+    if (minY <= 0 && maxY >= 0) {
+        const cy = toCanvasY(0);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    if (minX <= 0 && maxX >= 0) {
+        const cx = toCanvasX(0);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    
+    // Números
+    ctx.fillStyle = '#8a97b0';
+    ctx.font = '10px JetBrains Mono';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
+        if (Math.abs(x) < 0.001) continue;
+        const cx = toCanvasX(x);
+        const cy = minY <= 0 && maxY >= 0 ? toCanvasY(0) : margin + plotH;
+        ctx.fillText(parseFloat(x.toPrecision(3)).toString(), cx, cy + 5);
+    }
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
+        if (Math.abs(y) < 0.001) continue;
+        const cy = toCanvasY(y);
+        const cx = minX <= 0 && maxX >= 0 ? toCanvasX(0) : margin;
+        ctx.fillText(parseFloat(y.toPrecision(3)).toString(), cx - 5, cy);
+    }
+    
+    // Etiquetas
+    ctx.fillStyle = '#4f9cf9';
+    ctx.font = 'bold 12px JetBrains Mono';
+    ctx.textAlign = 'right';
+    ctx.fillText('x', w - margin, toCanvasY(0) - 10);
+    ctx.textAlign = 'left';
+    ctx.fillText('y', toCanvasX(0) + 10, margin + 10);
+    
+    // Graficar función izquierda (azul)
+    ctx.strokeStyle = '#4f9cf9';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    let started = false;
+    for (const p of leftPoints) {
+        if (p.y === null) { started = false; continue; }
+        const cx = toCanvasX(p.x), cy = toCanvasY(p.y);
+        if (!started) { ctx.moveTo(cx, cy); started = true; }
+        else ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+    
+    // Graficar función derecha (naranja)
+    ctx.strokeStyle = '#f97b4f';
+    ctx.beginPath();
+    started = false;
+    for (const p of rightPoints) {
+        if (p.y === null) { started = false; continue; }
+        const cx = toCanvasX(p.x), cy = toCanvasY(p.y);
+        if (!started) { ctx.moveTo(cx, cy); started = true; }
+        else ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+    
+    // Encontrar intersección
+    let intersection = null;
+    for (let i = 0; i < leftPoints.length - 1; i++) {
+        const p1 = leftPoints[i];
+        const p2 = leftPoints[i + 1];
+        const q1 = rightPoints[i];
+        const q2 = rightPoints[i + 1];
+        
+        if (p1.y !== null && p2.y !== null && q1.y !== null && q2.y !== null) {
+            // Verificar si hay cruce
+            if ((p1.y - q1.y) * (p2.y - q2.y) <= 0) {
+                // Interpolación lineal para encontrar el punto exacto
+                const denom = (p2.y - p1.y) - (q2.y - q1.y);
+                if (Math.abs(denom) < 1e-12) continue;
+                const t = (q1.y - p1.y) / denom;
+                const interX = p1.x + t * (p2.x - p1.x);
+                const interY = p1.y + t * (p2.y - p1.y);
+                intersection = { x: interX, y: interY };
+                break;
+            }
+        }
+    }
+    
+    // Dibujar punto de intersección
+    if (intersection) {
+        const cx = toCanvasX(intersection.x);
+        const cy = toCanvasY(intersection.y);
+        
+        // Círculo
+        ctx.fillStyle = '#4ff97b';
+        ctx.beginPath();
+        ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Etiqueta de coordenadas
+        ctx.fillStyle = '#4ff97b';
+        ctx.font = 'bold 11px JetBrains Mono';
+        ctx.textAlign = 'left';
+        ctx.fillText(`(${intersection.x.toFixed(2)}, ${intersection.y.toFixed(2)})`, cx + 12, cy - 5);
+        
+        // Agregar al resultado
+        genResult = `x = ${intersection.x.toFixed(3)} | Ecuación graficada`;
+        document.getElementById('gen-result').textContent = genResult;
+    } else {
+        // Si no hay intersección, mostrar mensaje
+        genResult = 'Ecuación graficada';
+        document.getElementById('gen-result').textContent = genResult;
+    }
+    
+    // Leyenda
+    ctx.fillStyle = '#4f9cf9';
+    ctx.fillRect(margin, margin - 25, 15, 15);
+    ctx.fillStyle = '#8a97b0';
+    ctx.font = '10px JetBrains Mono';
+    ctx.textAlign = 'left';
+    ctx.fillText(leftExpr, margin + 20, margin - 15);
+    
+    ctx.fillStyle = '#f97b4f';
+    ctx.fillRect(margin + 150, margin - 25, 15, 15);
+    ctx.fillStyle = '#8a97b0';
+    ctx.fillText(rightExpr, margin + 170, margin - 15);
+    
+    // Setup interactivity
+    currentPlotExpr = equation;
+    currentPlotType = 'equation';
+    setupCanvasInteractivity(canvas, equation);
+    
+    // Mostrar controles
+    document.getElementById('graph-controls').style.display = 'flex';
+}
+
+function genPlotInequality(equation, op, preserveView) {
+    // Desigualdad: graficar LHS y RHS como curvas, sombrear región
+    const parts = equation.split(op === '<=' ? '<=' : op === '>=' ? '>=' : op);
+    if (parts.length !== 2) return;
+    const leftExpr = parts[0].trim();
+    const rightExpr = parts[1].trim();
+    const canvas = document.getElementById('chart-canvas-general');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    var pw = (canvas.parentElement && canvas.parentElement.clientWidth) || window.innerWidth || 320;
+    const w = Math.max(pw - 28, 200);
+    const h = 250;
+    const margin = 40;
+    const plotW = w - margin * 2;
+    const plotH = h - margin * 2;
+    let minX = plotMinX, maxX = plotMaxX;
+    let minY = plotMinY, maxY = plotMaxY;
+    const steps = 400;
+    const leftPoints = [];
+    const rightPoints = [];
+    for (let i = 0; i <= steps; i++) {
+        const x = parseFloat((minX + (maxX - minX) * i / steps).toPrecision(10));
+        try {
+            const y1 = safeMathEval(leftExpr, { x });
+            const y2 = safeMathEval(rightExpr, { x });
+            leftPoints.push({ x, y: isFinite(y1) ? y1 : null });
+            rightPoints.push({ x, y: isFinite(y2) ? y2 : null });
+        } catch(e) {
+            leftPoints.push({ x, y: null });
+            rightPoints.push({ x, y: null });
+        }
+    }
+    // Auto Y range
+    if (!preserveView) {
+        const allY = [...leftPoints, ...rightPoints].filter(p => p.y !== null).map(p => p.y);
+        if (allY.length > 0) {
+            if (allY.length > 10) {
+                const sorted = [...allY].sort((a, b) => a - b);
+                minY = sorted[Math.floor(sorted.length * 0.02)];
+                maxY = sorted[Math.ceil(sorted.length * 0.98) - 1];
+            } else {
+                minY = Math.min(...allY);
+                maxY = Math.max(...allY);
+            }
+            const range = maxY - minY || 1;
+            minY -= range * 0.12;
+            maxY += range * 0.12;
+        }
+    }
+    var dpr = window.devicePixelRatio || 1;
+    canvas.style.display = 'block';
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+    const toCanvasX = (x) => margin + (x - minX) / (maxX - minX) * plotW;
+    const toCanvasY = (y) => margin + (maxY - y) / (maxY - minY) * plotH;
+    
+    // Background
+    ctx.fillStyle = 'rgba(30, 32, 40, 0.8)';
+    ctx.fillRect(0, 0, w, h);
+    
+    // Grid
+    const xRange = maxX - minX;
+    const yRange = maxY - minY;
+    const xStep = Math.pow(10, Math.floor(Math.log10(xRange / 5)));
+    const yStep = Math.pow(10, Math.floor(Math.log10(yRange / 5)));
+    ctx.strokeStyle = 'rgba(74, 85, 112, 0.3)';
+    ctx.lineWidth = 0.5;
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep / 2) {
+        const cx = toCanvasX(x);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep / 2) {
+        const cy = toCanvasY(y);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    ctx.strokeStyle = 'rgba(74, 85, 112, 0.6)';
+    ctx.lineWidth = 1;
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
+        const cx = toCanvasX(x);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
+        const cy = toCanvasY(y);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    
+    // Axes
+    ctx.strokeStyle = '#8a97b0';
+    ctx.lineWidth = 2;
+    if (minY <= 0 && maxY >= 0) {
+        const cy = toCanvasY(0);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    if (minX <= 0 && maxX >= 0) {
+        const cx = toCanvasX(0);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    
+    // Shade inequality region
+    const diffPoints = [];
+    for (let i = 0; i <= steps; i++) {
+        const pt = leftPoints[i];
+        if (pt.y !== null && rightPoints[i].y !== null) {
+            const diff = pt.y - rightPoints[i].y;
+            const satisfies = op === '>' ? diff > 0 : op === '<' ? diff < 0 : op === '>=' ? diff >= 0 : diff <= 0;
+            diffPoints.push({ x: pt.x, diff, satisfies, y1: pt.y, y2: rightPoints[i].y });
+        } else {
+            diffPoints.push({ x: leftPoints[i] ? leftPoints[i].x : pt.x, diff: null, satisfies: false, y1: null, y2: null });
+        }
+    }
+    
+    // Find satisfies segments and shade them
+    let shading = false;
+    let segStart = 0;
+    ctx.fillStyle = 'rgba(79, 156, 249, 0.15)';
+    ctx.strokeStyle = 'rgba(79, 156, 249, 0.3)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < diffPoints.length; i++) {
+        if (diffPoints[i].satisfies && !shading) {
+            shading = true;
+            segStart = i;
+        } else if (!diffPoints[i].satisfies && shading) {
+            shading = false;
+            // Shade segment segStart to i
+            ctx.beginPath();
+            ctx.moveTo(toCanvasX(diffPoints[segStart].x), toCanvasY(diffPoints[segStart].y1));
+            for (let j = segStart; j <= i; j++) {
+                ctx.lineTo(toCanvasX(diffPoints[j].x), toCanvasY(diffPoints[j].y1));
+            }
+            for (let j = i; j >= segStart; j--) {
+                ctx.lineTo(toCanvasX(diffPoints[j].x), toCanvasY(diffPoints[j].y2));
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+    }
+    if (shading) {
+        ctx.beginPath();
+        ctx.moveTo(toCanvasX(diffPoints[segStart].x), toCanvasY(diffPoints[segStart].y1));
+        for (let j = segStart; j < diffPoints.length; j++) {
+            ctx.lineTo(toCanvasX(diffPoints[j].x), toCanvasY(diffPoints[j].y1));
+        }
+        for (let j = diffPoints.length - 1; j >= segStart; j--) {
+            ctx.lineTo(toCanvasX(diffPoints[j].x), toCanvasY(diffPoints[j].y2));
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+    
+    // Draw LHS curve (solid)
+    ctx.strokeStyle = '#4f9cf9';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    let started = false;
+    for (let i = 0; i < leftPoints.length; i++) {
+        const p = leftPoints[i];
+        if (p.y === null) { started = false; continue; }
+        const cx = toCanvasX(p.x), cy = toCanvasY(p.y);
+        if (!started) { ctx.moveTo(cx, cy); started = true; }
+        else ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+    
+    // Draw RHS curve (dashed)
+    ctx.strokeStyle = '#f97b4f';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    started = false;
+    for (let i = 0; i < rightPoints.length; i++) {
+        const p = rightPoints[i];
+        if (p.y === null) { started = false; continue; }
+        const cx = toCanvasX(p.x), cy = toCanvasY(p.y);
+        if (!started) { ctx.moveTo(cx, cy); started = true; }
+        else ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    // Legend
+    ctx.font = '11px monospace';
+    ctx.fillStyle = '#4f9cf9';
+    ctx.textAlign = 'left';
+    ctx.fillText(leftExpr, margin + 5, margin + 16);
+    ctx.fillStyle = '#f97b4f';
+    ctx.fillText(rightExpr, margin + 5, margin + 32);
+    ctx.fillStyle = 'rgba(79, 156, 249, 0.3)';
+    ctx.fillText('Región: ' + op, margin + 5, margin + 48);
+    
+    currentPlotType = 'inequality';
+    currentPlotExpr = equation;
+    document.getElementById('graph-controls').style.display = 'flex';
+    setupCanvasInteractivity(canvas, equation);
+}
+
+function genPlotParametric(xExpr, yExpr, preserveView) {
+    // Curva paramétrica: x = f(t), y = g(t) para t ∈ [-10, 10]
+    const canvas = document.getElementById('chart-canvas-general');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    var pw = (canvas.parentElement && canvas.parentElement.clientWidth) || window.innerWidth || 320;
+    const w = Math.max(pw - 28, 200);
+    const h = 250;
+    const margin = 40;
+    const plotW = w - margin * 2;
+    const plotH = h - margin * 2;
+    let minX = plotMinX, maxX = plotMaxX;
+    let minY = plotMinY, maxY = plotMaxY;
+    const steps = 400;
+    const tMin = -10, tMax = 10;
+    const points = [];
+    const evalT = (expr, t) => {
+        try { return safeMathEval(expr, { t }); } catch(e) { return NaN; }
+    };
+    for (let i = 0; i <= steps; i++) {
+        const t = tMin + (tMax - tMin) * i / steps;
+        const x = evalT(xExpr, t);
+        const y = evalT(yExpr, t);
+        if (isFinite(x) && isFinite(y)) points.push({ x, y, t });
+    }
+    // Auto range
+    if (!preserveView && points.length > 0) {
+        const xs = points.map(p => p.x), ys = points.map(p => p.y);
+        if (points.length > 10) {
+            const sx = [...xs].sort((a, b) => a - b), sy = [...ys].sort((a, b) => a - b);
+            minX = sx[Math.floor(sx.length * 0.02)];
+            maxX = sx[Math.ceil(sx.length * 0.98) - 1];
+            minY = sy[Math.floor(sy.length * 0.02)];
+            maxY = sy[Math.ceil(sy.length * 0.98) - 1];
+        } else {
+            minX = Math.min(...xs); maxX = Math.max(...xs);
+            minY = Math.min(...ys); maxY = Math.max(...ys);
+        }
+        const rx = maxX - minX || 1, ry = maxY - minY || 1;
+        minX -= rx * 0.1; maxX += rx * 0.1;
+        minY -= ry * 0.1; maxY += ry * 0.1;
+    }
+    var dpr = window.devicePixelRatio || 1;
+    canvas.style.display = 'block';
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+    const toCanvasX = (x) => margin + (x - minX) / (maxX - minX) * plotW;
+    const toCanvasY = (y) => margin + (maxY - y) / (maxY - minY) * plotH;
+    
+    // Background
+    ctx.fillStyle = 'rgba(30, 32, 40, 0.8)';
+    ctx.fillRect(0, 0, w, h);
+    
+    // Grid
+    const xRange = maxX - minX;
+    const yRange = maxY - minY;
+    const xStep = Math.pow(10, Math.floor(Math.log10(xRange / 5)));
+    const yStep = Math.pow(10, Math.floor(Math.log10(yRange / 5)));
+    ctx.strokeStyle = 'rgba(74, 85, 112, 0.3)';
+    ctx.lineWidth = 0.5;
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep / 2) {
+        const cx = toCanvasX(x);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep / 2) {
+        const cy = toCanvasY(y);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    ctx.strokeStyle = 'rgba(74, 85, 112, 0.6)';
+    ctx.lineWidth = 1;
+    for (let x = Math.ceil(minX / xStep) * xStep; x <= maxX; x += xStep) {
+        const cx = toCanvasX(x);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    for (let y = Math.ceil(minY / yStep) * yStep; y <= maxY; y += yStep) {
+        const cy = toCanvasY(y);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    
+    // Axes
+    ctx.strokeStyle = '#8a97b0';
+    ctx.lineWidth = 2;
+    if (minY <= 0 && maxY >= 0) {
+        const cy = toCanvasY(0);
+        ctx.beginPath(); ctx.moveTo(margin, cy); ctx.lineTo(margin + plotW, cy); ctx.stroke();
+    }
+    if (minX <= 0 && maxX >= 0) {
+        const cx = toCanvasX(0);
+        ctx.beginPath(); ctx.moveTo(cx, margin); ctx.lineTo(cx, margin + plotH); ctx.stroke();
+    }
+    
+    // Draw parametric curve with gradient color
+    ctx.lineWidth = 2.5;
+    for (let i = 1; i < points.length; i++) {
+        const p1 = points[i - 1], p2 = points[i];
+        const t = p1.t;
+        // Color gradient from blue (start) to orange (end)
+        const frac = (t - tMin) / (tMax - tMin);
+        const r = Math.round(79 + (249 - 79) * frac);
+        const g = Math.round(156 + (123 - 156) * frac);
+        const b = Math.round(249 + (79 - 249) * frac);
+        ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
+        ctx.beginPath();
+        ctx.moveTo(toCanvasX(p1.x), toCanvasY(p1.y));
+        ctx.lineTo(toCanvasX(p2.x), toCanvasY(p2.y));
+        ctx.stroke();
+    }
+    
+    // Draw arrow at endpoint
+    if (points.length > 1) {
+        const last = points[points.length - 1];
+        const prev = points[points.length - 2];
+        const lx = toCanvasX(last.x), ly = toCanvasY(last.y);
+        const angle = Math.atan2(ly - toCanvasY(prev.y), lx - toCanvasX(prev.x));
+        ctx.fillStyle = '#f97b4f';
+        ctx.beginPath();
+        ctx.moveTo(lx, ly);
+        ctx.lineTo(lx - 10 * Math.cos(angle - 0.4), ly - 10 * Math.sin(angle - 0.4));
+        ctx.lineTo(lx - 10 * Math.cos(angle + 0.4), ly - 10 * Math.sin(angle + 0.4));
+        ctx.closePath();
+        ctx.fill();
+    }
+    
+    // Legend
+    ctx.font = '11px monospace';
+    const first = points.length > 0 ? points[Math.floor(points.length * 0.25)] : null;
+    ctx.fillStyle = '#4f9cf9';
+    ctx.textAlign = 'left';
+    ctx.fillText('x(t) = ' + xExpr, margin + 5, margin + 16);
+    ctx.fillText('y(t) = ' + yExpr, margin + 5, margin + 32);
+    if (first) {
+        ctx.fillStyle = '#aaa';
+        ctx.fillText('t₀ = ' + formatNumber(first.t, 2) + ' → (' + formatNumber(first.x, 2) + ', ' + formatNumber(first.y, 2) + ')', margin + 5, margin + 48);
+    }
+    
+    currentPlotType = 'parametric';
+    currentPlotExpr = xExpr + ', ' + yExpr;
+    document.getElementById('graph-controls').style.display = 'flex';
+    setupCanvasInteractivity(canvas, xExpr + ', ' + yExpr);
+}
+
+function resetGraphView() {
+    plotMinX = -10;
+    plotMaxX = 10;
+    plotMinY = -10;
+    plotMaxY = 10;
+    
+    // Re-graficar la última expresión
+    const canvas = document.getElementById('chart-canvas-general');
+    if (canvas.style.display !== 'none') {
+        const expr = currentPlotExpr || document.getElementById('gen-expr').textContent.replace('f(x) = ', '').replace(' =', '');
+        if (currentPlotType === 'inequality') {
+            const ineqMatch = expr.match(/(>=|<=|>|<)/);
+            if (ineqMatch) genPlotInequality(expr, ineqMatch[1]);
+        } else if (currentPlotType === 'parametric') {
+            const parts = expr.split(',').map(s => s.trim());
+            if (parts.length === 2) {
+                const xE = parts[0].replace(/^x\s*=\s*/, '').trim();
+                const yE = parts[1].replace(/^y\s*=\s*/, '').trim();
+                if (xE && yE) genPlotParametric(xE, yE);
+            }
+        } else if (expr.includes(',') && expr.includes('=')) {
+            const eqs = expr.split(',').map(s => s.trim());
+            if (eqs.length === 2) genPlotSystem2x2(eqs[0], eqs[1]);
+        } else if (expr.includes('=')) {
+            genPlotEquation(expr);
+        } else if (expr.includes('x')) {
+            genPlotFunc(expr);
+        }
+    }
+}

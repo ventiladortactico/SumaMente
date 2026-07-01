@@ -1,1 +1,651 @@
-const RedesVisual={initCanvas(e){const c=window.devicePixelRatio||1,x=e.getBoundingClientRect();e.width=x.width*c,e.height=x.height*c;const l=e.getContext("2d");return l.scale(c,c),l},_loop:{},_startLoop(e,c){this._loop[e.id]&&cancelAnimationFrame(this._loop[e.id]);const x=()=>{c(),this._loop[e.id]=requestAnimationFrame(x)};x()},_stopLoop(e){this._loop[e.id]&&(cancelAnimationFrame(this._loop[e.id]),delete this._loop[e.id])},subred(e,c,x,l,t,i){this._stopLoop(e);const o=this.initCanvas(e),s=e.width/(window.devicePixelRatio||1),n=e.height/(window.devicePixelRatio||1);let a=0;this._startLoop(e,()=>{a+=.02,o.clearRect(0,0,s,n);const f=o.createLinearGradient(0,0,s,n);f.addColorStop(0,"#0d1117"),f.addColorStop(1,"#161b22"),o.fillStyle=f,o.fillRect(0,0,s,n);const d=s-40,h=30,r=20,p=15;o.fillStyle="rgba(79,191,167,0.2)",o.beginPath(),o.roundRect(r,p,d,h,6),o.fill(),o.fillStyle="#4fbfa7",o.font="11px monospace",o.fillText(`Red: ${numToIpv4(l)} / ${x}`,r+10,p+20);const g=p+h+10;o.fillStyle="rgba(249,199,79,0.2)",o.beginPath(),o.roundRect(r,g,d,h,6),o.fill(),o.fillStyle="#f9c74f",o.fillText(`Broadcast: ${numToIpv4(t)}`,r+10,g+20);const b=g+h+10,S=x>=31?l:l+1,w=x>=31?t:t-1,R=.5+.5*Math.sin(a*2);o.fillStyle=`rgba(79,251,123,${.1+.15*R})`,o.beginPath(),o.roundRect(r,b,d,h*2,6),o.fill(),o.fillStyle="#4ff97b",o.font="10px monospace",o.fillText(`Hosts: ${numToIpv4(S)} \u2192 ${numToIpv4(w)}`,r+10,b+18),o.fillText(`[${i} hosts utilizables]`,r+10,b+38);const y=Math.min(1,i/256)*(d-40),P=r+20,m=b+h*2+15;o.fillStyle="rgba(79,251,123,0.15)",o.beginPath(),o.roundRect(P,m,d-40,8,4),o.fill(),o.fillStyle="#4ff97b";const M=Math.min(y,(d-40)*Math.min(1,a*2));o.beginPath(),o.roundRect(P,m,M,8,4),o.fill()})},hosts(e,c,x){this._stopLoop(e);const l=this.initCanvas(e),t=e.width/(window.devicePixelRatio||1),i=e.height/(window.devicePixelRatio||1);let o=0;const s=[24,25,26,27,28,29,30],n=s.map(f=>f>=31?f===31?2:0:(1<<32-f)-2),a=Math.max(...n);this._startLoop(e,()=>{o+=.03,l.clearRect(0,0,t,i),l.fillStyle="#0d1117",l.fillRect(0,0,t,i);const f=(t-40)/s.length-4,d=i-50;s.forEach((h,r)=>{const p=20+r*(f+4),g=n[r]/a*d,b=h===c,S=b?"#4fbfa7":"rgba(79,191,167,0.4)",w=Math.min(g,d*Math.min(1,o+r*.08));l.fillStyle=S,l.beginPath(),l.roundRect(p,i-30-w,f,w,[3,3,0,0]),l.fill(),l.fillStyle=b?"#4ff97b":"#4fbfa7",l.font="9px monospace",l.textAlign="center",l.fillText(`/${h}`,p+f/2,i-15),l.fillText(n[r],p+f/2,i-35-w)})})},cidr(e,c,x){this._stopLoop(e);const l=this.initCanvas(e),t=e.width/(window.devicePixelRatio||1),i=e.height/(window.devicePixelRatio||1);let o=0;this._startLoop(e,()=>{o+=.02,l.clearRect(0,0,t,i),l.fillStyle="#0d1117",l.fillRect(0,0,t,i);const s=t/2,n=i/2,a=40+15*Math.sin(o);l.strokeStyle="#4fbfa7",l.lineWidth=2,l.beginPath(),l.arc(s,n,a,0,Math.PI*2),l.stroke(),l.fillStyle="#4fbfa7",l.font="bold 14px monospace",l.textAlign="center",l.fillText(`/${x}`,s,n-5),l.fillStyle="#f9c74f",l.fillText(c+(c.length>14?"...":""),s,n+18);const f=c?c.split(".").map(d=>parseInt(d).toString(2).padStart(8,"0")).join("."):"";l.fillStyle="rgba(255,255,255,0.3)",l.font="9px monospace",l.textAlign="center",l.fillText(f,s,i-20)})},broadcast(e,c,x,l){this._stopLoop(e);const t=this.initCanvas(e),i=e.width/(window.devicePixelRatio||1),o=e.height/(window.devicePixelRatio||1);let s=0;this._startLoop(e,()=>{s+=.03,t.clearRect(0,0,i,o),t.fillStyle="#0d1117",t.fillRect(0,0,i,o);const n=i/2,a=o/2;for(let f=0;f<5;f++){const d=20+(s*40+f*30)%120,h=.3*(1-d/120);t.strokeStyle=`rgba(249,199,79,${h})`,t.lineWidth=2,t.beginPath(),t.arc(n,a,d,0,Math.PI*2),t.stroke()}t.fillStyle="#f9c74f",t.beginPath(),t.arc(n,a,8,0,Math.PI*2),t.fill(),t.shadowColor="#f9c74f",t.shadowBlur=15,t.beginPath(),t.arc(n,a,5,0,Math.PI*2),t.fill(),t.shadowBlur=0,t.fillStyle="#fff",t.font="bold 11px monospace",t.textAlign="center",t.fillText(`Broadcast: ${numToIpv4(l)}`,n,o-20)})},network(e,c,x,l){this._stopLoop(e);const t=this.initCanvas(e),i=e.width/(window.devicePixelRatio||1),o=e.height/(window.devicePixelRatio||1);let s=0;this._startLoop(e,()=>{s+=.02,t.clearRect(0,0,i,o),t.fillStyle="#0d1117",t.fillRect(0,0,i,o);const n=i/2,a=o/2-15;t.fillStyle="#4fbfa7",t.font="11px monospace",t.textAlign="center",t.fillText(`IP: ${c}`,n,a-30),t.fillStyle="#f9c74f",t.fillText(`Masc: ${x}`,n,a-12),t.fillStyle="#4ff97b",t.fillText("\u2501\u2501\u2501 AND \u2501\u2501\u2501",n,a+3);const f=.5+.5*Math.sin(s*2);t.fillStyle=`rgba(79,251,123,${.4+.3*f})`,t.font="bold 12px monospace",t.fillText(`Red: ${l}`,n,a+25),t.fillStyle="rgba(255,255,255,0.1)",t.font="8px monospace";const d=c.split(".").map(h=>parseInt(h).toString(2).padStart(8,"0")).join(".");t.fillText(d,n,o-15)})},vlsm(e,c,x,l){this._stopLoop(e);const t=this.initCanvas(e),i=e.width/(window.devicePixelRatio||1),o=e.height/(window.devicePixelRatio||1);let s=0;this._startLoop(e,()=>{s+=.02,t.clearRect(0,0,i,o),t.fillStyle="#0d1117",t.fillRect(0,0,i,o);const n=c.reduce((h,r)=>h+r.size,0),a=i-40;let f=20;const d=["#4fbfa7","#f9c74f","#f97b4f","#a78bfa","#4ff97b","#f94fa7","#38e8c8","#f9f54f"];c.forEach((h,r)=>{const p=h.size/n*a,g=Math.min(p,h.size/n*a*Math.min(1,s+r*.15)),b=d[r%d.length];t.fillStyle=b,t.beginPath(),t.roundRect(f,o/2-15,Math.max(g,2),30,[r===0?6:0,r===c.length-1?6:0,r===c.length-1?6:0,r===0?6:0]),t.fill(),t.fillStyle="#fff",t.font="8px monospace",t.textAlign="center",p>40&&t.fillText(`${h.name}`,f+p/2,o/2+4),f+=p}),t.fillStyle="rgba(255,255,255,0.3)",t.font="9px monospace",t.textAlign="center",t.fillText(`Red base: ${numToIpv4(ipv4ToNum(x))}/${l}`,i/2,20)})},ipv6(e,c,x){this._stopLoop(e);const l=this.initCanvas(e),t=e.width/(window.devicePixelRatio||1),i=e.height/(window.devicePixelRatio||1);let o=0;this._startLoop(e,()=>{o+=.02,l.clearRect(0,0,t,i),l.fillStyle="#0d1117",l.fillRect(0,0,t,i),l.fillStyle="#4fbfa7",l.font="bold 11px monospace",l.textAlign="center",l.fillText(c+(c.includes("/")?"":`/${x}`),t/2,25),l.font="10px monospace",l.textAlign="center";for(let n=0;n<4;n++)for(let a=0;a<4;a++){const f=30+a*35+n%2*17,d=50+n*30,h=Math.floor(Math.random()*16).toString(16),r=a*4+n<x/8?.6:.15;l.fillStyle=`rgba(79,191,167,${r})`,l.fillText(h,f,d)}const s=128-x;l.fillStyle="rgba(255,255,255,0.3)",l.font="9px monospace",l.textAlign="center",l.fillText(`/${x} \xB7 ~2^${s} hosts`,t/2,i-20)})},wildcard(e,c,x){this._stopLoop(e);const l=this.initCanvas(e),t=e.width/(window.devicePixelRatio||1),i=e.height/(window.devicePixelRatio||1);let o=0;this._startLoop(e,()=>{o+=.03,l.clearRect(0,0,t,i),l.fillStyle="#0d1117",l.fillRect(0,0,t,i);const s=c.split(".").map(Number),n=t/2;s.forEach((a,f)=>{const d=20+f*((t-40)/4),h=a.toString(2).padStart(8,"0"),r=x[f].toString(2).padStart(8,"0");l.font="8px monospace",l.textAlign="center",l.fillStyle="#4fbfa7";for(let p=0;p<8;p++)l.fillText(h[p],d+p*9+9,i/2-12);l.fillStyle="#f9c74f";for(let p=0;p<8;p++){const g=Math.sin(o*3+f+p)>0?h[p]==="1"?"0":"1":" ";l.fillText(g,d+p*9+9,i/2+5)}l.fillStyle="rgba(255,255,255,0.2)",l.font="8px monospace",l.fillText(a,d+36,i/2+25)})})},transfer(e,c,x,l,t,i){this._stopLoop(e);const o=this.initCanvas(e),s=e.width/(window.devicePixelRatio||1),n=e.height/(window.devicePixelRatio||1);let a=0;this._startLoop(e,()=>{a+=.02,o.clearRect(0,0,s,n),o.fillStyle="#0d1117",o.fillRect(0,0,s,n);const f=s-40,d=30,h=20,r=n/2-15,p=Math.min(1,a/(i>0?Math.min(i,5):1));o.fillStyle="rgba(79,191,167,0.15)",o.beginPath(),o.roundRect(h,r,f,d,6),o.fill();const g=o.createLinearGradient(h,0,h+f*p,0);g.addColorStop(0,"#4fbfa7"),g.addColorStop(1,"#4ff97b"),o.fillStyle=g,o.beginPath(),o.roundRect(h,r,f*p,d,6),o.fill(),o.fillStyle="rgba(79,191,167,0.5)";for(let S=0;S<5;S++){const w=h+(a*30+S*50)%f,R=r+d/2+5*Math.sin(a*3+S);o.beginPath(),o.arc(w,R,2,0,Math.PI*2),o.fill()}o.fillStyle="#fff",o.font="bold 11px monospace",o.textAlign="center";const b=i>60?`${(i/60).toFixed(1)}m`:`${i.toFixed(1)}s`;o.fillText(`${c} ${x} @ ${l} ${t} = ${b}`,s/2,r+20)})},mbps(e,c,x){this._stopLoop(e);const l=this.initCanvas(e),t=e.width/(window.devicePixelRatio||1),i=e.height/(window.devicePixelRatio||1);let o=0;this._startLoop(e,()=>{o+=.02,l.clearRect(0,0,t,i),l.fillStyle="#0d1117",l.fillRect(0,0,t,i);const s=t/2,n=Math.min(t,i)/2-25;l.strokeStyle="rgba(79,191,167,0.2)",l.lineWidth=12,l.beginPath(),l.arc(s,i/2+10,n,Math.PI*.75,Math.PI*2.25),l.stroke();const a=Math.PI*.75+Math.PI*1.5*Math.min(1,c/1e3),f=.5+.5*Math.sin(o*2);l.strokeStyle=`rgba(79,251,123,${.4+.3*f})`,l.lineWidth=12,l.beginPath(),l.arc(s,i/2+10,n,Math.PI*.75,a),l.stroke(),l.fillStyle="#4ff97b",l.font="bold 16px monospace",l.textAlign="center",l.fillText(`${c.toFixed(1)} Mbps`,s,i/2-5),l.fillStyle="#f9c74f",l.font="12px monospace",l.fillText(`= ${x.toFixed(2)} MB/s`,s,i/2+20);const d=s+(n-15)*Math.cos(a-Math.PI/2),h=i/2+10+(n-15)*Math.sin(a-Math.PI/2);l.strokeStyle="#4ff97b",l.lineWidth=2,l.beginPath(),l.moveTo(s,i/2+10),l.lineTo(d,h),l.stroke()})},ancho(e,c,x,l,t){this._stopLoop(e);const i=this.initCanvas(e),o=e.width/(window.devicePixelRatio||1),s=e.height/(window.devicePixelRatio||1);let n=0;this._startLoop(e,()=>{n+=.03,i.clearRect(0,0,o,s),i.fillStyle="#0d1117",i.fillRect(0,0,o,s);const a=o-60,f=Math.min(c,20),d=Math.min(12,(s-40)/f);for(let h=0;h<f;h++){const r=Math.sin(n*2+h*1.5)>1-l*2,p=15+h*(d+4);i.fillStyle=r?`rgba(79,251,123,${.3+.3*Math.sin(n*3+h)})`:"rgba(79,191,167,0.1)",i.beginPath(),i.roundRect(20,p,a*(r?x/10:.05),d,3),i.fill()}i.fillStyle="#4ff97b",i.font="bold 10px monospace",textAlign="center",i.fillText(`Recomendado: ${t.toFixed(1)} Mbps`,o/2,s-10)})},utilizacion(e,c,x,l){this._stopLoop(e);const t=this.initCanvas(e),i=e.width/(window.devicePixelRatio||1),o=e.height/(window.devicePixelRatio||1);let s=0;this._startLoop(e,()=>{s+=.02,t.clearRect(0,0,i,o),t.fillStyle="#0d1117",t.fillRect(0,0,i,o);const n=i/2,a=o/2,f=Math.min(i,o)/2-30,d=l/100*Math.PI*2,h=l>80?"#f94f4f":l>50?"#f9c74f":"#4ff97b";t.strokeStyle="rgba(255,255,255,0.05)",t.lineWidth=14,t.beginPath(),t.arc(n,a,f,0,Math.PI*2),t.stroke();const r=Math.min(d,Math.PI*2*Math.min(1,s*2));t.strokeStyle=h,t.lineWidth=14,t.lineCap="round",t.beginPath(),t.arc(n,a,f,-Math.PI/2,-Math.PI/2+r),t.stroke();const p=.6+.4*Math.sin(s*2);t.fillStyle=`rgba(255,255,255,${.05+.05*p})`,t.beginPath(),t.arc(n,a,f*.65,0,Math.PI*2),t.fill(),t.fillStyle=h,t.font="bold 16px monospace",t.textAlign="center",t.fillText(`${l.toFixed(1)}%`,n,a+2),t.fillStyle="rgba(255,255,255,0.3)",t.font="9px monospace",t.fillText(`${c} / ${x} Mbps`,n,a+20)})},rtt(e,c,x,l,t){this._stopLoop(e);const i=this.initCanvas(e),o=e.width/(window.devicePixelRatio||1),s=e.height/(window.devicePixelRatio||1);let n=0;this._startLoop(e,()=>{n+=.04,i.clearRect(0,0,o,s),i.fillStyle="#0d1117",i.fillRect(0,0,o,s);const a=s/2,f=30,d=o-30,h=.5+.5*Math.sin(n*2);i.fillStyle=`rgba(79,191,167,${.4+.3*h})`,i.beginPath(),i.arc(f,a,8,0,Math.PI*2),i.fill(),i.beginPath(),i.arc(d,a,8,0,Math.PI*2),i.fill();const r=n*2%1,p=f+(d-f)*r,g=a+(r>.5?-1:1)*8*Math.sin(n*6);i.fillStyle="#f9c74f",i.shadowColor="#f9c74f",i.shadowBlur=10,i.beginPath(),i.arc(p,g,4,0,Math.PI*2),i.fill(),i.shadowBlur=0,i.strokeStyle="rgba(79,191,167,0.15)",i.lineWidth=1,i.setLineDash([4,4]),i.beginPath(),i.moveTo(f,a),i.lineTo(d,a),i.stroke(),i.setLineDash([]),i.fillStyle="#fff",i.font="10px monospace",i.textAlign="center",i.fillText(`${c} km \xB7 ${l} hops`,o/2,a+25),i.fillStyle="#4fbfa7",i.fillText(`RTT: ${t.toFixed(2)} ms`,o/2,a-20)})},throughput(e,c,x,l){this._stopLoop(e);const t=this.initCanvas(e),i=e.width/(window.devicePixelRatio||1),o=e.height/(window.devicePixelRatio||1);let s=0;this._startLoop(e,()=>{s+=.02,t.clearRect(0,0,i,o),t.fillStyle="#0d1117",t.fillRect(0,0,i,o);const n=i-60,a=30,f=o/2-20;t.fillStyle="rgba(79,191,167,0.15)",t.beginPath(),t.roundRect(a,f,n,25,6),t.fill(),t.fillStyle="#4fbfa7",t.font="9px monospace",t.fillText(`Nominal: ${c} Mbps`,a+5,f+17);const d=l/c*n,h=Math.min(d,n*Math.min(1,s*2)),r=t.createLinearGradient(a,0,a+n,0);r.addColorStop(0,"#4fbfa7"),r.addColorStop(1,"#4ff97b"),t.fillStyle=r,t.beginPath(),t.roundRect(a,f+30,h,25,6),t.fill(),t.fillStyle="#fff",t.font="bold 9px monospace",t.fillText(`Real: ${l.toFixed(1)} Mbps (${100-x}%)`,a+5,f+47);const p=n-d;t.fillStyle="rgba(249,79,79,0.2)",t.beginPath(),t.roundRect(a+d,f+30,p,25,6),t.fill()})},poe(e,c,x,l,t){this._stopLoop(e);const i=this.initCanvas(e),o=e.width/(window.devicePixelRatio||1),s=e.height/(window.devicePixelRatio||1);let n=0;this._startLoop(e,()=>{n+=.02,i.clearRect(0,0,o,s),i.fillStyle="#0d1117",i.fillRect(0,0,o,s);const a=Math.min(c,16),f=4,d=Math.ceil(a/f),h=(o-40)/f,r=(s-60)/d;for(let p=0;p<a;p++){const g=p%f,b=Math.floor(p/f),S=20+g*h+h/2,w=20+b*r+r/2,R=Math.sin(n*2+p*1.3)>0,y=Math.min(h,r)/2-6;i.fillStyle=R?`rgba(79,251,123,${.2+.2*Math.sin(n*3+p)})`:"rgba(79,191,167,0.05)",i.beginPath(),i.roundRect(S-y,w-y,y*2,y*2,4),i.fill(),R&&(i.fillStyle="#4ff97b",i.font="8px monospace",i.textAlign="center",i.fillText(`${x}W`,S,w+3))}i.fillStyle="#fff",i.font="bold 11px monospace",i.textAlign="center",i.fillText(`Total: ${l.toFixed(1)} W (${t})`,o/2,s-12)})},dns(e,c,x){this._stopLoop(e);const l=this.initCanvas(e),t=e.width/(window.devicePixelRatio||1),i=e.height/(window.devicePixelRatio||1);let o=0;this._startLoop(e,()=>{o+=.02,l.clearRect(0,0,t,i),l.fillStyle="#0d1117",l.fillRect(0,0,t,i);const s=t/2,n=.5+.5*Math.sin(o*2),a=20+(i-60)*(.3+.3*Math.sin(o*1.5));l.fillStyle=`rgba(79,191,167,${.3+.3*n})`,l.beginPath(),l.roundRect(s-60,a,120,28,8),l.fill(),l.fillStyle="#4fbfa7",l.font="bold 10px monospace",l.textAlign="center",l.fillText(c,s,a+19),l.fillStyle="rgba(249,199,79,0.4)";const f=a+40;l.beginPath(),l.moveTo(s,f),l.lineTo(s-6,f-8),l.lineTo(s+6,f-8),l.fill(),x.slice(0,6).forEach((d,h)=>{const r=f+15+h*22;l.fillStyle=`rgba(255,255,255,${.05+.05*(h%2)})`,l.beginPath(),l.roundRect(20,r,t-40,18,4),l.fill(),l.fillStyle="#f9c74f",l.font="9px monospace",l.textAlign="left",l.fillText(d.tipo,25,r+13),l.fillStyle="#fff",l.textAlign="right",l.fillText(d.valor,t-25,r+13)})})},fragmentacion(e,c,x,l){this._stopLoop(e);const t=this.initCanvas(e),i=e.width/(window.devicePixelRatio||1),o=e.height/(window.devicePixelRatio||1);let s=0;const n=Math.min(l,10);this._startLoop(e,()=>{s+=.03,t.clearRect(0,0,i,o),t.fillStyle="#0d1117",t.fillRect(0,0,i,o);const a=4,f=18,d=(i-40-a*(n-1))/n;for(let h=0;h<n;h++){const r=20+h*(d+a),p=o/2-f/2,g=h===n-1,b=Math.sin(s*2+h)*2;t.fillStyle=g?`rgba(249,199,79,${.3+.2*Math.sin(s*3)})`:`rgba(79,191,167,${.4+.2*Math.sin(s*2+h)})`,t.beginPath(),t.roundRect(r,p+b,d,f,4),t.fill(),t.fillStyle=g?"#f9c74f":"#4fbfa7",t.font="8px monospace",t.textAlign="center";const S=c-(n-1)*x;t.fillText(g?`${S}`:`${x}`,r+d/2,p+b+13)}t.fillStyle="rgba(255,255,255,0.3)",t.font="9px monospace",t.textAlign="center",t.fillText(`${c} bytes  \u2192  MTU ${x}  \u2192  ${l} fragmentos`,i/2,o-15)})},vlan(e){this._stopLoop(e);const c=this.initCanvas(e),x=e.width/(window.devicePixelRatio||1),l=e.height/(window.devicePixelRatio||1);let t=0;this._startLoop(e,()=>{t+=.02,c.clearRect(0,0,x,l),c.fillStyle="#0d1117",c.fillRect(0,0,x,l);const i=12,o=6,s=(x-20)/i,n=(l-40)/o;for(let a=0;a<72;a++){const f=a%i,d=Math.floor(a/i),h=10+f*s+s/2,r=15+d*n+n/2,p=(a+1)%2===0;c.fillStyle=p?`rgba(79,191,167,${.2+.1*Math.sin(t*2+a)})`:"rgba(255,255,255,0.05)",c.beginPath(),c.roundRect(h-s/2+1,r-n/2+1,s-2,n-2,3),c.fill(),p&&(c.fillStyle="#4fbfa7",c.font="7px monospace",c.textAlign="center",c.fillText(`${a+1}`,h,r+3))}c.fillStyle="rgba(255,255,255,0.3)",c.font="9px monospace",c.textAlign="center",c.fillText("VLANs 1-4094 disponibles",x/2,l-10)})},dhcp(e,c,x,l){this._stopLoop(e);const t=this.initCanvas(e),i=e.width/(window.devicePixelRatio||1),o=e.height/(window.devicePixelRatio||1);let s=0;this._startLoop(e,()=>{s+=.02,t.clearRect(0,0,i,o),t.fillStyle="#0d1117",t.fillRect(0,0,i,o);const n=i-60,a=30,f=30,d=o/2-15;t.fillStyle="rgba(79,191,167,0.2)",t.beginPath(),t.roundRect(f,d,n,a,6),t.fill();const h=l/c*n,r=Math.min(h,n*Math.min(1,s*2)),p=t.createLinearGradient(f,0,f+n,0);p.addColorStop(0,"#4fbfa7"),p.addColorStop(1,"#4ff97b"),t.fillStyle=p,t.beginPath(),t.roundRect(f,d,r,a,6),t.fill();const g=x/c*n;t.fillStyle="rgba(249,199,79,0.4)",t.beginPath(),t.roundRect(f+h,d,g,a,[0,6,6,0]),t.fill(),t.fillStyle="#4ff97b",t.font="9px monospace",t.textAlign="left",t.fillText(`Disponibles: ${l}`,f+5,d+20),g>40&&(t.fillStyle="#f9c74f",t.textAlign="right",t.fillText(`Reservas: ${x}`,f+n-5,d+20)),t.fillStyle="rgba(255,255,255,0.3)",t.font="9px monospace",t.textAlign="center",t.fillText(`Total: ${c} IPs`,i/2,o-15)})},overhead_tcp(e,c,x,l,t){this._stopLoop(e);const i=this.initCanvas(e),o=e.width/(window.devicePixelRatio||1),s=e.height/(window.devicePixelRatio||1);let n=0;this._startLoop(e,()=>{n+=.02,i.clearRect(0,0,o,s),i.fillStyle="#0d1117",i.fillRect(0,0,o,s);const a=o-40,f=20,d=s/2-25,h=l/c*a,r=Math.min(h,a*Math.min(1,n*2)),p=i.createLinearGradient(f,0,f+a,0);p.addColorStop(0,"#4ff97b"),p.addColorStop(1,"#4fbfa7"),i.fillStyle=p,i.beginPath(),i.roundRect(f,d,r,20,[6,0,0,6]),i.fill(),i.fillStyle="#fff",i.font="9px monospace",i.textAlign="left",i.fillText(`Datos: ${l} B`,f+5,d+15);const g=a-h;i.fillStyle="rgba(249,79,79,0.3)",i.beginPath(),i.roundRect(f+r,d,g,20,[0,6,6,0]),i.fill(),i.fillStyle="#f94f4f",i.font="9px monospace",i.textAlign="right",i.fillText(`Cabeceras: ${x} B`,f+a-5,d+15),i.fillStyle="#f9c74f",i.font="bold 14px monospace",i.textAlign="center",i.fillText(`Overhead: ${t.toFixed(1)}%`,o/2,d+55)})}};
+const RedesVisual = {
+    initCanvas(canvas) {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return ctx;
+    },
+    _loop: {},
+    _startLoop(canvas, fn) {
+        if (this._loop[canvas.id]) cancelAnimationFrame(this._loop[canvas.id]);
+        const animate = () => { fn(); this._loop[canvas.id] = requestAnimationFrame(animate); };
+        animate();
+    },
+    _stopLoop(canvas) {
+        if (this._loop[canvas.id]) { cancelAnimationFrame(this._loop[canvas.id]); delete this._loop[canvas.id]; }
+    },
+
+    subred(canvas, ip, bits, net, bcast, hosts) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.02;
+            ctx.clearRect(0, 0, w, h);
+            // Fondo
+            const grad = ctx.createLinearGradient(0, 0, w, h);
+            grad.addColorStop(0, '#0d1117'); grad.addColorStop(1, '#161b22');
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+            // Bloque de red
+            const bw = w - 40, bh = 30, bx = 20, by = 15;
+            ctx.fillStyle = 'rgba(79,191,167,0.2)';
+            ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 6); ctx.fill();
+            ctx.fillStyle = '#4fbfa7'; ctx.font = '11px monospace';
+            ctx.fillText(`Red: ${numToIpv4(net)} / ${bits}`, bx + 10, by + 20);
+            // Bloque broadcast
+            const by2 = by + bh + 10;
+            ctx.fillStyle = 'rgba(249,199,79,0.2)';
+            ctx.beginPath(); ctx.roundRect(bx, by2, bw, bh, 6); ctx.fill();
+            ctx.fillStyle = '#f9c74f'; ctx.fillText(`Broadcast: ${numToIpv4(bcast)}`, bx + 10, by2 + 20);
+            // Rango hosts
+            const by3 = by2 + bh + 10;
+            const first = bits >= 31 ? net : net + 1;
+            const last = bits >= 31 ? bcast : bcast - 1;
+            const pulse = 0.5 + 0.5 * Math.sin(t * 2);
+            ctx.fillStyle = `rgba(79,251,123,${0.1 + 0.15 * pulse})`;
+            ctx.beginPath(); ctx.roundRect(bx, by3, bw, bh * 2, 6); ctx.fill();
+            ctx.fillStyle = '#4ff97b';
+            ctx.font = '10px monospace';
+            ctx.fillText(`Hosts: ${numToIpv4(first)} → ${numToIpv4(last)}`, bx + 10, by3 + 18);
+            ctx.fillText(`[${hosts} hosts utilizables]`, bx + 10, by3 + 38);
+            // Barra de hosts animada
+            const barW = Math.min(1, hosts / 256) * (bw - 40);
+            const barX = bx + 20, barY = by3 + bh * 2 + 15;
+            ctx.fillStyle = 'rgba(79,251,123,0.15)';
+            ctx.beginPath(); ctx.roundRect(barX, barY, bw - 40, 8, 4); ctx.fill();
+            ctx.fillStyle = '#4ff97b';
+            const animW = Math.min(barW, (bw - 40) * Math.min(1, t * 2));
+            ctx.beginPath(); ctx.roundRect(barX, barY, animW, 8, 4); ctx.fill();
+        });
+    },
+
+    hosts(canvas, bits, hosts) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        const masks = [24, 25, 26, 27, 28, 29, 30];
+        const vals = masks.map(m => m >= 31 ? (m === 31 ? 2 : 0) : (1 << (32 - m)) - 2);
+        const maxVal = Math.max(...vals);
+        this._startLoop(canvas, () => {
+            t += 0.03;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const barW = (w - 40) / masks.length - 4;
+            const maxH = h - 50;
+            masks.forEach((m, i) => {
+                const bx = 20 + i * (barW + 4);
+                const bh = (vals[i] / maxVal) * maxH;
+                const isSelected = m === bits;
+                const color = isSelected ? '#4fbfa7' : 'rgba(79,191,167,0.4)';
+                const animH = Math.min(bh, (maxH) * Math.min(1, t + i * 0.08));
+                ctx.fillStyle = color;
+                ctx.beginPath(); ctx.roundRect(bx, h - 30 - animH, barW, animH, [3,3,0,0]); ctx.fill();
+                ctx.fillStyle = isSelected ? '#4ff97b' : '#4fbfa7';
+                ctx.font = '9px monospace'; ctx.textAlign = 'center';
+                ctx.fillText(`/${m}`, bx + barW / 2, h - 15);
+                ctx.fillText(vals[i], bx + barW / 2, h - 35 - animH);
+            });
+        });
+    },
+
+    cidr(canvas, mask, bits) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.02;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const cx = w / 2, cy = h / 2;
+            // Círculo animado
+            const r = 40 + 15 * Math.sin(t);
+            ctx.strokeStyle = '#4fbfa7'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+            // Flechas
+            ctx.fillStyle = '#4fbfa7'; ctx.font = 'bold 14px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`/${bits}`, cx, cy - 5);
+            ctx.fillStyle = '#f9c74f';
+            ctx.fillText(mask + (mask.length > 14 ? '...' : ''), cx, cy + 18);
+            // Bits
+            const bin = mask ? mask.split('.').map(p => parseInt(p).toString(2).padStart(8,'0')).join('.') : '';
+            ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(bin, cx, h - 20);
+        });
+    },
+
+    broadcast(canvas, ip, bits, bcast) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.03;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const cx = w / 2, cy = h / 2;
+            // Ondas de broadcast
+            for (let i = 0; i < 5; i++) {
+                const r = 20 + (t * 40 + i * 30) % 120;
+                const alpha = 0.3 * (1 - r / 120);
+                ctx.strokeStyle = `rgba(249,199,79,${alpha})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+            }
+            // Centro
+            ctx.fillStyle = '#f9c74f';
+            ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowColor = '#f9c74f'; ctx.shadowBlur = 15;
+            ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`Broadcast: ${numToIpv4(bcast)}`, cx, h - 20);
+        });
+    },
+
+    network(canvas, ip, mask, net) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.02;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            // Puerta AND visual
+            const cx = w / 2, cy = h / 2 - 15;
+            ctx.fillStyle = '#4fbfa7'; ctx.font = '11px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`IP: ${ip}`, cx, cy - 30);
+            ctx.fillStyle = '#f9c74f';
+            ctx.fillText(`Masc: ${mask}`, cx, cy - 12);
+            ctx.fillStyle = '#4ff97b';
+            ctx.fillText(`━━━ AND ━━━`, cx, cy + 3);
+            const glow = 0.5 + 0.5 * Math.sin(t * 2);
+            ctx.fillStyle = `rgba(79,251,123,${0.4 + 0.3 * glow})`;
+            ctx.font = 'bold 12px monospace';
+            ctx.fillText(`Red: ${net}`, cx, cy + 25);
+            // Bits decorativos
+            ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.font = '8px monospace';
+            const ipB = ip.split('.').map(p => parseInt(p).toString(2).padStart(8,'0')).join('.');
+            ctx.fillText(ipB, cx, h - 15);
+        });
+    },
+
+    vlsm(canvas, results, ip, redBits) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.02;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const total = results.reduce((s, r) => s + r.size, 0);
+            const barW = w - 40;
+            let xOff = 20;
+            const colors = ['#4fbfa7','#f9c74f','#f97b4f','#a78bfa','#4ff97b','#f94fa7','#38e8c8','#f9f54f'];
+            results.forEach((r, i) => {
+                const segW = (r.size / total) * barW;
+                const animW = Math.min(segW, (r.size / total) * barW * Math.min(1, t + i * 0.15));
+                const col = colors[i % colors.length];
+                ctx.fillStyle = col;
+                ctx.beginPath(); ctx.roundRect(xOff, h / 2 - 15, Math.max(animW, 2), 30, [i === 0 ? 6 : 0, i === results.length - 1 ? 6 : 0, i === results.length - 1 ? 6 : 0, i === 0 ? 6 : 0]); ctx.fill();
+                ctx.fillStyle = '#fff'; ctx.font = '8px monospace'; ctx.textAlign = 'center';
+                if (segW > 40) ctx.fillText(`${r.name}`, xOff + segW / 2, h / 2 + 4);
+                xOff += segW;
+            });
+            // Etiqueta red base arriba
+            ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`Red base: ${numToIpv4(ipv4ToNum(ip))}/${redBits}`, w / 2, 20);
+        });
+    },
+
+    ipv6(canvas, dir, prefix) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.02;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            ctx.fillStyle = '#4fbfa7'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(dir + (dir.includes('/') ? '' : `/${prefix}`), w / 2, 25);
+            // Hex grid decorativo
+            ctx.font = '10px monospace'; ctx.textAlign = 'center';
+            for (let row = 0; row < 4; row++) {
+                for (let col = 0; col < 4; col++) {
+                    const hx = 30 + col * 35 + (row % 2) * 17;
+                    const hy = 50 + row * 30;
+                    const hex = Math.floor(Math.random() * 16).toString(16);
+                    const alpha = col * 4 + row < prefix / 8 ? 0.6 : 0.15;
+                    ctx.fillStyle = `rgba(79,191,167,${alpha})`;
+                    ctx.fillText(hex, hx, hy);
+                }
+            }
+            const hostBits = 128 - prefix;
+            ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`/${prefix} · ~2^${hostBits} hosts`, w / 2, h - 20);
+        });
+    },
+
+    wildcard(canvas, mask, wildParts) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.03;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const maskParts = mask.split('.').map(Number);
+            const cx = w / 2;
+            // Bits visuales por octeto
+            maskParts.forEach((oct, i) => {
+                const bx = 20 + i * ((w - 40) / 4);
+                const binM = oct.toString(2).padStart(8, '0');
+                const binW = wildParts[i].toString(2).padStart(8, '0');
+                ctx.font = '8px monospace'; ctx.textAlign = 'center';
+                // Máscara en verde
+                ctx.fillStyle = '#4fbfa7';
+                for (let b = 0; b < 8; b++) {
+                    ctx.fillText(binM[b], bx + b * 9 + 9, h / 2 - 12);
+                }
+                // Wildcard en amarillo (invertido)
+                ctx.fillStyle = '#f9c74f';
+                for (let b = 0; b < 8; b++) {
+                    const flip = Math.sin(t * 3 + i + b) > 0;
+                    const char = flip ? (binM[b] === '1' ? '0' : '1') : ' ';
+                    ctx.fillText(char, bx + b * 9 + 9, h / 2 + 5);
+                }
+                ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = '8px monospace';
+                ctx.fillText(oct, bx + 36, h / 2 + 25);
+            });
+        });
+    },
+
+    transfer(canvas, size, sizeUnit, speed, speedUnit, seconds) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.02;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            // Barra de progreso animada
+            const barW = w - 40, barH = 30, barX = 20, barY = h / 2 - 15;
+            const progress = Math.min(1, t / (seconds > 0 ? Math.min(seconds, 5) : 1));
+            ctx.fillStyle = 'rgba(79,191,167,0.15)';
+            ctx.beginPath(); ctx.roundRect(barX, barY, barW, barH, 6); ctx.fill();
+            const grad = ctx.createLinearGradient(barX, 0, barX + barW * progress, 0);
+            grad.addColorStop(0, '#4fbfa7'); grad.addColorStop(1, '#4ff97b');
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.roundRect(barX, barY, barW * progress, barH, 6); ctx.fill();
+            // Partículas
+            ctx.fillStyle = 'rgba(79,191,167,0.5)';
+            for (let i = 0; i < 5; i++) {
+                const px = barX + ((t * 30 + i * 50) % barW);
+                const py = barY + barH / 2 + 5 * Math.sin(t * 3 + i);
+                ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI * 2); ctx.fill();
+            }
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+            const timeStr = seconds > 60 ? `${(seconds/60).toFixed(1)}m` : `${seconds.toFixed(1)}s`;
+            ctx.fillText(`${size} ${sizeUnit} @ ${speed} ${speedUnit} = ${timeStr}`, w / 2, barY + 20);
+        });
+    },
+
+    mbps(canvas, mbpsVal, mbsVal) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.02;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const cx = w / 2;
+            // Velocímetro
+            const r = Math.min(w, h) / 2 - 25;
+            ctx.strokeStyle = 'rgba(79,191,167,0.2)'; ctx.lineWidth = 12;
+            ctx.beginPath(); ctx.arc(cx, h / 2 + 10, r, Math.PI * 0.75, Math.PI * 2.25); ctx.stroke();
+            const ang = Math.PI * 0.75 + (Math.PI * 1.5) * Math.min(1, mbpsVal / 1000);
+            const pulse = 0.5 + 0.5 * Math.sin(t * 2);
+            ctx.strokeStyle = `rgba(79,251,123,${0.4 + 0.3 * pulse})`; ctx.lineWidth = 12;
+            ctx.beginPath(); ctx.arc(cx, h / 2 + 10, r, Math.PI * 0.75, ang); ctx.stroke();
+            ctx.fillStyle = '#4ff97b'; ctx.font = 'bold 16px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`${mbpsVal.toFixed(1)} Mbps`, cx, h / 2 - 5);
+            ctx.fillStyle = '#f9c74f'; ctx.font = '12px monospace';
+            ctx.fillText(`= ${mbsVal.toFixed(2)} MB/s`, cx, h / 2 + 20);
+            // Aguja
+            const ax = cx + (r - 15) * Math.cos(ang - Math.PI / 2);
+            const ay = h / 2 + 10 + (r - 15) * Math.sin(ang - Math.PI / 2);
+            ctx.strokeStyle = '#4ff97b'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(cx, h / 2 + 10); ctx.lineTo(ax, ay); ctx.stroke();
+        });
+    },
+
+    ancho(canvas, users, consumo, concurrencia, recomendado) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.03;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const barW = w - 60;
+            const maxUsers = Math.min(users, 20);
+            const barH = Math.min(12, (h - 40) / maxUsers);
+            for (let i = 0; i < maxUsers; i++) {
+                const active = Math.sin(t * 2 + i * 1.5) > (1 - concurrencia * 2);
+                const by = 15 + i * (barH + 4);
+                ctx.fillStyle = active ? `rgba(79,251,123,${0.3 + 0.3 * Math.sin(t * 3 + i)})` : 'rgba(79,191,167,0.1)';
+                ctx.beginPath(); ctx.roundRect(20, by, barW * (active ? consumo / 10 : 0.05), barH, 3); ctx.fill();
+            }
+            ctx.fillStyle = '#4ff97b'; ctx.font = 'bold 10px monospace'; textAlign = 'center';
+            ctx.fillText(`Recomendado: ${recomendado.toFixed(1)} Mbps`, w / 2, h - 10);
+        });
+    },
+
+    utilizacion(canvas, trafico, capacidad, pct) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.02;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const cx = w / 2, cy = h / 2;
+            const r = Math.min(w, h) / 2 - 30;
+            const angle = (pct / 100) * Math.PI * 2;
+            const color = pct > 80 ? '#f94f4f' : pct > 50 ? '#f9c74f' : '#4ff97b';
+            // Círculo de fondo
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 14;
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+            // Arco animado
+            const animAngle = Math.min(angle, (Math.PI * 2) * Math.min(1, t * 2));
+            ctx.strokeStyle = color; ctx.lineWidth = 14; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + animAngle); ctx.stroke();
+            // Centro
+            const pulse = 0.6 + 0.4 * Math.sin(t * 2);
+            ctx.fillStyle = `rgba(255,255,255,${0.05 + 0.05 * pulse})`;
+            ctx.beginPath(); ctx.arc(cx, cy, r * 0.65, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = color; ctx.font = 'bold 16px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`${pct.toFixed(1)}%`, cx, cy + 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '9px monospace';
+            ctx.fillText(`${trafico} / ${capacidad} Mbps`, cx, cy + 20);
+        });
+    },
+
+    rtt(canvas, dist, vel, dispositivos, latenciaTotal) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.04;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const cy = h / 2;
+            // Nodos origen y destino
+            const ox = 30, dx = w - 30;
+            const pulse = 0.5 + 0.5 * Math.sin(t * 2);
+            ctx.fillStyle = `rgba(79,191,167,${0.4 + 0.3 * pulse})`;
+            ctx.beginPath(); ctx.arc(ox, cy, 8, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(dx, cy, 8, 0, Math.PI * 2); ctx.fill();
+            // Paquete viajando
+            const pct = (t * 2) % 1;
+            const px = ox + (dx - ox) * pct;
+            const py = cy + (pct > 0.5 ? -1 : 1) * 8 * Math.sin(t * 6);
+            ctx.fillStyle = '#f9c74f';
+            ctx.shadowColor = '#f9c74f'; ctx.shadowBlur = 10;
+            ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowBlur = 0;
+            // Línea
+            ctx.strokeStyle = 'rgba(79,191,167,0.15)'; ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(ox, cy); ctx.lineTo(dx, cy); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#fff'; ctx.font = '10px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`${dist} km · ${dispositivos} hops`, w / 2, cy + 25);
+            ctx.fillStyle = '#4fbfa7';
+            ctx.fillText(`RTT: ${latenciaTotal.toFixed(2)} ms`, w / 2, cy - 20);
+        });
+    },
+
+    throughput(canvas, capacidad, overhead, efectivo) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.02;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const barW = w - 60, barX = 30, barY = h / 2 - 20;
+            // Barra nominal
+            ctx.fillStyle = 'rgba(79,191,167,0.15)';
+            ctx.beginPath(); ctx.roundRect(barX, barY, barW, 25, 6); ctx.fill();
+            ctx.fillStyle = '#4fbfa7'; ctx.font = '9px monospace';
+            ctx.fillText(`Nominal: ${capacidad} Mbps`, barX + 5, barY + 17);
+            // Barra efectiva
+            const effW = (efectivo / capacidad) * barW;
+            const animW = Math.min(effW, barW * Math.min(1, t * 2));
+            const grad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+            grad.addColorStop(0, '#4fbfa7'); grad.addColorStop(1, '#4ff97b');
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.roundRect(barX, barY + 30, animW, 25, 6); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 9px monospace';
+            ctx.fillText(`Real: ${efectivo.toFixed(1)} Mbps (${(100-overhead)}%)`, barX + 5, barY + 47);
+            // Overhead (pérdida)
+            const lostW = barW - effW;
+            ctx.fillStyle = 'rgba(249,79,79,0.2)';
+            ctx.beginPath(); ctx.roundRect(barX + effW, barY + 30, lostW, 25, 6); ctx.fill();
+        });
+    },
+
+    poe(canvas, disp, potencia, total, estandar) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.02;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const maxDisp = Math.min(disp, 16);
+            const cols = 4, rows = Math.ceil(maxDisp / cols);
+            const cellW = (w - 40) / cols, cellH = (h - 60) / rows;
+            for (let i = 0; i < maxDisp; i++) {
+                const col = i % cols, row = Math.floor(i / cols);
+                const cx = 20 + col * cellW + cellW / 2;
+                const cy = 20 + row * cellH + cellH / 2;
+                const on = Math.sin(t * 2 + i * 1.3) > 0;
+                const r = Math.min(cellW, cellH) / 2 - 6;
+                ctx.fillStyle = on ? `rgba(79,251,123,${0.2 + 0.2 * Math.sin(t * 3 + i)})` : 'rgba(79,191,167,0.05)';
+                ctx.beginPath(); ctx.roundRect(cx - r, cy - r, r * 2, r * 2, 4); ctx.fill();
+                if (on) {
+                    ctx.fillStyle = '#4ff97b'; ctx.font = '8px monospace'; ctx.textAlign = 'center';
+                    ctx.fillText(`${potencia}W`, cx, cy + 3);
+                }
+            }
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`Total: ${total.toFixed(1)} W (${estandar})`, w / 2, h - 12);
+        });
+    },
+
+    dns(canvas, dominio, registros) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.02;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const cx = w / 2;
+            const pulse = 0.5 + 0.5 * Math.sin(t * 2);
+            const ay = 20 + (h - 60) * (0.3 + 0.3 * Math.sin(t * 1.5));
+            ctx.fillStyle = `rgba(79,191,167,${0.3 + 0.3 * pulse})`;
+            ctx.beginPath(); ctx.roundRect(cx - 60, ay, 120, 28, 8); ctx.fill();
+            ctx.fillStyle = '#4fbfa7'; ctx.font = 'bold 10px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(dominio, cx, ay + 19);
+            ctx.fillStyle = 'rgba(249,199,79,0.4)';
+            const arrowY = ay + 40;
+            ctx.beginPath(); ctx.moveTo(cx, arrowY); ctx.lineTo(cx - 6, arrowY - 8); ctx.lineTo(cx + 6, arrowY - 8); ctx.fill();
+            const records = registros.slice(0, 6);
+            records.forEach((r, i) => {
+                const ry = arrowY + 15 + i * 22;
+                ctx.fillStyle = `rgba(255,255,255,${0.05 + 0.05 * (i % 2)})`;
+                ctx.beginPath(); ctx.roundRect(20, ry, w - 40, 18, 4); ctx.fill();
+                ctx.fillStyle = '#f9c74f'; ctx.font = '9px monospace'; ctx.textAlign = 'left';
+                ctx.fillText(r.tipo, 25, ry + 13);
+                ctx.fillStyle = '#fff'; ctx.textAlign = 'right';
+                ctx.fillText(r.valor, w - 25, ry + 13);
+            });
+        });
+    },
+
+    fragmentacion(canvas, paquete, mtu, fragmentos) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        const count = Math.min(fragmentos, 10);
+        this._startLoop(canvas, () => {
+            t += 0.03;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const gap = 4, barH = 18, totalW = w - 40;
+            const segW = (totalW - gap * (count - 1)) / count;
+            for (let i = 0; i < count; i++) {
+                const bx = 20 + i * (segW + gap);
+                const by = h / 2 - barH / 2;
+                const isLast = i === count - 1;
+                const fall = Math.sin(t * 2 + i) * 2;
+                ctx.fillStyle = isLast ? `rgba(249,199,79,${0.3 + 0.2 * Math.sin(t * 3)})` : `rgba(79,191,167,${0.4 + 0.2 * Math.sin(t * 2 + i)})`;
+                ctx.beginPath(); ctx.roundRect(bx, by + fall, segW, barH, 4); ctx.fill();
+                ctx.fillStyle = isLast ? '#f9c74f' : '#4fbfa7';
+                ctx.font = '8px monospace'; ctx.textAlign = 'center';
+                const lastBytes = paquete - (count - 1) * mtu;
+                ctx.fillText(isLast ? `${lastBytes}` : `${mtu}`, bx + segW / 2, by + fall + 13);
+            }
+            ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`${paquete} bytes  →  MTU ${mtu}  →  ${fragmentos} fragmentos`, w / 2, h - 15);
+        });
+    },
+
+    vlan(canvas) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.02;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const cols = 12, rows = 6;
+            const cellW = (w - 20) / cols, cellH = (h - 40) / rows;
+            for (let i = 0; i < 72; i++) {
+                const col = i % cols, row = Math.floor(i / cols);
+                const cx = 10 + col * cellW + cellW / 2;
+                const cy = 15 + row * cellH + cellH / 2;
+                const active = (i + 1) % 2 === 0;
+                ctx.fillStyle = active ? `rgba(79,191,167,${0.2 + 0.1 * Math.sin(t * 2 + i)})` : 'rgba(255,255,255,0.05)';
+                ctx.beginPath(); ctx.roundRect(cx - cellW / 2 + 1, cy - cellH / 2 + 1, cellW - 2, cellH - 2, 3); ctx.fill();
+                if (active) {
+                    ctx.fillStyle = '#4fbfa7'; ctx.font = '7px monospace'; ctx.textAlign = 'center';
+                    ctx.fillText(`${i + 1}`, cx, cy + 3);
+                }
+            }
+            ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
+            ctx.fillText('VLANs 1-4094 disponibles', w / 2, h - 10);
+        });
+    },
+
+    dhcp(canvas, totalIps, reservas, disponibles) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.02;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const barW = w - 60, barH = 30, barX = 30, barY = h / 2 - 15;
+            ctx.fillStyle = 'rgba(79,191,167,0.2)';
+            ctx.beginPath(); ctx.roundRect(barX, barY, barW, barH, 6); ctx.fill();
+            const dispW = (disponibles / totalIps) * barW;
+            const animW = Math.min(dispW, barW * Math.min(1, t * 2));
+            const grad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+            grad.addColorStop(0, '#4fbfa7'); grad.addColorStop(1, '#4ff97b');
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.roundRect(barX, barY, animW, barH, 6); ctx.fill();
+            const resW = (reservas / totalIps) * barW;
+            ctx.fillStyle = 'rgba(249,199,79,0.4)';
+            ctx.beginPath(); ctx.roundRect(barX + dispW, barY, resW, barH, [0, 6, 6, 0]); ctx.fill();
+            ctx.fillStyle = '#4ff97b'; ctx.font = '9px monospace'; ctx.textAlign = 'left';
+            ctx.fillText(`Disponibles: ${disponibles}`, barX + 5, barY + 20);
+            if (resW > 40) {
+                ctx.fillStyle = '#f9c74f'; ctx.textAlign = 'right';
+                ctx.fillText(`Reservas: ${reservas}`, barX + barW - 5, barY + 20);
+            }
+            ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`Total: ${totalIps} IPs`, w / 2, h - 15);
+        });
+    },
+
+    overhead_tcp(canvas, paquete, cabeceras, datosUtiles, overheadPct) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+        this._startLoop(canvas, () => {
+            t += 0.02;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, w, h);
+            const barW = w - 40, barX = 20, barY = h / 2 - 25;
+            const datosW = (datosUtiles / paquete) * barW;
+            const animW = Math.min(datosW, barW * Math.min(1, t * 2));
+            const grad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+            grad.addColorStop(0, '#4ff97b'); grad.addColorStop(1, '#4fbfa7');
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.roundRect(barX, barY, animW, 20, [6, 0, 0, 6]); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.font = '9px monospace'; ctx.textAlign = 'left';
+            ctx.fillText(`Datos: ${datosUtiles} B`, barX + 5, barY + 15);
+            const cabW = barW - datosW;
+            ctx.fillStyle = 'rgba(249,79,79,0.3)';
+            ctx.beginPath(); ctx.roundRect(barX + animW, barY, cabW, 20, [0, 6, 6, 0]); ctx.fill();
+            ctx.fillStyle = '#f94f4f'; ctx.font = '9px monospace'; ctx.textAlign = 'right';
+            ctx.fillText(`Cabeceras: ${cabeceras} B`, barX + barW - 5, barY + 15);
+            ctx.fillStyle = '#f9c74f'; ctx.font = 'bold 14px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`Overhead: ${overheadPct.toFixed(1)}%`, w / 2, barY + 55);
+        });
+    }
+};

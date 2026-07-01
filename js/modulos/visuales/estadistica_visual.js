@@ -1,1 +1,440 @@
-FORMS.estad={basica:{title:"Estad\xEDstica Descriptiva",formula:"An\xE1lisis de tendencia central y dispersi\xF3n",fields:[{id:"data",label:"Datos (separados por espacio)",type:"text",val:"10 15 15 20 25"}],calc(r){let e=r.data.value.trim().split(/[\s,]+/).map(Number).filter(s=>!isNaN(s)).sort((s,d)=>s-d);if(e.length<2)return{error:!0,msg:"Ingres\xE1 al menos 2 n\xFAmeros",label:"Insuficiente"};let a=e.length,t=e.reduce((s,d)=>s+d,0),l=t/a,i=a%2===0?(e[a/2-1]+e[a/2])/2:e[Math.floor(a/2)],o=e.reduce((s,d)=>s+Math.pow(d-l,2),0)/(a-1),n=Math.sqrt(o);return{main:`Media: ${l.toFixed(2)}`,label:`N = ${a} muestras`,extras:[{cls:"info",txt:`Mediana: ${i} | Rango: ${e[a-1]-e[0]}`},{cls:"info",txt:`Desv. Est\xE1ndar (s): ${n.toFixed(3)}`},{cls:"ok",txt:`Suma total: ${t}`}],steps:[`Media = \u03A3x / n = ${t} / ${a}`,"s = \u221A(\u03A3(x-\u03BC)\xB2 / (n-1))"],chart(s){EstadisticaVisual.basica(s,e,l,i,n)}}}},percentiles:{title:"Percentiles y Cuartiles",formula:"Posici\xF3n de datos P_k = k * (n + 1) / 100",fields:[{id:"data",label:"Datos (separados por espacio)",type:"text",val:"3 5 7 8 9 11 13 15"},{id:"k",label:"Percentil deseado (k: 1-99)",type:"text",val:"75"}],calc(r){let e=r.data.value.trim().split(/[\s,]+/).map(Number).filter(s=>!isNaN(s)).sort((s,d)=>s-d),a=parseFloat(r.k.value);if(e.length<2)return{error:!0,msg:"Faltan datos",label:"Error"};if(isNaN(a)||a<1||a>99)return{error:!0,msg:"k debe estar entre 1 y 99",label:"Rango Inv\xE1lido"};let t=e.length,l=a/100*(t-1),i=Math.floor(l),o=Math.ceil(l),n=e[i]+(l-i)*(e[o]-e[i]);return{main:`P(${a}) = ${n.toFixed(2)}`,label:`Percentil ${a}`,extras:[{cls:"info",txt:`Valor m\xEDnimo: ${e[0]} | M\xE1ximo: ${e[t-1]}`},{cls:"ok",txt:`\xCDndice calculado pos: ${l.toFixed(2)}`}],steps:[`Posici\xF3n aproximada = (${a}/100) * (${t}-1)`],chart(s){EstadisticaVisual.percentiles(s,e,l,n,a)}}}},regresion:{title:"Regresi\xF3n Lineal Simple",formula:"y = mx + b",fields:[{id:"x_vals",label:"Valores X (ej: 1 2 3)",type:"text",val:"1 2 3 4 5"},{id:"y_vals",label:"Valores Y (ej: 2 4 5)",type:"text",val:"3 5 7 9 11"}],calc(r){let e=r.x_vals.value.trim().split(/[\s,]+/).map(Number),a=r.y_vals.value.trim().split(/[\s,]+/).map(Number);if(e.length!==a.length||e.length<2)return{error:!0,msg:"X e Y deben tener la misma cantidad de datos (min 2)",label:"Desajuste"};let t=e.length,l=0,i=0,o=0,n=0;for(let u=0;u<t;u++)l+=e[u],i+=a[u],o+=e[u]*a[u],n+=e[u]*e[u];let s=(t*o-l*i)/(t*n-l*l),d=(i-s*l)/t;return{main:`y = ${s.toFixed(2)}x + ${d.toFixed(2)}`,label:"Ecuaci\xF3n de la recta",extras:[{cls:"info",txt:`Pendiente (m): ${s.toFixed(4)}`},{cls:"info",txt:`Intersecci\xF3n (b): ${d.toFixed(4)}`}],steps:["m = (n\u03A3xy - \u03A3x\u03A3y) / (n\u03A3x\xB2 - (\u03A3x)\xB2)","b = (\u03A3y - m\u03A3x) / n"],chart(u){EstadisticaVisual.regresion(u,e,a,s,d)}}}},normal:{title:"Distribuci\xF3n Normal (Z-Score)",formula:"Z = (x \u2212 \u03BC) / \u03C3",fields:[{id:"x",label:"Valor (x)",val:"115"},{id:"m",label:"Media (\u03BC)",val:"100"},{id:"s",label:"Desv. Est\xE1ndar (\u03C3)",val:"15"}],calc(r){let e=parseFloat(r.x.value),a=parseFloat(r.m.value),t=parseFloat(r.s.value);if(isNaN(e)||isNaN(a)||isNaN(t))return null;if(t<=0)return{error:!0,msg:"\u03C3 debe ser mayor a 0",label:"Error"};let l=(e-a)/t;return{main:`Z = ${l.toFixed(4)}`,label:"Puntaje Z",extras:[{cls:"info",txt:`A ${l.toFixed(2)} desviaciones de la media`}],steps:[`Z = (${e} - ${a}) / ${t}`],chart(i){EstadisticaVisual.normal(i,e,a,t)}}}},confianza:{title:"Intervalo de Confianza (Media)",formula:"IC = x\u0304 \xB1 Z * (s / \u221An)",fields:[{id:"media",label:"Media muestral (x\u0304)",val:"50"},{id:"sd",label:"Desv. Est\xE1ndar (s)",val:"10"},{id:"n",label:"Tama\xF1o muestra (n)",val:"30"},{id:"conf",label:"Confianza (90, 95 o 99%)",val:"95"}],calc(r){let e=parseFloat(r.media.value),a=parseFloat(r.sd.value),t=parseFloat(r.n.value),l=parseFloat(r.conf.value);if(a<=0||t<=1)return{error:!0,msg:"Par\xE1metros inv\xE1lidos (n > 1, s > 0)",label:"Error"};let i=1.96;l===90?i=1.645:l===99&&(i=2.576);let o=i*(a/Math.sqrt(t)),n=e-o,s=e+o;return{main:`[${n.toFixed(2)} ; ${s.toFixed(2)}]`,label:`Intervalo de Confianza al ${l}%`,extras:[{cls:"warn",txt:`Margen de Error (E): \xB1${o.toFixed(3)}`}],steps:[`Error est\xE1ndar = ${a} / \u221A${t}`,`Margen = ${i} * Error est.`],chart(d){EstadisticaVisual.confianza(d,n,s,e)}}}},combinatoria:{title:"Combinatoria y Permutaciones",formula:"nCr = n! / (r!(n-r)!)  |  nPr = n! / (n-r)!",fields:[{id:"n",label:"Elementos Totales (n)",val:"5"},{id:"r",label:"Elementos Elegidos (r)",val:"3"}],calc(r){let e=parseInt(r.n.value),a=parseInt(r.r.value);if(isNaN(e)||isNaN(a)||e<0||a<0||a>e)return{error:!0,msg:"Requisitos: n >= r >= 0",label:"Matem\xE1tica Err\xF3nea"};const t=o=>o<=1?1:o*t(o-1);let l=t(e)/(t(a)*t(e-a)),i=t(e)/t(e-a);return{main:`nCr: ${l} | nPr: ${i}`,label:"Combinaciones y Permutaciones",extras:[{cls:"ok",txt:`Formas de agrupar sin importar orden (nCr): ${l}`},{cls:"info",txt:`Formas donde s\xED importa el orden (nPr): ${i}`}],steps:[`nCr = ${e}! / (${a}! * (${e}-${a})!)`],chart(o){EstadisticaVisual.combinatoria(o,l,i)}}}}},FORMS.estad||(FORMS.estad={}),Object.assign(FORMS.estad,{media_geo:{title:"Media Geom\xE9trica y Arm\xF3nica",formula:"G = (\u220Fx)^(1/n)  |  H = n / \u2211(1/x)",fields:[{id:"data",label:"Datos (separados por espacio)",type:"text",val:"2 4 8 16"}],calc(r){let e=r.data.value.trim().split(/[\s,]+/).map(Number).filter(s=>!isNaN(s)&&s>0);if(e.length<2)return{error:!0,msg:"Ingres\xE1 al menos 2 n\xFAmeros positivos",label:"Insuficiente"};let a=e.length,t=e.reduce((s,d)=>s*d,1),l=Math.pow(t,1/a),i=e.reduce((s,d)=>s+1/d,0),o=a/i,n=e.reduce((s,d)=>s+d,0)/a;return{main:`G: ${l.toFixed(4)} | H: ${o.toFixed(4)}`,label:`n = ${a}`,extras:[{cls:"info",txt:`Media aritm\xE9tica: ${n.toFixed(4)}`},{cls:"ok",txt:`G \u2265 H (${l.toFixed(4)} \u2265 ${o.toFixed(4)})`}],steps:[`G = (${e.join(" \xD7 ")})^(1/${a})`,`H = ${a} / (${e.map(s=>"1/"+s).join(" + ")})`],chart(s){EstadisticaVisual.media_geo(s,n,l,o)}}}},probabilidad:{title:"Probabilidad Simple",formula:"P = Casos favorables / Casos posibles",fields:[{id:"favorables",label:"Casos favorables",val:"1"},{id:"posibles",label:"Casos posibles",val:"6"}],calc(r){let e=parseInt(r.favorables.value),a=parseInt(r.posibles.value);if(isNaN(e)||isNaN(a)||a<=0||e<0)return{error:!0,msg:"Valores inv\xE1lidos",label:"Error"};if(e>a)return{error:!0,msg:"Favorables no puede superar a posibles",label:"Error"};let t=e/a,l=t*100;return{main:`P = ${t.toFixed(4)}`,label:"Probabilidad",extras:[{cls:"info",txt:`${l.toFixed(2)}% de probabilidad`},{cls:"ok",txt:`Raz\xF3n: ${e}:${a}`}],steps:[`P = ${e} / ${a}`,`P = ${t.toFixed(6)}`],chart(i){EstadisticaVisual.probabilidad(i,t,e,a)}}}},binomial:{title:"Distribuci\xF3n Binomial",formula:"P(X=k) = C(n,k) \xD7 p^k \xD7 (1-p)^(n-k)",fields:[{id:"n",label:"N\xFAmero de ensayos (n)",val:"10"},{id:"k",label:"\xC9xitos deseados (k)",val:"3"},{id:"p",label:"Probabilidad de \xE9xito (p)",val:"0.5"}],calc(r){let e=parseInt(r.n.value),a=parseInt(r.k.value),t=parseFloat(r.p.value);if(isNaN(e)||isNaN(a)||isNaN(t)||e<0||a<0||a>e||t<0||t>1)return{error:!0,msg:"Requisitos: n \u2265 k \u2265 0, 0 \u2264 p \u2264 1",label:"Error"};const l=n=>n<=1?1:n*l(n-1);let i=l(e)/(l(a)*l(e-a)),o=i*Math.pow(t,a)*Math.pow(1-t,e-a);return{main:`P(X=${a}) = ${o.toFixed(6)}`,label:`Binomial(n=${e}, p=${t})`,extras:[{cls:"info",txt:`Media: \u03BC = ${(e*t).toFixed(4)}`},{cls:"info",txt:`Desv. est: \u03C3 = ${Math.sqrt(e*t*(1-t)).toFixed(4)}`}],steps:[`C(${e},${a}) = ${i}`,`P = ${i} \xD7 ${t}^${a} \xD7 ${(1-t).toFixed(4)}^${e-a}`],chart(n){EstadisticaVisual.binomial(n,e,t,a,o)}}}},poisson:{title:"Distribuci\xF3n de Poisson",formula:"P(X=k) = (\u03BB^k \xD7 e^(-\u03BB)) / k!",fields:[{id:"lambda",label:"Tasa media (\u03BB)",val:"3"},{id:"k",label:"Valor de k",val:"2"}],calc(r){let e=parseFloat(r.lambda.value),a=parseInt(r.k.value);if(isNaN(e)||isNaN(a)||e<=0||a<0)return{error:!0,msg:"\u03BB > 0, k \u2265 0",label:"Error"};const t=i=>i<=1?1:i*t(i-1);let l=Math.pow(e,a)*Math.exp(-e)/t(a);return{main:`P(X=${a}) = ${l.toFixed(6)}`,label:`Poisson(\u03BB=${e})`,extras:[{cls:"info",txt:`Media = Varianza = ${e.toFixed(4)}`},{cls:"ok",txt:`Desv. est: ${Math.sqrt(e).toFixed(4)}`}],steps:[`P = (${e}^${a} \xD7 e^(-${e})) / ${a}!`],chart(i){EstadisticaVisual.poisson(i,e,a,l)}}}},chi_cuadrado:{title:"Chi-Cuadrado (\u03C7\xB2)",formula:"\u03C7\xB2 = \u03A3((O-E)\xB2/E)",fields:[{id:"observados",label:"Frecuencias observadas (espacio)",type:"text",val:"10 12 8 15"},{id:"esperados",label:"Frecuencias esperadas (espacio)",type:"text",val:"10 10 10 10"}],calc(r){let e=r.observados.value.trim().split(/[\s,]+/).map(Number).filter(l=>!isNaN(l)),a=r.esperados.value.trim().split(/[\s,]+/).map(Number).filter(l=>!isNaN(l));if(e.length!==a.length||e.length<2)return{error:!0,msg:"Misma cantidad de observados y esperados (min 2)",label:"Desajuste"};let t=0;for(let l=0;l<e.length;l++){if(a[l]<=0)return{error:!0,msg:"Esperados deben ser > 0",label:"Error"};t+=Math.pow(e[l]-a[l],2)/a[l]}return{main:`\u03C7\xB2 = ${t.toFixed(4)}`,label:`Con ${e.length-1} grados de libertad`,extras:[{cls:"info",txt:`Suma observados: ${e.reduce((l,i)=>l+i,0)}`},{cls:"info",txt:`Suma esperados: ${a.reduce((l,i)=>l+i,0)}`}],steps:e.map((l,i)=>`(${l} - ${a[i]})\xB2 / ${a[i]} = ${(Math.pow(l-a[i],2)/a[i]).toFixed(4)}`),chart(l){EstadisticaVisual.chi_cuadrado(l,e,a,t)}}}},prob_condicional:{title:"Probabilidad Condicional",formula:"P(A|B) = P(A\u2229B) / P(B)",fields:[{id:"p_interseccion",label:"P(A\u2229B)",val:"0.3"},{id:"p_b",label:"P(B)",val:"0.5"}],calc(r){let e=parseFloat(r.p_interseccion.value),a=parseFloat(r.p_b.value);if(isNaN(e)||isNaN(a)||a<=0||e<0||e>1||a>1)return{error:!0,msg:"Rango 0-1, P(B) > 0",label:"Error"};let t=e/a;return{main:`P(A|B) = ${t.toFixed(4)}`,label:"Probabilidad condicional",extras:[{cls:"info",txt:`P(A\u2229B) = ${e.toFixed(4)}`},{cls:"info",txt:`P(B) = ${a.toFixed(4)}`}],steps:[`P(A|B) = ${e} / ${a}`],chart(l){EstadisticaVisual.prob_condicional(l,t,e,a)}}}},teorema_bayes:{title:"Teorema de Bayes",formula:"P(A|B) = P(B|A) \xD7 P(A) / P(B)",fields:[{id:"p_b_dado_a",label:"P(B|A)",val:"0.8"},{id:"p_a",label:"P(A)",val:"0.3"},{id:"p_b",label:"P(B)",val:"0.5"}],calc(r){let e=parseFloat(r.p_b_dado_a.value),a=parseFloat(r.p_a.value),t=parseFloat(r.p_b.value);if(isNaN(e)||isNaN(a)||isNaN(t)||t<=0||e<0||a<0||e>1||a>1||t>1)return{error:!0,msg:"Rango 0-1, P(B) > 0",label:"Error"};let l=e*a/t;return{main:`P(A|B) = ${l.toFixed(4)}`,label:"Probabilidad posterior",extras:[{cls:"info",txt:`P(B|A) \xD7 P(A) = ${(e*a).toFixed(4)}`},{cls:"ok",txt:`Raz\xF3n de verosimilitud: ${(e/t).toFixed(4)}`}],steps:[`P(A|B) = (${e} \xD7 ${a}) / ${t}`],chart(i){EstadisticaVisual.teorema_bayes(i,l,e,a,t)}}}},cuartiles:{title:"Cuartiles e IQR",formula:"Q1, Q2 (mediana), Q3, IQR = Q3 - Q1",fields:[{id:"data",label:"Datos (separados por espacio)",type:"text",val:"3 7 8 9 12 15 18 20 25"}],calc(r){let e=r.data.value.trim().split(/[\s,]+/).map(Number).filter(d=>!isNaN(d)).sort((d,u)=>d-u);if(e.length<4)return{error:!0,msg:"Ingres\xE1 al menos 4 n\xFAmeros",label:"Insuficiente"};let a=e.length,t=a%2===0?(e[a/2-1]+e[a/2])/2:e[Math.floor(a/2)],l=e.slice(0,Math.floor(a/2)),i=e.slice(Math.ceil(a/2)),o=l.length%2===0?(l[l.length/2-1]+l[l.length/2])/2:l[Math.floor(l.length/2)],n=i.length%2===0?(i[i.length/2-1]+i[i.length/2])/2:i[Math.floor(i.length/2)],s=n-o;return{main:`Q1: ${o} | Q2: ${t} | Q3: ${n}`,label:`n = ${a}`,extras:[{cls:"ok",txt:`IQR = ${s.toFixed(2)}`},{cls:"info",txt:`Rango: [${e[0]}, ${e[a-1]}]`}],steps:[`Datos ordenados: ${e.join(", ")}`,`Q2 (mediana) = ${t}`],chart(d){EstadisticaVisual.cuartiles(d,e,o,t,n)}}}},desviacion_media:{title:"Desviaci\xF3n Media Absoluta",formula:"DM = \u03A3|x - x\u0304| / n",fields:[{id:"data",label:"Datos (separados por espacio)",type:"text",val:"10 12 15 18 20"}],calc(r){let e=r.data.value.trim().split(/[\s,]+/).map(Number).filter(o=>!isNaN(o));if(e.length<2)return{error:!0,msg:"Ingres\xE1 al menos 2 n\xFAmeros",label:"Insuficiente"};let a=e.length,t=e.reduce((o,n)=>o+n,0)/a,l=e.reduce((o,n)=>o+Math.abs(n-t),0)/a,i=e.reduce((o,n)=>o+Math.pow(n-t,2),0)/(a-1);return{main:`DM = ${l.toFixed(4)}`,label:"Desviaci\xF3n media absoluta",extras:[{cls:"info",txt:`Media: ${t.toFixed(4)}`},{cls:"info",txt:`Varianza: ${i.toFixed(4)} | Desv. Est: ${Math.sqrt(i).toFixed(4)}`}],steps:[`x\u0304 = ${t.toFixed(4)}`,`DM = \u03A3|x - x\u0304| / ${a}`],chart(o){EstadisticaVisual.desviacion_media(o,e,t,l)}}}}});
+FORMS.estad = {
+    basica: {
+        title: 'Estadística Descriptiva',
+        formula: 'Análisis de tendencia central y dispersión',
+        fields: [{ id: 'data', label: 'Datos (separados por espacio)', type: 'text', val: '10 15 15 20 25' }],
+        calc(f) {
+            let raw = f.data.value.trim().split(/[\s,]+/);
+            let nums = raw.map(Number).filter(n => !isNaN(n)).sort((a,b) => a-b);
+            if (nums.length < 2) return { error: true, msg: "Ingresá al menos 2 números", label: "Insuficiente" };
+
+            let n = nums.length;
+            let suma = nums.reduce((a, b) => a + b, 0);
+            let media = suma / n;
+            
+            let med = n % 2 === 0 ? (nums[n/2-1] + nums[n/2]) / 2 : nums[Math.floor(n/2)];
+
+            let varz = nums.reduce((a, b) => a + Math.pow(b - media, 2), 0) / (n - 1);
+            let sd = Math.sqrt(varz);
+
+            return {
+                main: `Media: ${media.toFixed(2)}`,
+                label: `N = ${n} muestras`,
+                extras: [
+                    { cls: 'info', txt: `Mediana: ${med} | Rango: ${nums[n-1] - nums[0]}` },
+                    { cls: 'info', txt: `Desv. Estándar (s): ${sd.toFixed(3)}` },
+                    { cls: 'ok', txt: `Suma total: ${suma}` }
+                ],
+                steps: [`Media = Σx / n = ${suma} / ${n}`, `s = √(Σ(x-μ)² / (n-1))`],
+                chart(canvas) {
+                    EstadisticaVisual.basica(canvas, nums, media, med, sd);
+                }
+            };
+        }
+    },
+    percentiles: {
+        title: 'Percentiles y Cuartiles',
+        formula: 'Posición de datos P_k = k * (n + 1) / 100',
+        fields: [
+            { id: 'data', label: 'Datos (separados por espacio)', type: 'text', val: '3 5 7 8 9 11 13 15' },
+            { id: 'k', label: 'Percentil deseado (k: 1-99)', type: 'text', val: '75' }
+        ],
+        calc(f) {
+            let raw = f.data.value.trim().split(/[\s,]+/);
+            let nums = raw.map(Number).filter(n => !isNaN(n)).sort((a,b) => a-b);
+            let k = parseFloat(f.k.value);
+
+            if (nums.length < 2) return { error: true, msg: "Faltan datos", label: "Error" };
+            if (isNaN(k) || k < 1 || k > 99) return { error: true, msg: "k debe estar entre 1 y 99", label: "Rango Inválido" };
+
+            let n = nums.length;
+            // Método de interpolación lineal estándar
+            let idx = (k / 100) * (n - 1);
+            let low = Math.floor(idx);
+            let high = Math.ceil(idx);
+            let pVal = nums[low] + (idx - low) * (nums[high] - nums[low]);
+
+            return {
+                main: `P(${k}) = ${pVal.toFixed(2)}`,
+                label: `Percentil ${k}`,
+                extras: [
+                    { cls: 'info', txt: `Valor mínimo: ${nums[0]} | Máximo: ${nums[n-1]}` },
+                    { cls: 'ok', txt: `Índice calculado pos: ${idx.toFixed(2)}` }
+                ],
+                steps: [`Posición aproximada = (${k}/100) * (${n}-1)`],
+                chart(canvas) {
+                    EstadisticaVisual.percentiles(canvas, nums, idx, pVal, k);
+                }
+            };
+        }
+    },
+    regresion: {
+        title: 'Regresión Lineal Simple',
+        formula: 'y = mx + b',
+        fields: [
+            { id: 'x_vals', label: 'Valores X (ej: 1 2 3)', type: 'text', val: '1 2 3 4 5' },
+            { id: 'y_vals', label: 'Valores Y (ej: 2 4 5)', type: 'text', val: '3 5 7 9 11' }
+        ],
+        calc(f) {
+            let x = f.x_vals.value.trim().split(/[\s,]+/).map(Number);
+            let y = f.y_vals.value.trim().split(/[\s,]+/).map(Number);
+            if (x.length !== y.length || x.length < 2) return { error: true, msg: "X e Y deben tener la misma cantidad de datos (min 2)", label: "Desajuste" };
+
+            let n = x.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+            for (let i = 0; i < n; i++) {
+                sumX += x[i]; sumY += y[i];
+                sumXY += x[i] * y[i]; sumXX += x[i] * x[i];
+            }
+            let m = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+            let b = (sumY - m * sumX) / n;
+
+            return {
+                main: `y = ${m.toFixed(2)}x + ${b.toFixed(2)}`,
+                label: 'Ecuación de la recta',
+                extras: [{ cls: 'info', txt: `Pendiente (m): ${m.toFixed(4)}` }, { cls: 'info', txt: `Intersección (b): ${b.toFixed(4)}` }],
+                steps: [`m = (nΣxy - ΣxΣy) / (nΣx² - (Σx)²)`, `b = (Σy - mΣx) / n`],
+                chart(canvas) {
+                    EstadisticaVisual.regresion(canvas, x, y, m, b);
+                }
+            };
+        }
+    },
+    normal: {
+        title: 'Distribución Normal (Z-Score)',
+        formula: 'Z = (x − μ) / σ',
+        fields: [
+            { id: 'x', label: 'Valor (x)', val: '115' },
+            { id: 'm', label: 'Media (μ)', val: '100' },
+            { id: 's', label: 'Desv. Estándar (σ)', val: '15' }
+        ],
+        calc(f) {
+            let x = parseFloat(f.x.value), m = parseFloat(f.m.value), s = parseFloat(f.s.value);
+            if (isNaN(x) || isNaN(m) || isNaN(s)) return null;
+            if (s <= 0) return { error: true, msg: "σ debe ser mayor a 0", label: "Error" };
+            let z = (x - m) / s;
+            return { 
+                main: `Z = ${z.toFixed(4)}`,
+                label: 'Puntaje Z',
+                extras: [{ cls: 'info', txt: `A ${z.toFixed(2)} desviaciones de la media` }],
+                steps: [`Z = (${x} - ${m}) / ${s}`],
+                chart(canvas) {
+                    EstadisticaVisual.normal(canvas, x, m, s);
+                }
+            };
+        }
+    },
+    confianza: {
+        title: 'Intervalo de Confianza (Media)',
+        formula: 'IC = x̄ ± Z * (s / √n)',
+        fields: [
+            { id: 'media', label: 'Media muestral (x̄)', val: '50' },
+            { id: 'sd', label: 'Desv. Estándar (s)', val: '10' },
+            { id: 'n', label: 'Tamaño muestra (n)', val: '30' },
+            { id: 'conf', label: 'Confianza (90, 95 o 99%)', val: '95' }
+        ],
+        calc(f) {
+            let xBar = parseFloat(f.media.value), s = parseFloat(f.sd.value), n = parseFloat(f.n.value), c = parseFloat(f.conf.value);
+            if (s <= 0 || n <= 1) return { error: true, msg: "Parámetros inválidos (n > 1, s > 0)", label: "Error" };
+            
+            // Valores Z críticos estándar
+            let z = 1.96; 
+            if (c === 90) z = 1.645;
+            else if (c === 99) z = 2.576;
+
+            let margen = z * (s / Math.sqrt(n));
+            let li = xBar - margen;
+            let ls = xBar + margen;
+
+            return {
+                main: `[${li.toFixed(2)} ; ${ls.toFixed(2)}]`,
+                label: `Intervalo de Confianza al ${c}%`,
+                extras: [{ cls: 'warn', txt: `Margen de Error (E): ±${margen.toFixed(3)}` }],
+                steps: [`Error estándar = ${s} / √${n}`, `Margen = ${z} * Error est.`],
+                chart(canvas) {
+                    EstadisticaVisual.confianza(canvas, li, ls, xBar);
+                }
+            };
+        }
+    },
+    combinatoria: {
+        title: 'Combinatoria y Permutaciones',
+        formula: 'nCr = n! / (r!(n-r)!)  |  nPr = n! / (n-r)!',
+        fields: [
+            { id: 'n', label: 'Elementos Totales (n)', val: '5' },
+            { id: 'r', label: 'Elementos Elegidos (r)', val: '3' }
+        ],
+        calc(f) {
+            let n = parseInt(f.n.value), r = parseInt(f.r.value);
+            if (isNaN(n) || isNaN(r) || n < 0 || r < 0 || r > n) {
+                return { error: true, msg: "Requisitos: n >= r >= 0", label: "Matemática Errónea" };
+            }
+
+            const fact = num => num <= 1 ? 1 : num * fact(num - 1);
+            
+            let comb = fact(n) / (fact(r) * fact(n - r));
+            let perm = fact(n) / fact(n - r);
+
+            return {
+                main: `nCr: ${comb} | nPr: ${perm}`,
+                label: 'Combinaciones y Permutaciones',
+                extras: [
+                    { cls: 'ok', txt: `Formas de agrupar sin importar orden (nCr): ${comb}` },
+                    { cls: 'info', txt: `Formas donde sí importa el orden (nPr): ${perm}` }
+                ],
+                steps: [`nCr = ${n}! / (${r}! * (${n}-${r})!)`],
+                chart(canvas) {
+                    EstadisticaVisual.combinatoria(canvas, comb, perm);
+                }
+            };
+        }
+    }
+};
+
+if (!FORMS.estad) FORMS.estad = {};
+Object.assign(FORMS.estad, {
+
+    media_geo: {
+        title: 'Media Geométrica y Armónica',
+        formula: 'G = (∏x)^(1/n)  |  H = n / ∑(1/x)',
+        fields: [{ id: 'data', label: 'Datos (separados por espacio)', type: 'text', val: '2 4 8 16' }],
+        calc(f) {
+            let raw = f.data.value.trim().split(/[\s,]+/);
+            let nums = raw.map(Number).filter(n => !isNaN(n) && n > 0);
+            if (nums.length < 2) return { error: true, msg: "Ingresá al menos 2 números positivos", label: "Insuficiente" };
+            let n = nums.length;
+            let prod = nums.reduce((a, b) => a * b, 1);
+            let geo = Math.pow(prod, 1 / n);
+            let sumInv = nums.reduce((a, b) => a + 1 / b, 0);
+            let harm = n / sumInv;
+            let arith = nums.reduce((a, b) => a + b, 0) / n;
+            return {
+                main: `G: ${geo.toFixed(4)} | H: ${harm.toFixed(4)}`,
+                label: `n = ${n}`,
+                extras: [
+                    { cls: 'info', txt: `Media aritmética: ${arith.toFixed(4)}` },
+                    { cls: 'ok', txt: `G ≥ H (${geo.toFixed(4)} ≥ ${harm.toFixed(4)})` }
+                ],
+                steps: [`G = (${nums.join(' × ')})^(1/${n})`, `H = ${n} / (${nums.map(v => '1/' + v).join(' + ')})`],
+                chart(canvas) { EstadisticaVisual.media_geo(canvas, arith, geo, harm); }
+            };
+        }
+    },
+
+    probabilidad: {
+        title: 'Probabilidad Simple',
+        formula: 'P = Casos favorables / Casos posibles',
+        fields: [
+            { id: 'favorables', label: 'Casos favorables', val: '1' },
+            { id: 'posibles', label: 'Casos posibles', val: '6' }
+        ],
+        calc(f) {
+            let fav = parseInt(f.favorables.value);
+            let pos = parseInt(f.posibles.value);
+            if (isNaN(fav) || isNaN(pos) || pos <= 0 || fav < 0) return { error: true, msg: "Valores inválidos", label: "Error" };
+            if (fav > pos) return { error: true, msg: "Favorables no puede superar a posibles", label: "Error" };
+            let p = fav / pos;
+            let pct = p * 100;
+            return {
+                main: `P = ${p.toFixed(4)}`,
+                label: 'Probabilidad',
+                extras: [
+                    { cls: 'info', txt: `${pct.toFixed(2)}% de probabilidad` },
+                    { cls: 'ok', txt: `Razón: ${fav}:${pos}` }
+                ],
+                steps: [`P = ${fav} / ${pos}`, `P = ${p.toFixed(6)}`],
+                chart(canvas) { EstadisticaVisual.probabilidad(canvas, p, fav, pos); }
+            };
+        }
+    },
+
+    binomial: {
+        title: 'Distribución Binomial',
+        formula: 'P(X=k) = C(n,k) × p^k × (1-p)^(n-k)',
+        fields: [
+            { id: 'n', label: 'Número de ensayos (n)', val: '10' },
+            { id: 'k', label: 'Éxitos deseados (k)', val: '3' },
+            { id: 'p', label: 'Probabilidad de éxito (p)', val: '0.5' }
+        ],
+        calc(f) {
+            let n = parseInt(f.n.value), k = parseInt(f.k.value), p = parseFloat(f.p.value);
+            if (isNaN(n) || isNaN(k) || isNaN(p) || n < 0 || k < 0 || k > n || p < 0 || p > 1)
+                return { error: true, msg: "Requisitos: n ≥ k ≥ 0, 0 ≤ p ≤ 1", label: "Error" };
+            const fact = num => num <= 1 ? 1 : num * fact(num - 1);
+            let comb = fact(n) / (fact(k) * fact(n - k));
+            let prob = comb * Math.pow(p, k) * Math.pow(1 - p, n - k);
+            return {
+                main: `P(X=${k}) = ${prob.toFixed(6)}`,
+                label: `Binomial(n=${n}, p=${p})`,
+                extras: [
+                    { cls: 'info', txt: `Media: μ = ${(n * p).toFixed(4)}` },
+                    { cls: 'info', txt: `Desv. est: σ = ${(Math.sqrt(n * p * (1 - p))).toFixed(4)}` }
+                ],
+                steps: [`C(${n},${k}) = ${comb}`, `P = ${comb} × ${p}^${k} × ${(1-p).toFixed(4)}^${n-k}`],
+                chart(canvas) { EstadisticaVisual.binomial(canvas, n, p, k, prob); }
+            };
+        }
+    },
+
+    poisson: {
+        title: 'Distribución de Poisson',
+        formula: 'P(X=k) = (λ^k × e^(-λ)) / k!',
+        fields: [
+            { id: 'lambda', label: 'Tasa media (λ)', val: '3' },
+            { id: 'k', label: 'Valor de k', val: '2' }
+        ],
+        calc(f) {
+            let lam = parseFloat(f.lambda.value), k = parseInt(f.k.value);
+            if (isNaN(lam) || isNaN(k) || lam <= 0 || k < 0) return { error: true, msg: "λ > 0, k ≥ 0", label: "Error" };
+            const fact = num => num <= 1 ? 1 : num * fact(num - 1);
+            let prob = Math.pow(lam, k) * Math.exp(-lam) / fact(k);
+            return {
+                main: `P(X=${k}) = ${prob.toFixed(6)}`,
+                label: `Poisson(λ=${lam})`,
+                extras: [
+                    { cls: 'info', txt: `Media = Varianza = ${lam.toFixed(4)}` },
+                    { cls: 'ok', txt: `Desv. est: ${Math.sqrt(lam).toFixed(4)}` }
+                ],
+                steps: [`P = (${lam}^${k} × e^(-${lam})) / ${k}!`],
+                chart(canvas) { EstadisticaVisual.poisson(canvas, lam, k, prob); }
+            };
+        }
+    },
+
+    chi_cuadrado: {
+        title: 'Chi-Cuadrado (χ²)',
+        formula: 'χ² = Σ((O-E)²/E)',
+        fields: [
+            { id: 'observados', label: 'Frecuencias observadas (espacio)', type: 'text', val: '10 12 8 15' },
+            { id: 'esperados', label: 'Frecuencias esperadas (espacio)', type: 'text', val: '10 10 10 10' }
+        ],
+        calc(f) {
+            let obs = f.observados.value.trim().split(/[\s,]+/).map(Number).filter(n => !isNaN(n));
+            let esp = f.esperados.value.trim().split(/[\s,]+/).map(Number).filter(n => !isNaN(n));
+            if (obs.length !== esp.length || obs.length < 2) return { error: true, msg: "Misma cantidad de observados y esperados (min 2)", label: "Desajuste" };
+            let chi2 = 0;
+            for (let i = 0; i < obs.length; i++) {
+                if (esp[i] <= 0) return { error: true, msg: "Esperados deben ser > 0", label: "Error" };
+                chi2 += Math.pow(obs[i] - esp[i], 2) / esp[i];
+            }
+            return {
+                main: `χ² = ${chi2.toFixed(4)}`,
+                label: `Con ${obs.length - 1} grados de libertad`,
+                extras: [
+                    { cls: 'info', txt: `Suma observados: ${obs.reduce((a,b) => a+b, 0)}` },
+                    { cls: 'info', txt: `Suma esperados: ${esp.reduce((a,b) => a+b, 0)}` }
+                ],
+                steps: obs.map((o, i) => `(${o} - ${esp[i]})² / ${esp[i]} = ${(Math.pow(o - esp[i], 2) / esp[i]).toFixed(4)}`),
+                chart(canvas) { EstadisticaVisual.chi_cuadrado(canvas, obs, esp, chi2); }
+            };
+        }
+    },
+
+    prob_condicional: {
+        title: 'Probabilidad Condicional',
+        formula: 'P(A|B) = P(A∩B) / P(B)',
+        fields: [
+            { id: 'p_interseccion', label: 'P(A∩B)', val: '0.3' },
+            { id: 'p_b', label: 'P(B)', val: '0.5' }
+        ],
+        calc(f) {
+            let pInt = parseFloat(f.p_interseccion.value);
+            let pB = parseFloat(f.p_b.value);
+            if (isNaN(pInt) || isNaN(pB) || pB <= 0 || pInt < 0 || pInt > 1 || pB > 1)
+                return { error: true, msg: "Rango 0-1, P(B) > 0", label: "Error" };
+            let pAGivenB = pInt / pB;
+            return {
+                main: `P(A|B) = ${pAGivenB.toFixed(4)}`,
+                label: 'Probabilidad condicional',
+                extras: [
+                    { cls: 'info', txt: `P(A∩B) = ${pInt.toFixed(4)}` },
+                    { cls: 'info', txt: `P(B) = ${pB.toFixed(4)}` }
+                ],
+                steps: [`P(A|B) = ${pInt} / ${pB}`],
+                chart(canvas) { EstadisticaVisual.prob_condicional(canvas, pAGivenB, pInt, pB); }
+            };
+        }
+    },
+
+    teorema_bayes: {
+        title: 'Teorema de Bayes',
+        formula: 'P(A|B) = P(B|A) × P(A) / P(B)',
+        fields: [
+            { id: 'p_b_dado_a', label: 'P(B|A)', val: '0.8' },
+            { id: 'p_a', label: 'P(A)', val: '0.3' },
+            { id: 'p_b', label: 'P(B)', val: '0.5' }
+        ],
+        calc(f) {
+            let pBdA = parseFloat(f.p_b_dado_a.value);
+            let pA = parseFloat(f.p_a.value);
+            let pB = parseFloat(f.p_b.value);
+            if (isNaN(pBdA) || isNaN(pA) || isNaN(pB) || pB <= 0 || pBdA < 0 || pA < 0 || pBdA > 1 || pA > 1 || pB > 1)
+                return { error: true, msg: "Rango 0-1, P(B) > 0", label: "Error" };
+            let pAGivenB = (pBdA * pA) / pB;
+            return {
+                main: `P(A|B) = ${pAGivenB.toFixed(4)}`,
+                label: 'Probabilidad posterior',
+                extras: [
+                    { cls: 'info', txt: `P(B|A) × P(A) = ${(pBdA * pA).toFixed(4)}` },
+                    { cls: 'ok', txt: `Razón de verosimilitud: ${(pBdA / pB).toFixed(4)}` }
+                ],
+                steps: [`P(A|B) = (${pBdA} × ${pA}) / ${pB}`],
+                chart(canvas) { EstadisticaVisual.teorema_bayes(canvas, pAGivenB, pBdA, pA, pB); }
+            };
+        }
+    },
+
+    cuartiles: {
+        title: 'Cuartiles e IQR',
+        formula: 'Q1, Q2 (mediana), Q3, IQR = Q3 - Q1',
+        fields: [{ id: 'data', label: 'Datos (separados por espacio)', type: 'text', val: '3 7 8 9 12 15 18 20 25' }],
+        calc(f) {
+            let raw = f.data.value.trim().split(/[\s,]+/);
+            let nums = raw.map(Number).filter(n => !isNaN(n)).sort((a,b) => a-b);
+            if (nums.length < 4) return { error: true, msg: "Ingresá al menos 4 números", label: "Insuficiente" };
+            let n = nums.length;
+            let q2 = n % 2 === 0 ? (nums[n/2-1] + nums[n/2]) / 2 : nums[Math.floor(n/2)];
+            let lowerHalf = nums.slice(0, Math.floor(n/2));
+            let upperHalf = nums.slice(Math.ceil(n/2));
+            let q1 = lowerHalf.length % 2 === 0 ? (lowerHalf[lowerHalf.length/2-1] + lowerHalf[lowerHalf.length/2]) / 2 : lowerHalf[Math.floor(lowerHalf.length/2)];
+            let q3 = upperHalf.length % 2 === 0 ? (upperHalf[upperHalf.length/2-1] + upperHalf[upperHalf.length/2]) / 2 : upperHalf[Math.floor(upperHalf.length/2)];
+            let iqr = q3 - q1;
+            return {
+                main: `Q1: ${q1} | Q2: ${q2} | Q3: ${q3}`,
+                label: `n = ${n}`,
+                extras: [
+                    { cls: 'ok', txt: `IQR = ${iqr.toFixed(2)}` },
+                    { cls: 'info', txt: `Rango: [${nums[0]}, ${nums[n-1]}]` }
+                ],
+                steps: [`Datos ordenados: ${nums.join(', ')}`, `Q2 (mediana) = ${q2}`],
+                chart(canvas) { EstadisticaVisual.cuartiles(canvas, nums, q1, q2, q3); }
+            };
+        }
+    },
+
+    desviacion_media: {
+        title: 'Desviación Media Absoluta',
+        formula: 'DM = Σ|x - x̄| / n',
+        fields: [{ id: 'data', label: 'Datos (separados por espacio)', type: 'text', val: '10 12 15 18 20' }],
+        calc(f) {
+            let raw = f.data.value.trim().split(/[\s,]+/);
+            let nums = raw.map(Number).filter(n => !isNaN(n));
+            if (nums.length < 2) return { error: true, msg: "Ingresá al menos 2 números", label: "Insuficiente" };
+            let n = nums.length;
+            let media = nums.reduce((a,b) => a+b, 0) / n;
+            let desvMed = nums.reduce((a,b) => a + Math.abs(b - media), 0) / n;
+            let varz = nums.reduce((a,b) => a + Math.pow(b - media, 2), 0) / (n - 1);
+            return {
+                main: `DM = ${desvMed.toFixed(4)}`,
+                label: 'Desviación media absoluta',
+                extras: [
+                    { cls: 'info', txt: `Media: ${media.toFixed(4)}` },
+                    { cls: 'info', txt: `Varianza: ${varz.toFixed(4)} | Desv. Est: ${Math.sqrt(varz).toFixed(4)}` }
+                ],
+                steps: [`x̄ = ${media.toFixed(4)}`, `DM = Σ|x - x̄| / ${n}`],
+                chart(canvas) { EstadisticaVisual.desviacion_media(canvas, nums, media, desvMed); }
+            };
+        }
+    }
+
+});

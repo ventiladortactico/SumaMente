@@ -1,1 +1,978 @@
-const QuimicaVisual={loops:{},initCanvas:function(l){const x=window.devicePixelRatio||1,d=l.getBoundingClientRect(),r=d.width||l.clientWidth||300,e=d.height||l.clientHeight||150;l.width=r*x,l.height=e*x;const t=l.getContext("2d");return t.setTransform(x,0,0,x,0,0),t},startLoop:function(l,x){this.loops[l]&&cancelAnimationFrame(this.loops[l]);const d=()=>{x(),this.loops[l]=requestAnimationFrame(d)};this.loops[l]=requestAnimationFrame(d)},molaridad:function(l,x,d,r,e,t){l.id||(l.id="canvas_quim_molar"),this.startLoop(l.id,()=>{const a=this.initCanvas(l),f=l.width/(window.devicePixelRatio||1),c=l.height/(window.devicePixelRatio||1);a.clearRect(0,0,f,c);const o=Date.now()*.001,i=f/2,n=c/2+10,s=70,h=80,m=Math.min(.9,Math.max(.15,d/1e3)),b=h*m;a.fillStyle=`rgba(56, 189, 248, ${Math.min(.8,.2+r*.15)})`,a.beginPath(),a.moveTo(i-s/2,n+h/2);for(let p=i-s/2;p<=i+s/2;p++)a.lineTo(p,n+h/2-b+Math.sin(p*.1+o*4)*2);if(a.lineTo(i+s/2,n+h/2),a.closePath(),a.fill(),r>0){a.fillStyle="#60a5fa";const p=Math.min(60,Math.round(r*15));for(let T=0;T<p;T++){let g=i-s/2+5+Math.abs(Math.sin(T*99))*(s-10),M=n+h/2-b+10+Math.abs(Math.cos(T*45))*(b-15)+Math.sin(o*2+T)*4;M>n+h/2-b&&M<n+h/2&&(a.beginPath(),a.arc(g,M,1.5,0,Math.PI*2),a.fill())}}a.strokeStyle="#94a3b8",a.lineWidth=2.5,a.beginPath(),a.moveTo(i-s/2-4,n-h/2),a.lineTo(i-s/2,n-h/2),a.lineTo(i-s/2,n+h/2),a.lineTo(i+s/2,n+h/2),a.lineTo(i+s/2,n-h/2),a.stroke(),a.strokeStyle="rgba(148,163,184,0.4)",a.lineWidth=1;for(let p=.2;p<.9;p+=.2){let T=n+h/2-h*p;a.beginPath(),a.moveTo(i+s/2-10,T),a.lineTo(i+s/2,T),a.stroke()}a.fillStyle="#64748b",a.font="bold 9px monospace",a.textAlign="center",a.fillText(`${t}: ${r.toFixed(2)} M`,i,n-h/2-12),a.fillText(`${d.toFixed(0)} mL`,i+s/2+28,n+h/2-b+4)})},ph:function(l,x){l.id||(l.id="canvas_quim_ph"),this.startLoop(l.id,()=>{const d=this.initCanvas(l),r=l.width/(window.devicePixelRatio||1),e=l.height/(window.devicePixelRatio||1);d.clearRect(0,0,r,e);const t=25,a=r-2*t,f=14,c=e/2-5;let o="#7c3aed";x<3?o="#ef4444":x<7?o="#f59e0b":x===7?o="#10b981":x<11&&(o="#3b82f6");const i=d.createLinearGradient(t,0,t+a,0);i.addColorStop(0,"#ef4444"),i.addColorStop(.5,"#10b981"),i.addColorStop(1,"#6d28d9"),d.fillStyle=i,d.fillRect(t,c,a,f),d.fillStyle="#64748b",d.font="8px monospace",d.textAlign="center";for(let h=0;h<=14;h+=2){let m=t+h/14*a;d.fillText(h.toString(),m,c+f+12),d.strokeStyle="rgba(148,163,184,0.3)",d.beginPath(),d.moveTo(m,c),d.lineTo(m,c+f),d.stroke()}let n=t+x/14*a;d.fillStyle=o,d.beginPath(),d.moveTo(n,c-2),d.lineTo(n-6,c-9),d.lineTo(n+6,c-9),d.closePath(),d.fill(),d.fillStyle=o,d.font="bold 10px monospace",d.textAlign="center";let s=x<7?"\xC1CIDO":x>7?"ALCALINO":"NEUTRO";d.fillText(`pH ${x.toFixed(2)} [${s}]`,r/2,c-14)})},dilucion:function(l,x,d,r,e){l.id||(l.id="canvas_quim_dilucion"),this.startLoop(l.id,()=>{const t=this.initCanvas(l),a=l.width/(window.devicePixelRatio||1),f=l.height/(window.devicePixelRatio||1);t.clearRect(0,0,a,f);const c=Date.now()*.001,o=f-25,i=a*.28;t.fillStyle=`rgba(185, 28, 28, ${Math.min(.8,.3+x*.1)})`,t.beginPath(),t.moveTo(i-20,o),t.lineTo(i+20,o),t.lineTo(i+8,o-30),t.lineTo(i-8,o-30),t.closePath(),t.fill(),t.strokeStyle="#64748b",t.lineWidth=2,t.beginPath(),t.moveTo(i-22,o+1),t.lineTo(i+22,o+1),t.lineTo(i+7,o-32),t.lineTo(i+7,o-45),t.lineTo(i-7,o-45),t.lineTo(i-7,o-32),t.closePath(),t.stroke();const n=a*.72;t.fillStyle=`rgba(185, 28, 28, ${Math.min(.5,.1+r*.08)})`;let s=35;t.beginPath(),t.moveTo(n-28,o),t.lineTo(n+28,o),t.lineTo(n+10,o-s),t.lineTo(n-10,o-s+Math.sin(c*5)*1.5),t.closePath(),t.fill(),t.beginPath(),t.moveTo(n-30,o+1),t.lineTo(n+30,o+1),t.lineTo(n+9,o-42),t.lineTo(n+9,o-60),t.lineTo(n-9,o-60),t.lineTo(n-9,o-42),t.closePath(),t.stroke(),d>0&&e>d&&(t.strokeStyle="rgba(185,28,28,0.6)",t.lineWidth=1.5,t.setLineDash([3,3]),t.beginPath(),t.moveTo(i+5,o-40),t.bezierCurveTo(a/2,o-75,a/2,o-75,n-2,o-55),t.stroke(),t.setLineDash([])),t.fillStyle="#475569",t.font="bold 8px monospace",t.textAlign="center",t.fillText("CONCENTRADA",i,o+12),t.fillText(`${x.toFixed(2)}M / ${d.toFixed(0)}mL`,i,o+22),t.fillText("DILUIDA",n,o+12),t.fillText(`${r.toFixed(2)}M / ${e.toFixed(0)}mL`,n,o+22)})},moles:function(l,x,d,r){l.id||(l.id="canvas_quim_moles"),this.startLoop(l.id,()=>{const e=this.initCanvas(l),t=l.width/(window.devicePixelRatio||1),a=l.height/(window.devicePixelRatio||1);e.clearRect(0,0,t,a);const f=Date.now()*.001,c=e.createRadialGradient(t/2,a/2,0,t/2,a/2,t*.5);c.addColorStop(0,"rgba(250,200,100,0.15)"),c.addColorStop(1,"rgba(100,150,255,0.05)"),e.fillStyle=c,e.fillRect(0,0,t,a);const o=Math.min(24,Math.max(4,Math.round(x*10)));for(let i=0;i<o;i++){const n=Math.ceil(o/6),s=(t-40)/6,h=(a-60)/n,m=i%6,b=Math.floor(i/6),p=20+m*s+s/2+Math.sin(f+i*1.7)*4,T=30+b*h+h/2+Math.cos(f*.8+i*2.3)*3,g=5+Math.sin(f*.5+i)*1;e.fillStyle=i%3===0?"#4f9cf9":i%3===1?"#f9c74f":"#4fffa0",e.beginPath(),e.arc(p,T,g,0,Math.PI*2),e.fill(),e.strokeStyle="rgba(255,255,255,0.2)",e.lineWidth=.5,e.stroke()}e.fillStyle="#e8edf5",e.font="bold 12px monospace",e.textAlign="center",e.fillText(`${x.toFixed(4)} mol = ${d.toFixed(2)} g`,t/2,15),e.fillStyle="#94a3b8",e.font="9px monospace",e.fillText(`PM: ${r.toFixed(2)} g/mol`,t/2,a-8)})},normalidad:function(l,x,d,r){l.id||(l.id="canvas_quim_normalidad"),this.startLoop(l.id,()=>{const e=this.initCanvas(l),t=l.width/(window.devicePixelRatio||1),a=l.height/(window.devicePixelRatio||1);e.clearRect(0,0,t,a);const f=Date.now()*.001,c=e.createRadialGradient(t/2,a/2,0,t/2,a/2,t*.5);c.addColorStop(0,"rgba(80,255,170,0.12)"),c.addColorStop(1,"rgba(100,150,255,0.05)"),e.fillStyle=c,e.fillRect(0,0,t,a);const o=t/2-40,i=30,n=80,s=a-70;e.strokeStyle="#94a3b8",e.lineWidth=2.5,e.strokeRect(o,i,n,s),e.fillStyle=`rgba(56,189,248,${Math.min(.4,.08+x*.03)})`,e.fillRect(o+1,i+1,n-2,s-2);const h=Math.min(16,Math.max(6,Math.round(x*4)));for(let m=0;m<h;m++){const b=o+8+Math.abs(Math.sin(m*53))*(n-16),p=i+8+Math.abs(Math.cos(m*37))*(s-16)+Math.sin(f*1.5+m*2)*5;e.fillStyle="#4fffa0",e.beginPath(),e.arc(b,p,5,0,Math.PI*2),e.fill(),e.fillStyle="#0f172a",e.font="7px monospace",e.textAlign="center",e.fillText(m%2===0?"+":"\u2212",b,p+2.5)}e.fillStyle="#e8edf5",e.font="bold 11px monospace",e.textAlign="center",e.fillText(`N = ${x.toFixed(3)} N`,t/2,15),e.fillStyle="#94a3b8",e.font="9px monospace",e.fillText(`M = ${d.toFixed(3)} M  |  eq = ${r}`,t/2,a-8)})},gasIdeal:function(l,x,d,r,e){l.id||(l.id="canvas_quim_gas"),this.startLoop(l.id,()=>{const t=this.initCanvas(l),a=l.width/(window.devicePixelRatio||1),f=l.height/(window.devicePixelRatio||1);t.clearRect(0,0,a,f);const c=Date.now()*.001,o=t.createLinearGradient(0,0,0,f);o.addColorStop(0,"rgba(100,150,255,0.1)"),o.addColorStop(1,"rgba(255,150,100,0.06)"),t.fillStyle=o,t.fillRect(0,0,a,f);const i=a*.22,n=f*.18,s=a*.56,h=f*.58;t.strokeStyle="#94a3b8",t.lineWidth=2.5,t.strokeRect(i,n,s,h);const m=Math.sqrt(e/298)*(x/1)*1.5,b=Math.min(40,Math.max(8,Math.round(r*12+x*3))),p=[];for(let T=0;T<b;T++){const g=T*7.3,M=i+8+Math.abs(Math.sin(g))*(s-16),w=n+8+Math.abs(Math.cos(g*1.3))*(h-16),P=Math.sin(g*2.1+c*m*.5)*6,y=Math.cos(g*1.7+c*m*.5)*6,u=Math.max(i+8,Math.min(i+s-8,M+P)),S=Math.max(n+8,Math.min(n+h-8,w+y)),v=3+Math.min(1,x*.2);t.fillStyle=T%2===0?"#60a5fa":"#f9c74f",t.beginPath(),t.arc(u,S,v,0,Math.PI*2),t.fill()}t.fillStyle="#e8edf5",t.font="9px monospace",t.textAlign="left",t.fillText(`P: ${x.toFixed(2)} ${x>10?"kPa":"atm"}`,10,16),t.fillText(`V: ${d.toFixed(2)} L`,10,30),t.fillText(`n: ${r.toFixed(4)} mol`,10,44),t.fillText(`T: ${(e-273.15).toFixed(1)} \xB0C`,10,58)})},porcentaje:function(l,x,d,r,e){l.id||(l.id="canvas_quim_pct"),this.startLoop(l.id,()=>{const t=this.initCanvas(l),a=l.width/(window.devicePixelRatio||1),f=l.height/(window.devicePixelRatio||1);t.clearRect(0,0,a,f);const c=Date.now()*.002,o=a/2,i=35,n=50,s=f-70,h=Math.min(.9,Math.max(.05,d/50));t.strokeStyle="#94a3b8",t.lineWidth=2.5,t.strokeRect(o-n/2,i,n,s);const m=Math.min(1,d/30);t.fillStyle=`rgb(${Math.floor(50+180*m)}, ${Math.floor(120+(1-m)*80)}, ${Math.floor(200-150*m)})`,t.beginPath(),t.moveTo(o-n/2+1,i+s-1);for(let b=o-n/2+1;b<=o+n/2-1;b++)t.lineTo(b,i+s-h*s+Math.sin(b*.15+c*3)*1.5);t.lineTo(o+n/2-1,i+s-1),t.closePath(),t.fill(),t.fillStyle="#64748b",t.font="8px monospace",t.textAlign="center",t.fillText(`${x}`,o,i-6),t.fillStyle="#e8edf5",t.font="bold 11px monospace",t.fillText(`${d.toFixed(2)}%`,o,i+s+16),t.fillStyle="#94a3b8",t.font="8px monospace",t.fillText(`${r.toFixed(2)}g / ${e.toFixed(0)}mL`,o,i+s+30)})},calor:function(l,x,d,r,e){l.id||(l.id="canvas_quim_calor"),this.startLoop(l.id,()=>{const t=this.initCanvas(l),a=l.width/(window.devicePixelRatio||1),f=l.height/(window.devicePixelRatio||1);t.clearRect(0,0,a,f);const c=Date.now()*.002,o=e>0,i=t.createRadialGradient(a/2,f/2,0,a/2,f/2,a*.6);i.addColorStop(0,o?"rgba(255,80,20,0.2)":"rgba(20,80,255,0.15)"),i.addColorStop(1,"rgba(10,15,30,0.3)"),t.fillStyle=i,t.fillRect(0,0,a,f);const n=a/2-35,s=30,h=70,m=f-70;t.strokeStyle="#94a3b8",t.lineWidth=2.5,t.strokeRect(n,s,h,m);const b=o?`rgba(255,${Math.floor(80-e*5)},0,${Math.min(.6,.15+Math.abs(e)*.02)})`:`rgba(0,${Math.floor(100+e*5)},255,${Math.min(.6,.15+Math.abs(e)*.02)})`,p=m*.7;t.fillStyle=b,t.beginPath(),t.moveTo(n+1,s+m-1);for(let S=n+1;S<=n+h-1;S++)t.lineTo(S,s+m-p+Math.sin(S*.12+c*(4+Math.abs(e)))*2);t.lineTo(n+h-1,s+m-1),t.closePath(),t.fill();const T=Math.min(20,Math.max(4,Math.round(4+Math.abs(e)*2))),g=Math.abs(e)*.8+1;for(let S=0;S<T;S++){const v=n+6+Math.abs(Math.sin(S*73))*(h-12),R=s+m-p+5+Math.abs(Math.cos(S*51))*(p-10),$=Math.sin(c*g+S*1.3)*(3+Math.abs(e)*.3),k=Math.cos(c*g*.8+S*2.1)*(3+Math.abs(e)*.3);t.fillStyle=o?"#f97316":"#38bdf8",t.beginPath(),t.arc(v+$,R+k,3,0,Math.PI*2),t.fill()}const M=a-45,w=25,P=18,y=f-50;t.strokeStyle="#94a3b8",t.lineWidth=1.5,t.strokeRect(M,w,P,y);const u=Math.min(1,Math.max(0,Math.abs(e)/20));t.fillStyle=o?"#ef4444":"#3b82f6",t.fillRect(M+1,w+y-u*(y-2),P-2,u*(y-2)),t.fillStyle="#e8edf5",t.font="bold 9px monospace",t.textAlign="center",t.fillText(`${e.toFixed(1)}\xB0C`,M+P/2,w-5),t.fillStyle="#94a3b8",t.font="8px monospace",t.fillText(`Q = ${x.toFixed(2)} J`,a/2,f-6),t.fillText(`m = ${d.toFixed(1)}g  c = ${r.toFixed(2)} J/g\xB0C`,a/2,12)})},gasesCombinada:function(l,x,d,r,e,t,a){l.id||(l.id="canvas_quim_gases"),this.startLoop(l.id,()=>{const f=this.initCanvas(l),c=l.width/(window.devicePixelRatio||1),o=l.height/(window.devicePixelRatio||1);f.clearRect(0,0,c,o);const i=Date.now()*.002,n=f.createLinearGradient(0,0,0,o);n.addColorStop(0,"rgba(100,200,255,0.1)"),n.addColorStop(1,"rgba(255,200,100,0.06)"),f.fillStyle=n,f.fillRect(0,0,c,o);const s=c/2,h=Math.min(c*.4,120),m=Math.min(o*.5,90),b=o/2;f.strokeStyle="#94a3b8",f.lineWidth=2.5,f.beginPath(),f.moveTo(s-h/2,b-m/2),f.lineTo(s-h/2,b+m/2),f.lineTo(s+h/2,b+m/2),f.lineTo(s+h/2,b-m/2),f.stroke();const p=t/d||1,T=b-m/2+m/Math.max(1,p);f.fillStyle="#475569",f.fillRect(s-h/2-3,T-4,h+6,8),f.strokeStyle="#64748b",f.lineWidth=1.5,f.strokeRect(s-h/2-3,T-4,h+6,8);const g=Math.max(10,m/Math.max(1,p)-8),M=Math.min(25,Math.max(6,Math.round(x*5)));for(let w=0;w<M;w++){const P=s-h/2+8+Math.abs(Math.sin(w*37))*(h-16),y=b+m/2-8-Math.abs(Math.cos(w*53))*g,u=Math.sin(i*2+w*1.7)*3,S=Math.cos(i*1.8+w*2.3)*3;f.fillStyle=w%2===0?"#60a5fa":"#f9c74f",f.beginPath(),f.arc(P+u,Math.min(T-4,Math.max(b-m/2+4,y+S)),3,0,Math.PI*2),f.fill()}f.fillStyle="#e8edf5",f.font="9px monospace",f.textAlign="left",f.fillText("Estado 1:",10,16),f.fillText(`P\u2081=${x.toFixed(2)}  V\u2081=${d.toFixed(2)}L  T\u2081=${r.toFixed(1)}K`,10,30),f.fillText("Estado 2:",10,48),f.fillText(`P\u2082=${e.toFixed(2)}  V\u2082=${t.toFixed(2)}L  T\u2082=${a.toFixed(1)}K`,10,62),f.fillStyle="#4fffa0",f.font="bold 10px monospace",f.textAlign="center",f.fillText("P\u2081V\u2081/T\u2081 = P\u2082V\u2082/T\u2082",c/2,o-8)})},equilibrio:function(l,x,d,r,e){l.id||(l.id="canvas_quim_equilibrio"),this.startLoop(l.id,()=>{const t=this.initCanvas(l),a=l.width/(window.devicePixelRatio||1),f=l.height/(window.devicePixelRatio||1);t.clearRect(0,0,a,f);const c=Date.now()*.002,o=a/2,i=f/2,n=a*.22;t.fillStyle=`rgba(56,189,248,${Math.min(.6,.08+d*.3)})`,t.beginPath(),t.arc(n,i,22+Math.sin(c*2)*2,0,Math.PI*2),t.fill(),t.strokeStyle="#38bdf8",t.lineWidth=2,t.stroke(),t.fillStyle="#e8edf5",t.font="bold 14px monospace",t.textAlign="center",t.fillText("A",n,i+5),t.fillStyle="#94a3b8",t.font="8px monospace",t.fillText(`${d.toFixed(3)}M`,n,i+35);const s=c*2,h=e||(x>1?1:-1);t.strokeStyle="#f9c74f",t.lineWidth=2.5,t.beginPath(),t.moveTo(n+30,i-5),t.lineTo(o-10,i-5),t.stroke(),t.beginPath(),t.moveTo(o+10,i+5),t.lineTo(a*.78-30,i+5),t.stroke(),t.fillStyle=h>0?"#4fffa0":"#64748b",t.beginPath(),t.moveTo(o-5,i-5),t.lineTo(o+5,i-5),t.lineTo(o,i-12),t.closePath(),t.fill(),t.beginPath(),t.moveTo(o-5,i+5),t.lineTo(o+5,i+5),t.lineTo(o,i+12),t.closePath(),t.fill(),t.fillStyle="#94a3b8",t.font="7px monospace",t.textAlign="center",t.fillText("\u21CC",o,i+4);const m=a*.78;t.fillStyle=`rgba(249,199,79,${Math.min(.6,.08+r*.3)})`,t.beginPath(),t.arc(m,i,22+Math.sin(c*2+1)*2,0,Math.PI*2),t.fill(),t.strokeStyle="#f9c74f",t.lineWidth=2,t.stroke(),t.fillStyle="#e8edf5",t.font="bold 14px monospace",t.textAlign="center",t.fillText("B",m,i+5),t.fillStyle="#94a3b8",t.font="8px monospace",t.fillText(`${r.toFixed(3)}M`,m,i+35),t.fillStyle="#4fffa0",t.font="bold 12px monospace",t.textAlign="center",t.fillText(`Kc = ${x.toFixed(4)}`,a/2,f-12);const b=h>0?"\u2192 favorece productos":h<0?"\u2190 favorece reactivos":"en equilibrio";t.fillStyle=h>0?"#4fffa0":"#f97316",t.font="9px monospace",t.fillText(b,a/2,15)})},boyle:function(l,x,d,r,e){l.id||(l.id="canvas_quim_boyle"),this.startLoop(l.id,()=>{const t=this.initCanvas(l),a=l.width/(window.devicePixelRatio||1),f=l.height/(window.devicePixelRatio||1);t.clearRect(0,0,a,f);const c=Date.now()*.001,o=a/2,i=80,n=70,s=f/2,h=e/d||1,m=s+n/2-n/Math.max(.3,Math.min(3,h));t.strokeStyle="#94a3b8",t.lineWidth=2.5,t.beginPath(),t.moveTo(o-i/2,s-n/2),t.lineTo(o-i/2,s+n/2),t.lineTo(o+i/2,s+n/2),t.lineTo(o+i/2,s-n/2),t.stroke(),t.fillStyle="#475569",t.fillRect(o-i/2-3,m-4,i+6,8);const b=Math.max(10,n/Math.max(1,h)-8),p=Math.round(x*8);for(let T=0;T<p;T++){const g=o-i/2+8+Math.abs(Math.sin(T*37))*(i-16),M=m-6-Math.abs(Math.cos(T*53))*b,w=Math.sin(c*2+T*1.7)*3,P=Math.cos(c*1.8+T*2.3)*3;t.fillStyle=T%2===0?"#60a5fa":"#f9c74f",t.beginPath(),t.arc(g+w,s+n/2-8-Math.abs(Math.cos(T*53))*b+P,3,0,Math.PI*2),t.fill()}t.fillStyle="#e8edf5",t.font="9px monospace",t.textAlign="left",t.fillText(`P\u2081=${x.toFixed(2)}  V\u2081=${d.toFixed(2)}L`,10,16),t.fillText(`P\u2082=${r.toFixed(2)}  V\u2082=${e.toFixed(2)}L`,10,30),t.fillStyle="#4fffa0",t.font="bold 10px monospace",t.textAlign="center",t.fillText("P\u2081V\u2081 = P\u2082V\u2082",a/2,f-8)})},charles:function(l,x,d,r,e){l.id||(l.id="canvas_quim_charles"),this.startLoop(l.id,()=>{const t=this.initCanvas(l),a=l.width/(window.devicePixelRatio||1),f=l.height/(window.devicePixelRatio||1);t.clearRect(0,0,a,f);const c=Date.now()*.002,o=a/2,i=60,n=60,s=f/2,h=r/x||1,m=s+n/2-n/Math.max(.3,h);t.strokeStyle="#94a3b8",t.lineWidth=2.5,t.beginPath(),t.moveTo(o-i/2,s-n/2),t.lineTo(o-i/2,s+n/2),t.lineTo(o+i/2,s+n/2),t.lineTo(o+i/2,s-n/2),t.stroke();const b=`rgba(239,68,68,${Math.min(.5,.15+(e-273.15)*.005)})`;t.fillStyle=b;const p=n/Math.max(1,h);t.beginPath(),t.moveTo(o-i/2+1,s+n/2);for(let y=o-i/2+1;y<=o+i/2-1;y++)t.lineTo(y,s+n/2-p+Math.sin(y*.1+c*4)*2);t.lineTo(o+i/2-1,s+n/2),t.closePath(),t.fill();const T=a-40,g=20,M=14,w=f-40;t.strokeStyle="#94a3b8",t.lineWidth=1.5,t.strokeRect(T,g,M,w);const P=Math.min(1,Math.max(0,(e-273.15)/100));t.fillStyle="#ef4444",t.fillRect(T+1,g+w-P*(w-2),M-2,P*(w-2)),t.fillStyle="#e8edf5",t.font="8px monospace",t.textAlign="center",t.fillText(`${(e-273.15).toFixed(0)}\xB0C`,T+M/2,g-5),t.fillStyle="#e8edf5",t.font="9px monospace",t.textAlign="left",t.fillText(`V\u2081=${x.toFixed(2)}L  T\u2081=${(d-273.15).toFixed(1)}\xB0C`,10,16),t.fillText(`V\u2082=${r.toFixed(2)}L  T\u2082=${(e-273.15).toFixed(1)}\xB0C`,10,30),t.fillStyle="#4fffa0",t.font="bold 10px monospace",t.textAlign="center",t.fillText("V\u2081/T\u2081 = V\u2082/T\u2082",a/2,f-8)})},dalton:function(l,x,d,r){l.id||(l.id="canvas_quim_dalton"),this.startLoop(l.id,()=>{const e=this.initCanvas(l),t=l.width/(window.devicePixelRatio||1),a=l.height/(window.devicePixelRatio||1);e.clearRect(0,0,t,a);const f=Date.now()*.001,c=25,o=t-2*c,i=14,n=a/2-16,s=a/2+16,h=Math.max(d,r)*1.2;e.fillStyle="#1a1f2e",e.beginPath(),e.roundRect(c,n,o,i,4),e.fill(),e.fillStyle="#4f9cf9";const m=Math.min(1,d/h);e.beginPath(),e.roundRect(c,n,o*m,i,[4,0,0,4]),e.fill(),e.fillStyle="#1a1f2e",e.beginPath(),e.roundRect(c,s,o,i,4),e.fill(),e.fillStyle="#f9c74f";const b=Math.min(1,r/h);e.beginPath(),e.roundRect(c,s,o*b,i,[4,0,0,4]),e.fill(),e.fillStyle="#e8edf5",e.font="9px monospace",e.textAlign="left",e.fillText(`P_total: ${d.toFixed(2)} atm`,c,n-4),e.fillText(`P_parcial: ${r.toFixed(4)} atm`,c,s-4),e.fillStyle="#94a3b8",e.font="8px monospace",e.fillText(`X = ${x}`,c,s+i+14),e.fillStyle="#4fffa0",e.font="bold 10px monospace",e.textAlign="center",e.fillText("P_i = X_i \xB7 P_total",t/2,a-6)})},velocidad_reaccion:function(l,x,d,r,e){l.id||(l.id="canvas_quim_vel"),this.startLoop(l.id,()=>{const t=this.initCanvas(l),a=l.width/(window.devicePixelRatio||1),f=l.height/(window.devicePixelRatio||1);t.clearRect(0,0,a,f);const c=Date.now()*.001,o=30,i=t.createRadialGradient(a/2,f/2,0,a/2,f/2,a*.5);i.addColorStop(0,"rgba(100,200,255,0.1)"),i.addColorStop(1,"rgba(10,15,30,0.3)"),t.fillStyle=i,t.fillRect(0,0,a,f);const n=a-2*o,s=f-2*o;t.strokeStyle="#2a3345",t.lineWidth=1,t.beginPath(),t.moveTo(o,o),t.lineTo(o,o+s),t.lineTo(o+n,o+s),t.stroke(),t.strokeStyle="rgba(79,249,123,0.4)",t.lineWidth=2,t.beginPath();for(let p=0;p<=n;p++){const T=p/n*2;let g=0;r===0?g=x:r===1?g=x*T:g=x*T*T;const M=o+s-g/(x*Math.pow(2,r)||1)*s;p===0?t.moveTo(o+p,M):t.lineTo(o+p,M)}t.stroke();const h=o+d/2*n,m=x*Math.pow(d,r),b=o+s-m/(x*Math.pow(2,r)||1)*s;t.shadowColor="#4fffa0",t.shadowBlur=8,t.fillStyle="#4fffa0",t.beginPath(),t.arc(h,b,4,0,Math.PI*2),t.fill(),t.shadowBlur=0,t.fillStyle="#e8edf5",t.font="9px monospace",t.textAlign="left",t.fillText(`k=${x}  n=${r}  [A]=${d}M`,10,14),t.fillText(`v=${e.toExponential(4)}`,10,28),t.fillStyle="#94a3b8",t.font="7px monospace",t.textAlign="center",t.fillText("[A]",a-10,o+s+12)})},numero_avogadro:function(l,x,d){l.id||(l.id="canvas_quim_avogadro"),this.startLoop(l.id,()=>{const r=this.initCanvas(l),e=l.width/(window.devicePixelRatio||1),t=l.height/(window.devicePixelRatio||1);r.clearRect(0,0,e,t);const a=Date.now()*.001,f=r.createRadialGradient(e/2,t/2,0,e/2,t/2,e*.6);f.addColorStop(0,"rgba(250,200,100,0.12)"),f.addColorStop(1,"rgba(100,150,255,0.05)"),r.fillStyle=f,r.fillRect(0,0,e,t);const c=Math.min(30,Math.max(4,Math.round(x*8)));for(let o=0;o<c;o++){const i=Math.ceil(c/6),n=(e-30)/6,s=(t-40)/i,h=o%6,m=Math.floor(o/6),b=15+h*n+n/2+Math.sin(a+o*1.7)*5,p=20+m*s+s/2+Math.cos(a*.8+o*2.3)*4,T=5+Math.sin(a*.5+o)*1.5,g=["#4f9cf9","#f9c74f","#4fffa0","#f94f4f","#a78bfa"];r.fillStyle=g[o%g.length],r.shadowColor=r.fillStyle,r.shadowBlur=4,r.beginPath(),r.arc(b,p,T,0,Math.PI*2),r.fill(),r.shadowBlur=0}r.fillStyle="#e8edf5",r.font="bold 11px monospace",r.textAlign="center",r.fillText(`${x.toFixed(4)} mol \u2192 ${d.toExponential(4)} mol\xE9culas`,e/2,t-8),r.fillStyle="#94a3b8",r.font="8px monospace",r.fillText("N\u2090 = 6.022\xD710\xB2\xB3",e/2,12)})},masa_molar:function(l,x,d,r){this._stopLoop(l);const e=this.initCanvas(l),t=l.width/(window.devicePixelRatio||1),a=l.height/(window.devicePixelRatio||1);let f=0;this._startLoop(l,()=>{e.clearRect(0,0,t,a),f+=.02;const c=t/2,o=a-30,i=60,n=6;e.strokeStyle="#4a5570",e.lineWidth=2,e.beginPath(),e.moveTo(c-70,o-80),e.lineTo(c+70,o-80),e.stroke(),e.beginPath(),e.moveTo(c,o-80),e.lineTo(c,o-30),e.stroke(),e.fillStyle="#4a5570",e.fillRect(c-2,o-30,4,10);const s=6*Math.sin(f*2);e.fillStyle="#1e293b",e.beginPath(),e.rect(c-70-i/2+1,o-80+i/2,i,n),e.fill(),e.fillStyle="#4f9cf9",e.font="bold 11px monospace",e.textAlign="center",e.fillText(`${x}g`,c-70,o-80+i/2-6),e.fillStyle="#1e293b",e.beginPath(),e.rect(c+70-i/2-1,o-80+i/2,i,n),e.fill(),e.fillStyle="#f9c74f",e.font="bold 11px monospace",e.textAlign="center",e.fillText(`${d}mol`,c+70,o-80+i/2-6),e.fillStyle="#4fffa0",e.font="bold 13px monospace",e.textAlign="center",e.fillText(`M = ${r.toFixed(2)} g/mol`,c,o-6);const h=["#4f9cf9","#f9c74f","#a78bfa","#4fffa0"];for(let m=0;m<8;m++){const b=10+(t-20)*((m+.5*Math.sin(f+m*2))/8),p=10+Math.sin(f*1.5+m)*4;e.fillStyle=h[m%4],e.globalAlpha=.3+.3*Math.sin(f+m),e.beginPath(),e.arc(b,p,3,0,Math.PI*2),e.fill(),e.globalAlpha=1}})},rendimiento:function(l,x,d,r){this._stopLoop(l);const e=this.initCanvas(l),t=l.width/(window.devicePixelRatio||1),a=l.height/(window.devicePixelRatio||1);let f=0;this._startLoop(l,()=>{e.clearRect(0,0,t,a),f+=.03;const c=30,o=a/2,i=t-2*c,n=30,s=r<50?"#f94f4f":r<80?"#f9c74f":"#4fffa0";e.fillStyle="#1a1f2e",e.beginPath(),e.roundRect(c,o-n/2,i,n,8),e.fill();const h=Math.min(f*2,1),m=i*(r/100)*h;e.fillStyle=s,e.shadowColor=s,e.shadowBlur=6,e.beginPath(),e.roundRect(c,o-n/2,m,n,[8,0,0,8]),e.fill(),e.shadowBlur=0,e.strokeStyle="#f94f4f44",e.lineWidth=1,e.setLineDash([4,4]),e.beginPath(),e.moveTo(c+i*.5,o-n/2-4),e.lineTo(c+i*.5,o+n/2+4),e.stroke(),e.setLineDash([]),e.fillStyle="#fff",e.font="bold 14px monospace",e.textAlign="center",e.fillText(`${r.toFixed(1)}%`,t/2,o+4);const b=t*.2,p=a*.85;e.strokeStyle="#94a3b8",e.lineWidth=2,e.beginPath(),e.moveTo(b-16,p),e.lineTo(b-16,p-30),e.quadraticCurveTo(b-16,p-40,b,p-40),e.quadraticCurveTo(b+16,p-40,b+16,p-30),e.lineTo(b+16,p),e.closePath(),e.stroke(),e.fillStyle=s+"44",e.fillRect(b-14,p-20*(r/100),28,20),this._label(e,"Rendimiento",b,p+14,"#8a97b0",7)})},henderson:function(l,x,d,r,e){this._stopLoop(l);const t=this.initCanvas(l),a=l.width/(window.devicePixelRatio||1),f=l.height/(window.devicePixelRatio||1);let c=0;this._startLoop(l,()=>{t.clearRect(0,0,a,f),c+=.02;const o=25,i=a-2*o,n=f-2*o;t.strokeStyle="#2a3040",t.lineWidth=1,t.beginPath(),t.moveTo(o,o),t.lineTo(o,o+n),t.lineTo(o+i,o+n),t.stroke(),t.strokeStyle="#4f9cf9",t.lineWidth=2,t.beginPath();for(let p=0;p<=100;p++){const T=o+p/100*i,g=-3+p/100*6,M=o+n-(x+g)/14*n;p===0?t.moveTo(T,M):t.lineTo(T,M)}t.stroke();const s=Math.log10(d/r),h=o+(s+3)/6*i,m=o+n-e/14*n;h>=o&&h<=o+i&&(t.shadowColor="#f9c74f",t.shadowBlur=8,t.fillStyle="#f9c74f",t.beginPath(),t.arc(h,m,4,0,Math.PI*2),t.fill(),t.shadowBlur=0);const b=o+n-x/14*n;t.strokeStyle="#f9c74f44",t.lineWidth=1,t.setLineDash([4,4]),t.beginPath(),t.moveTo(o,b),t.lineTo(o+i,b),t.stroke(),t.setLineDash([]),t.fillStyle="#f9c74f",t.font="7px monospace",t.textAlign="left",t.fillText(`pKa=${x}`,o+i-30,b-2),t.fillStyle="#e8edf5",t.font="bold 11px monospace",t.textAlign="center",t.fillText(`pH = ${e.toFixed(2)}`,a/2,12)})},graham:function(l,x,d,r){this._stopLoop(l);const e=this.initCanvas(l),t=l.width/(window.devicePixelRatio||1),a=l.height/(window.devicePixelRatio||1);let f=0;this._startLoop(l,()=>{e.clearRect(0,0,t,a),f+=.02;const c=t/2,o=a/2,i=c/2+Math.sin(f*4)*40,n=o+Math.cos(f*3)*20;e.shadowColor="#4f9cf9",e.shadowBlur=10,e.fillStyle="#4f9cf9",e.beginPath(),e.arc(i,n,x<d?12:6,0,Math.PI*2),e.fill();const s=c+c/2+Math.sin(f*6+2)*40,h=o+Math.cos(f*5+1)*20;e.shadowColor="#f9c74f",e.shadowBlur=10,e.fillStyle="#f9c74f",e.beginPath(),e.arc(s,h,d<x?12:6,0,Math.PI*2),e.fill(),e.shadowBlur=0,e.fillStyle="#4f9cf9",e.font="bold 9px monospace",e.textAlign="center",e.fillText(`Gas 1 (M=${x})`,c/2,o-40),e.fillStyle="#f9c74f",e.font="bold 9px monospace",e.fillText(`Gas 2 (M=${d})`,c+c/2,o-40),e.strokeStyle="#2a3040",e.lineWidth=3,e.beginPath(),e.moveTo(c,0),e.lineTo(c,a),e.stroke(),e.strokeStyle="#1a1f2e",e.lineWidth=1,e.setLineDash([2,4]),e.beginPath(),e.moveTo(c,0),e.lineTo(c,a),e.stroke(),e.setLineDash([]),e.fillStyle="#8a97b0",e.font="7px monospace",e.fillText("pared porosa",c,8),e.fillStyle="#4fffa0",e.font="bold 12px monospace",e.fillText(`v\u2081/v\u2082 = ${r.toFixed(4)}`,c,a-12)})},arrhenius:function(l,x,d,r,e){this._stopLoop(l);const t=this.initCanvas(l),a=l.width/(window.devicePixelRatio||1),f=l.height/(window.devicePixelRatio||1);let c=0;this._startLoop(l,()=>{t.clearRect(0,0,a,f),c+=.02;const o=30,i=a-2*o,n=f-2*o;t.strokeStyle="#4f9cf9",t.lineWidth=2,t.beginPath(),[{x:0,y:.1},{x:.2,y:.05},{x:.45,y:.85},{x:.55,y:.85},{x:.8,y:.05},{x:1,y:.1}].forEach((b,p)=>{const T=o+b.x*i,g=o+(1-b.y)*n;p===0?t.moveTo(T,g):t.lineTo(T,g)}),t.stroke();const s=o+.25*i,h=o+.45*i,m=o+(1-.6)*n;t.strokeStyle="#f9c74f",t.lineWidth=2,t.beginPath(),t.moveTo(s,m),t.lineTo(h,m),t.stroke(),t.fillStyle="#f9c74f",t.font="bold 9px monospace",t.textAlign="center",t.fillText(`Ea = ${(x/1e3).toFixed(2)} kJ/mol`,(s+h)/2,m-6),t.shadowColor="#f94f4f",t.shadowBlur=8,t.fillStyle="#f94f4f",t.beginPath(),t.arc(o+.5*i,o+.15000000000000002*n,4,0,Math.PI*2),t.fill(),t.shadowBlur=0,t.fillStyle="#4fffa0",t.font="bold 11px monospace",t.textAlign="center",t.fillText(`k = ${e.toExponential(4)} s\u207B\xB9  (T=${d} K)`,a/2,f-6),t.fillStyle="#8a97b0",t.font="7px monospace",t.fillText("Reactivos \u2192",o+5,o+.9*n+12),t.fillText("\u2190 Productos",o+i-30,o+.9*n+12)})}};
+const QuimicaVisual = {
+    loops: {},
+
+    initCanvas: function(canvas) {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        const cssW = rect.width || canvas.clientWidth || 300;
+        const cssH = rect.height || canvas.clientHeight || 150;
+        canvas.width = cssW * dpr;
+        canvas.height = cssH * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return ctx;
+    },
+
+    startLoop: function(canvasId, frameCallback) {
+        if (this.loops[canvasId]) cancelAnimationFrame(this.loops[canvasId]);
+        const run = () => {
+            frameCallback();
+            this.loops[canvasId] = requestAnimationFrame(run);
+        };
+        this.loops[canvasId] = requestAnimationFrame(run);
+    },
+
+    // 1. MOLARIDAD — Vaso con disolución, ondas y partículas de soluto
+    molaridad: function(canvas, masa, volumen, molaridad, PM, compuesto) {
+        if (!canvas.id) canvas.id = 'canvas_quim_molar';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const time = Date.now() * 0.001;
+            const cx = w / 2, cy = h / 2 + 10;
+            const vw = 70, vh = 80;
+            const fillPct = Math.min(0.9, Math.max(0.15, volumen / 1000));
+            const fillH = vh * fillPct;
+
+            ctx.fillStyle = `rgba(56, 189, 248, ${Math.min(0.8, 0.2 + molaridad * 0.15)})`;
+            ctx.beginPath();
+            ctx.moveTo(cx - vw / 2, cy + vh / 2);
+            for (let x = cx - vw / 2; x <= cx + vw / 2; x++) {
+                ctx.lineTo(x, cy + vh / 2 - fillH + Math.sin(x * 0.1 + time * 4) * 2);
+            }
+            ctx.lineTo(cx + vw / 2, cy + vh / 2);
+            ctx.closePath(); ctx.fill();
+
+            if (molaridad > 0) {
+                ctx.fillStyle = '#60a5fa';
+                const n = Math.min(60, Math.round(molaridad * 15));
+                for (let i = 0; i < n; i++) {
+                    let px = cx - vw / 2 + 5 + (Math.abs(Math.sin(i * 99))) * (vw - 10);
+                    let py = cy + vh / 2 - fillH + 10 + (Math.abs(Math.cos(i * 45))) * (fillH - 15) + Math.sin(time * 2 + i) * 4;
+                    if (py > cy + vh / 2 - fillH && py < cy + vh / 2) {
+                        ctx.beginPath(); ctx.arc(px, py, 1.5, 0, Math.PI * 2); ctx.fill();
+                    }
+                }
+            }
+
+            ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(cx - vw / 2 - 4, cy - vh / 2);
+            ctx.lineTo(cx - vw / 2, cy - vh / 2);
+            ctx.lineTo(cx - vw / 2, cy + vh / 2);
+            ctx.lineTo(cx + vw / 2, cy + vh / 2);
+            ctx.lineTo(cx + vw / 2, cy - vh / 2);
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(148,163,184,0.4)'; ctx.lineWidth = 1;
+            for (let hv = 0.2; hv < 0.9; hv += 0.2) {
+                let ly = cy + vh / 2 - vh * hv;
+                ctx.beginPath(); ctx.moveTo(cx + vw / 2 - 10, ly); ctx.lineTo(cx + vw / 2, ly); ctx.stroke();
+            }
+
+            ctx.fillStyle = '#64748b'; ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`${compuesto}: ${molaridad.toFixed(2)} M`, cx, cy - vh / 2 - 12);
+            ctx.fillText(`${volumen.toFixed(0)} mL`, cx + vw / 2 + 28, cy + vh / 2 - fillH + 4);
+        });
+    },
+
+    // 2. pH — Escala cromática con indicador deslizante
+    ph: function(canvas, ph) {
+        if (!canvas.id) canvas.id = 'canvas_quim_ph';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const pad = 25, bW = w - 2 * pad, bH = 14, cy = h / 2 - 5;
+
+            let color = '#7c3aed';
+            if (ph < 3) color = '#ef4444';
+            else if (ph < 7) color = '#f59e0b';
+            else if (ph === 7) color = '#10b981';
+            else if (ph < 11) color = '#3b82f6';
+
+            const grad = ctx.createLinearGradient(pad, 0, pad + bW, 0);
+            grad.addColorStop(0, '#ef4444');
+            grad.addColorStop(0.5, '#10b981');
+            grad.addColorStop(1, '#6d28d9');
+            ctx.fillStyle = grad;
+            ctx.fillRect(pad, cy, bW, bH);
+
+            ctx.fillStyle = '#64748b'; ctx.font = '8px monospace'; ctx.textAlign = 'center';
+            for (let i = 0; i <= 14; i += 2) {
+                let mx = pad + (i / 14) * bW;
+                ctx.fillText(i.toString(), mx, cy + bH + 12);
+                ctx.strokeStyle = 'rgba(148,163,184,0.3)';
+                ctx.beginPath(); ctx.moveTo(mx, cy); ctx.lineTo(mx, cy + bH); ctx.stroke();
+            }
+
+            let tx = pad + (ph / 14) * bW;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(tx, cy - 2);
+            ctx.lineTo(tx - 6, cy - 9);
+            ctx.lineTo(tx + 6, cy - 9);
+            ctx.closePath(); ctx.fill();
+
+            ctx.fillStyle = color; ctx.font = 'bold 10px monospace'; ctx.textAlign = 'center';
+            let estado = ph < 7 ? 'ÁCIDO' : ph > 7 ? 'ALCALINO' : 'NEUTRO';
+            ctx.fillText(`pH ${ph.toFixed(2)} [${estado}]`, w / 2, cy - 14);
+        });
+    },
+
+    // 3. DILUCIÓN — Dos matraces con transferencia de volumen
+    dilucion: function(canvas, c1, v1, c2, v2) {
+        if (!canvas.id) canvas.id = 'canvas_quim_dilucion';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const time = Date.now() * 0.001;
+            const yf = h - 25;
+
+            const m1x = w * 0.28;
+            ctx.fillStyle = `rgba(185, 28, 28, ${Math.min(0.8, 0.3 + c1 * 0.1)})`;
+            ctx.beginPath();
+            ctx.moveTo(m1x - 20, yf); ctx.lineTo(m1x + 20, yf);
+            ctx.lineTo(m1x + 8, yf - 30); ctx.lineTo(m1x - 8, yf - 30);
+            ctx.closePath(); ctx.fill();
+
+            ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(m1x - 22, yf + 1); ctx.lineTo(m1x + 22, yf + 1);
+            ctx.lineTo(m1x + 7, yf - 32); ctx.lineTo(m1x + 7, yf - 45);
+            ctx.lineTo(m1x - 7, yf - 45); ctx.lineTo(m1x - 7, yf - 32);
+            ctx.closePath(); ctx.stroke();
+
+            const m2x = w * 0.72;
+            ctx.fillStyle = `rgba(185, 28, 28, ${Math.min(0.5, 0.1 + c2 * 0.08)})`;
+            let h2 = 35;
+            ctx.beginPath();
+            ctx.moveTo(m2x - 28, yf); ctx.lineTo(m2x + 28, yf);
+            ctx.lineTo(m2x + 10, yf - h2);
+            ctx.lineTo(m2x - 10, yf - h2 + Math.sin(time * 5) * 1.5);
+            ctx.closePath(); ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(m2x - 30, yf + 1); ctx.lineTo(m2x + 30, yf + 1);
+            ctx.lineTo(m2x + 9, yf - 42); ctx.lineTo(m2x + 9, yf - 60);
+            ctx.lineTo(m2x - 9, yf - 60); ctx.lineTo(m2x - 9, yf - 42);
+            ctx.closePath(); ctx.stroke();
+
+            if (v1 > 0 && v2 > v1) {
+                ctx.strokeStyle = 'rgba(185,28,28,0.6)'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
+                ctx.beginPath();
+                ctx.moveTo(m1x + 5, yf - 40);
+                ctx.bezierCurveTo(w / 2, yf - 75, w / 2, yf - 75, m2x - 2, yf - 55);
+                ctx.stroke(); ctx.setLineDash([]);
+            }
+
+            ctx.fillStyle = '#475569'; ctx.font = 'bold 8px monospace'; ctx.textAlign = 'center';
+            ctx.fillText('CONCENTRADA', m1x, yf + 12);
+            ctx.fillText(`${c1.toFixed(2)}M / ${v1.toFixed(0)}mL`, m1x, yf + 22);
+            ctx.fillText('DILUIDA', m2x, yf + 12);
+            ctx.fillText(`${c2.toFixed(2)}M / ${v2.toFixed(0)}mL`, m2x, yf + 22);
+        });
+    },
+
+    // 4. MOLES — Esferas moleculares animadas (Estequiometría / Masa ↔ Moles)
+    moles: function(canvas, moles, masa, PM) {
+        if (!canvas.id) canvas.id = 'canvas_quim_moles';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const time = Date.now() * 0.001;
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(250,200,100,0.15)');
+            grad.addColorStop(1, 'rgba(100,150,255,0.05)');
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+
+            const n = Math.min(24, Math.max(4, Math.round(moles * 10)));
+            for (let i = 0; i < n; i++) {
+                const col = 6, row = Math.ceil(n / col);
+                const sepX = (w - 40) / col, sepY = (h - 60) / row;
+                const ix = i % col, iy = Math.floor(i / col);
+                const px = 20 + ix * sepX + sepX / 2 + Math.sin(time + i * 1.7) * 4;
+                const py = 30 + iy * sepY + sepY / 2 + Math.cos(time * 0.8 + i * 2.3) * 3;
+                const r = 5 + Math.sin(time * 0.5 + i) * 1;
+
+                ctx.fillStyle = i % 3 === 0 ? '#4f9cf9' : i % 3 === 1 ? '#f9c74f' : '#4fffa0';
+                ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 0.5; ctx.stroke();
+            }
+
+            ctx.fillStyle = '#e8edf5'; ctx.font = 'bold 12px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`${moles.toFixed(4)} mol = ${masa.toFixed(2)} g`, w / 2, 15);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '9px monospace';
+            ctx.fillText(`PM: ${PM.toFixed(2)} g/mol`, w / 2, h - 8);
+        });
+    },
+
+    // 5. NORMALIDAD — Vaso con iones cargados (N = M × eq)
+    normalidad: function(canvas, norm, molaridad, eq) {
+        if (!canvas.id) canvas.id = 'canvas_quim_normalidad';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const time = Date.now() * 0.001;
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(80,255,170,0.12)');
+            grad.addColorStop(1, 'rgba(100,150,255,0.05)');
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+
+            const bx = w / 2 - 40, by = 30, bw = 80, bh = h - 70;
+            ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2.5;
+            ctx.strokeRect(bx, by, bw, bh);
+
+            ctx.fillStyle = `rgba(56,189,248,${Math.min(0.4, 0.08 + norm * 0.03)})`;
+            ctx.fillRect(bx + 1, by + 1, bw - 2, bh - 2);
+
+            const n = Math.min(16, Math.max(6, Math.round(norm * 4)));
+            for (let i = 0; i < n; i++) {
+                const px = bx + 8 + (Math.abs(Math.sin(i * 53)) * (bw - 16));
+                const py = by + 8 + (Math.abs(Math.cos(i * 37)) * (bh - 16)) + Math.sin(time * 1.5 + i * 2) * 5;
+                ctx.fillStyle = '#4fffa0';
+                ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#0f172a'; ctx.font = '7px monospace'; ctx.textAlign = 'center';
+                ctx.fillText(i % 2 === 0 ? '+' : '−', px, py + 2.5);
+            }
+
+            ctx.fillStyle = '#e8edf5'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`N = ${norm.toFixed(3)} N`, w / 2, 15);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '9px monospace';
+            ctx.fillText(`M = ${molaridad.toFixed(3)} M  |  eq = ${eq}`, w / 2, h - 8);
+        });
+    },
+
+    // 6. GAS IDEAL — Recipiente con partículas en movimiento (PV = nRT)
+    gasIdeal: function(canvas, P, V, n, T) {
+        if (!canvas.id) canvas.id = 'canvas_quim_gas';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const time = Date.now() * 0.001;
+
+            const grad = ctx.createLinearGradient(0, 0, 0, h);
+            grad.addColorStop(0, 'rgba(100,150,255,0.1)');
+            grad.addColorStop(1, 'rgba(255,150,100,0.06)');
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+
+            const px = w * 0.22, py = h * 0.18, pw = w * 0.56, ph = h * 0.58;
+            ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2.5;
+            ctx.strokeRect(px, py, pw, ph);
+
+            const vel = Math.sqrt(T / 298) * (P / 1) * 1.5;
+            const nParticles = Math.min(40, Math.max(8, Math.round(n * 12 + P * 3)));
+            const particlePositions = [];
+            for (let i = 0; i < nParticles; i++) {
+                const seed = i * 7.3;
+                const bx = px + 8 + (Math.abs(Math.sin(seed)) * (pw - 16));
+                const by = py + 8 + (Math.abs(Math.cos(seed * 1.3)) * (ph - 16));
+                const dx = Math.sin(seed * 2.1 + time * vel * 0.5) * 6;
+                const dy = Math.cos(seed * 1.7 + time * vel * 0.5) * 6;
+                const cx = Math.max(px + 8, Math.min(px + pw - 8, bx + dx));
+                const cy = Math.max(py + 8, Math.min(py + ph - 8, by + dy));
+                const size = 3 + Math.min(1, P * 0.2);
+                ctx.fillStyle = i % 2 === 0 ? '#60a5fa' : '#f9c74f';
+                ctx.beginPath(); ctx.arc(cx, cy, size, 0, Math.PI * 2); ctx.fill();
+            }
+
+            ctx.fillStyle = '#e8edf5'; ctx.font = '9px monospace'; ctx.textAlign = 'left';
+            ctx.fillText(`P: ${P.toFixed(2)} ${P > 10 ? 'kPa' : 'atm'}`, 10, 16);
+            ctx.fillText(`V: ${V.toFixed(2)} L`, 10, 30);
+            ctx.fillText(`n: ${n.toFixed(4)} mol`, 10, 44);
+            ctx.fillText(`T: ${(T - 273.15).toFixed(1)} °C`, 10, 58);
+        });
+    },
+
+    // 7. CONCENTRACIÓN % — Probetas con color variable según %
+    porcentaje: function(canvas, tipo, valor, masaSoluto, volSolucion) {
+        if (!canvas.id) canvas.id = 'canvas_quim_pct';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const time = Date.now() * 0.002;
+
+            const cx = w / 2, by = 35, bw = 50, bh = h - 70;
+            const fill = Math.min(0.9, Math.max(0.05, valor / 50));
+
+            ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2.5;
+            ctx.strokeRect(cx - bw / 2, by, bw, bh);
+
+            const intensidad = Math.min(1, valor / 30);
+            ctx.fillStyle = `rgb(${Math.floor(50 + 180 * intensidad)}, ${Math.floor(120 + (1 - intensidad) * 80)}, ${Math.floor(200 - 150 * intensidad)})`;
+            ctx.beginPath();
+            ctx.moveTo(cx - bw / 2 + 1, by + bh - 1);
+            for (let x = cx - bw / 2 + 1; x <= cx + bw / 2 - 1; x++) {
+                ctx.lineTo(x, by + bh - fill * bh + Math.sin(x * 0.15 + time * 3) * 1.5);
+            }
+            ctx.lineTo(cx + bw / 2 - 1, by + bh - 1);
+            ctx.closePath(); ctx.fill();
+
+            ctx.fillStyle = '#64748b'; ctx.font = '8px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`${tipo}`, cx, by - 6);
+            ctx.fillStyle = '#e8edf5'; ctx.font = 'bold 11px monospace';
+            ctx.fillText(`${valor.toFixed(2)}%`, cx, by + bh + 16);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '8px monospace';
+            ctx.fillText(`${masaSoluto.toFixed(2)}g / ${volSolucion.toFixed(0)}mL`, cx, by + bh + 30);
+        });
+    },
+
+    // 8. CALORIMETRÍA — Vaso con termómetro, partículas se agitan con T
+    calor: function(canvas, Q, m, c, deltaT) {
+        if (!canvas.id) canvas.id = 'canvas_quim_calor';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const time = Date.now() * 0.002;
+            const exotermico = deltaT > 0;
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w * 0.6);
+            grad.addColorStop(0, exotermico ? 'rgba(255,80,20,0.2)' : 'rgba(20,80,255,0.15)');
+            grad.addColorStop(1, 'rgba(10,15,30,0.3)');
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+
+            // Vaso
+            const bx = w / 2 - 35, by = 30, bw = 70, bh = h - 70;
+            ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2.5;
+            ctx.strokeRect(bx, by, bw, bh);
+
+            // Líquido con color según temperatura
+            const tempColor = exotermico
+                ? `rgba(255,${Math.floor(80 - deltaT * 5)},0,${Math.min(0.6, 0.15 + Math.abs(deltaT) * 0.02)})`
+                : `rgba(0,${Math.floor(100 + deltaT * 5)},255,${Math.min(0.6, 0.15 + Math.abs(deltaT) * 0.02)})`;
+            const liqH = bh * 0.7;
+            ctx.fillStyle = tempColor;
+            ctx.beginPath();
+            ctx.moveTo(bx + 1, by + bh - 1);
+            for (let x = bx + 1; x <= bx + bw - 1; x++) {
+                ctx.lineTo(x, by + bh - liqH + Math.sin(x * 0.12 + time * (4 + Math.abs(deltaT))) * 2);
+            }
+            ctx.lineTo(bx + bw - 1, by + bh - 1);
+            ctx.closePath(); ctx.fill();
+
+            // Partículas agitándose más con temperatura
+            const n = Math.min(20, Math.max(4, Math.round(4 + Math.abs(deltaT) * 2)));
+            const agitacion = Math.abs(deltaT) * 0.8 + 1;
+            for (let i = 0; i < n; i++) {
+                const px = bx + 6 + (Math.abs(Math.sin(i * 73))) * (bw - 12);
+                const py = by + bh - liqH + 5 + (Math.abs(Math.cos(i * 51))) * (liqH - 10);
+                const dx = Math.sin(time * agitacion + i * 1.3) * (3 + Math.abs(deltaT) * 0.3);
+                const dy = Math.cos(time * agitacion * 0.8 + i * 2.1) * (3 + Math.abs(deltaT) * 0.3);
+                ctx.fillStyle = exotermico ? '#f97316' : '#38bdf8';
+                ctx.beginPath(); ctx.arc(px + dx, py + dy, 3, 0, Math.PI * 2); ctx.fill();
+            }
+
+            // Termómetro
+            const tx = w - 45, ty = 25, tw = 18, th = h - 50;
+            ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5;
+            ctx.strokeRect(tx, ty, tw, th);
+            const tempFill = Math.min(1, Math.max(0, (Math.abs(deltaT) / 20)));
+            ctx.fillStyle = exotermico ? '#ef4444' : '#3b82f6';
+            ctx.fillRect(tx + 1, ty + th - tempFill * (th - 2), tw - 2, tempFill * (th - 2));
+            ctx.fillStyle = '#e8edf5'; ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`${deltaT.toFixed(1)}°C`, tx + tw / 2, ty - 5);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '8px monospace';
+            ctx.fillText(`Q = ${Q.toFixed(2)} J`, w / 2, h - 6);
+            ctx.fillText(`m = ${m.toFixed(1)}g  c = ${c.toFixed(2)} J/g°C`, w / 2, 12);
+        });
+    },
+
+    // 9. GASES COMBINADA — Pistón con émbolo que se mueve según P/V/T
+    gasesCombinada: function(canvas, P1, V1, T1, P2, V2, T2) {
+        if (!canvas.id) canvas.id = 'canvas_quim_gases';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const time = Date.now() * 0.002;
+
+            const grad = ctx.createLinearGradient(0, 0, 0, h);
+            grad.addColorStop(0, 'rgba(100,200,255,0.1)');
+            grad.addColorStop(1, 'rgba(255,200,100,0.06)');
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+
+            const cx = w / 2, cw = Math.min(w * 0.4, 120), ch = Math.min(h * 0.5, 90);
+            const cy = h / 2;
+
+            // Cilindro (paredes laterales)
+            ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(cx - cw / 2, cy - ch / 2);
+            ctx.lineTo(cx - cw / 2, cy + ch / 2);
+            ctx.lineTo(cx + cw / 2, cy + ch / 2);
+            ctx.lineTo(cx + cw / 2, cy - ch / 2);
+            ctx.stroke();
+
+            // Émbolo (se mueve según V2/V1)
+            const relacion = V2 / V1 || 1;
+            const pistonY = cy - ch / 2 + ch / Math.max(1, relacion);
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(cx - cw / 2 - 3, pistonY - 4, cw + 6, 8);
+            ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1.5;
+            ctx.strokeRect(cx - cw / 2 - 3, pistonY - 4, cw + 6, 8);
+
+            // Gas particles dentro del pistón
+            const espacio = Math.max(10, ch / Math.max(1, relacion) - 8);
+            const nP = Math.min(25, Math.max(6, Math.round(P1 * 5)));
+            for (let i = 0; i < nP; i++) {
+                const px = cx - cw / 2 + 8 + (Math.abs(Math.sin(i * 37))) * (cw - 16);
+                const py = cy + ch / 2 - 8 - (Math.abs(Math.cos(i * 53))) * espacio;
+                const dx = Math.sin(time * 2 + i * 1.7) * 3;
+                const dy = Math.cos(time * 1.8 + i * 2.3) * 3;
+                ctx.fillStyle = i % 2 === 0 ? '#60a5fa' : '#f9c74f';
+                ctx.beginPath(); ctx.arc(px + dx, Math.min(pistonY - 4, Math.max(cy - ch / 2 + 4, py + dy)), 3, 0, Math.PI * 2); ctx.fill();
+            }
+
+            ctx.fillStyle = '#e8edf5'; ctx.font = '9px monospace'; ctx.textAlign = 'left';
+            ctx.fillText('Estado 1:', 10, 16);
+            ctx.fillText(`P₁=${P1.toFixed(2)}  V₁=${V1.toFixed(2)}L  T₁=${T1.toFixed(1)}K`, 10, 30);
+            ctx.fillText('Estado 2:', 10, 48);
+            ctx.fillText(`P₂=${P2.toFixed(2)}  V₂=${V2.toFixed(2)}L  T₂=${T2.toFixed(1)}K`, 10, 62);
+            ctx.fillStyle = '#4fffa0'; ctx.font = 'bold 10px monospace'; ctx.textAlign = 'center';
+            ctx.fillText('P₁V₁/T₁ = P₂V₂/T₂', w / 2, h - 8);
+        });
+    },
+
+    // 10. EQUILIBRIO — Reacción reversible A ↔ B con concentraciones
+    equilibrio: function(canvas, Kc, A_conc, B_conc, direccion) {
+        if (!canvas.id) canvas.id = 'canvas_quim_equilibrio';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const time = Date.now() * 0.002;
+
+            const cx = w / 2, cy = h / 2;
+
+            // Reactivo A (izquierda)
+            const ax = w * 0.22;
+            ctx.fillStyle = `rgba(56,189,248,${Math.min(0.6, 0.08 + A_conc * 0.3)})`;
+            ctx.beginPath(); ctx.arc(ax, cy, 22 + Math.sin(time * 2) * 2, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.fillStyle = '#e8edf5'; ctx.font = 'bold 14px monospace'; ctx.textAlign = 'center';
+            ctx.fillText('A', ax, cy + 5);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '8px monospace';
+            ctx.fillText(`${A_conc.toFixed(3)}M`, ax, cy + 35);
+
+            // Flecha reversible en el medio
+            const t = time * 2;
+            const favorDir = direccion || (Kc > 1 ? 1 : -1);
+            ctx.strokeStyle = '#f9c74f'; ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(ax + 30, cy - 5);
+            ctx.lineTo(cx - 10, cy - 5);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(cx + 10, cy + 5);
+            ctx.lineTo(w * 0.78 - 30, cy + 5);
+            ctx.stroke();
+            // Punta derecha (→)
+            ctx.fillStyle = favorDir > 0 ? '#4fffa0' : '#64748b';
+            ctx.beginPath(); ctx.moveTo(cx - 5, cy - 5); ctx.lineTo(cx + 5, cy - 5); ctx.lineTo(cx, cy - 12); ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(cx - 5, cy + 5); ctx.lineTo(cx + 5, cy + 5); ctx.lineTo(cx, cy + 12); ctx.closePath(); ctx.fill();
+            ctx.fillStyle = '#94a3b8'; ctx.font = '7px monospace'; ctx.textAlign = 'center';
+            ctx.fillText('⇌', cx, cy + 4);
+
+            // Producto B (derecha)
+            const bx = w * 0.78;
+            ctx.fillStyle = `rgba(249,199,79,${Math.min(0.6, 0.08 + B_conc * 0.3)})`;
+            ctx.beginPath(); ctx.arc(bx, cy, 22 + Math.sin(time * 2 + 1) * 2, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = '#f9c74f'; ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.fillStyle = '#e8edf5'; ctx.font = 'bold 14px monospace'; ctx.textAlign = 'center';
+            ctx.fillText('B', bx, cy + 5);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '8px monospace';
+            ctx.fillText(`${B_conc.toFixed(3)}M`, bx, cy + 35);
+
+            // Valor de Kc
+            ctx.fillStyle = '#4fffa0'; ctx.font = 'bold 12px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`Kc = ${Kc.toFixed(4)}`, w / 2, h - 12);
+
+            // Indicador de dirección favorecida
+            const dirText = favorDir > 0 ? '→ favorece productos' : favorDir < 0 ? '← favorece reactivos' : 'en equilibrio';
+            ctx.fillStyle = favorDir > 0 ? '#4fffa0' : '#f97316'; ctx.font = '9px monospace';
+            ctx.fillText(dirText, w / 2, 15);
+        });
+    },
+
+    // 11. BOYLE — Pistón con presión y volumen (P₁V₁ = P₂V₂)
+    boyle: function(canvas, P1, V1, P2, V2) {
+        if (!canvas.id) canvas.id = 'canvas_quim_boyle';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const time = Date.now() * 0.001;
+            const cx = w / 2, cw = 80, ch = 70;
+            const cy = h / 2;
+            const relacion = V2 / V1 || 1;
+            const pistonY = cy + ch / 2 - ch / Math.max(0.3, Math.min(3, relacion));
+            ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(cx - cw / 2, cy - ch / 2);
+            ctx.lineTo(cx - cw / 2, cy + ch / 2);
+            ctx.lineTo(cx + cw / 2, cy + ch / 2);
+            ctx.lineTo(cx + cw / 2, cy - ch / 2);
+            ctx.stroke();
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(cx - cw / 2 - 3, pistonY - 4, cw + 6, 8);
+            const espacio = Math.max(10, ch / Math.max(1, relacion) - 8);
+            const nP = Math.round(P1 * 8);
+            for (let i = 0; i < nP; i++) {
+                const px = cx - cw / 2 + 8 + Math.abs(Math.sin(i * 37)) * (cw - 16);
+                const py = pistonY - 6 - Math.abs(Math.cos(i * 53)) * espacio;
+                const dx = Math.sin(time * 2 + i * 1.7) * 3;
+                const dy = Math.cos(time * 1.8 + i * 2.3) * 3;
+                ctx.fillStyle = i % 2 === 0 ? '#60a5fa' : '#f9c74f';
+                ctx.beginPath(); ctx.arc(px + dx, cy + ch / 2 - 8 - (Math.abs(Math.cos(i * 53)) * espacio) + dy, 3, 0, Math.PI * 2); ctx.fill();
+            }
+            ctx.fillStyle = '#e8edf5'; ctx.font = '9px monospace'; ctx.textAlign = 'left';
+            ctx.fillText(`P₁=${P1.toFixed(2)}  V₁=${V1.toFixed(2)}L`, 10, 16);
+            ctx.fillText(`P₂=${P2.toFixed(2)}  V₂=${V2.toFixed(2)}L`, 10, 30);
+            ctx.fillStyle = '#4fffa0'; ctx.font = 'bold 10px monospace'; ctx.textAlign = 'center';
+            ctx.fillText('P₁V₁ = P₂V₂', w / 2, h - 8);
+        });
+    },
+
+    // 12. CHARLES — Termómetro + volumen variable (V₁/T₁ = V₂/T₂)
+    charles: function(canvas, V1, T1, V2, T2) {
+        if (!canvas.id) canvas.id = 'canvas_quim_charles';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const time = Date.now() * 0.002;
+            const cx = w / 2, cw = 60, ch = 60;
+            const cy = h / 2;
+            const relacion = V2 / V1 || 1;
+            const pistonY = cy + ch / 2 - ch / Math.max(0.3, relacion);
+            ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(cx - cw / 2, cy - ch / 2);
+            ctx.lineTo(cx - cw / 2, cy + ch / 2);
+            ctx.lineTo(cx + cw / 2, cy + ch / 2);
+            ctx.lineTo(cx + cw / 2, cy - ch / 2);
+            ctx.stroke();
+            const tempColor = `rgba(239,68,68,${Math.min(0.5, 0.15 + (T2 - 273.15) * 0.005)})`;
+            ctx.fillStyle = tempColor;
+            const fillH = ch / Math.max(1, relacion);
+            ctx.beginPath();
+            ctx.moveTo(cx - cw / 2 + 1, cy + ch / 2);
+            for (let x = cx - cw / 2 + 1; x <= cx + cw / 2 - 1; x++) {
+                ctx.lineTo(x, cy + ch / 2 - fillH + Math.sin(x * 0.1 + time * 4) * 2);
+            }
+            ctx.lineTo(cx + cw / 2 - 1, cy + ch / 2);
+            ctx.closePath(); ctx.fill();
+            // Termómetro
+            const tx = w - 40, ty = 20, tw = 14, th = h - 40;
+            ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5;
+            ctx.strokeRect(tx, ty, tw, th);
+            const tempFill = Math.min(1, Math.max(0, ((T2 - 273.15) / 100)));
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(tx + 1, ty + th - tempFill * (th - 2), tw - 2, tempFill * (th - 2));
+            ctx.fillStyle = '#e8edf5'; ctx.font = '8px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`${(T2 - 273.15).toFixed(0)}°C`, tx + tw / 2, ty - 5);
+            ctx.fillStyle = '#e8edf5'; ctx.font = '9px monospace'; ctx.textAlign = 'left';
+            ctx.fillText(`V₁=${V1.toFixed(2)}L  T₁=${(T1 - 273.15).toFixed(1)}°C`, 10, 16);
+            ctx.fillText(`V₂=${V2.toFixed(2)}L  T₂=${(T2 - 273.15).toFixed(1)}°C`, 10, 30);
+            ctx.fillStyle = '#4fffa0'; ctx.font = 'bold 10px monospace'; ctx.textAlign = 'center';
+            ctx.fillText('V₁/T₁ = V₂/T₂', w / 2, h - 8);
+        });
+    },
+
+    // 13. DALTON — Barras de presión total vs parcial
+    dalton: function(canvas, X, PT, Pi) {
+        if (!canvas.id) canvas.id = 'canvas_quim_dalton';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const time = Date.now() * 0.001;
+            const pad = 25, bw = w - 2 * pad, bh = 14;
+            const cy1 = h / 2 - 16, cy2 = h / 2 + 16;
+            const maxP = Math.max(PT, Pi) * 1.2;
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath(); ctx.roundRect(pad, cy1, bw, bh, 4); ctx.fill();
+            ctx.fillStyle = '#4f9cf9';
+            const pct1 = Math.min(1, PT / maxP);
+            ctx.beginPath(); ctx.roundRect(pad, cy1, bw * pct1, bh, [4, 0, 0, 4]); ctx.fill();
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath(); ctx.roundRect(pad, cy2, bw, bh, 4); ctx.fill();
+            ctx.fillStyle = '#f9c74f';
+            const pct2 = Math.min(1, Pi / maxP);
+            ctx.beginPath(); ctx.roundRect(pad, cy2, bw * pct2, bh, [4, 0, 0, 4]); ctx.fill();
+            ctx.fillStyle = '#e8edf5'; ctx.font = '9px monospace'; ctx.textAlign = 'left';
+            ctx.fillText(`P_total: ${PT.toFixed(2)} atm`, pad, cy1 - 4);
+            ctx.fillText(`P_parcial: ${Pi.toFixed(4)} atm`, pad, cy2 - 4);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '8px monospace';
+            ctx.fillText(`X = ${X}`, pad, cy2 + bh + 14);
+            ctx.fillStyle = '#4fffa0'; ctx.font = 'bold 10px monospace'; ctx.textAlign = 'center';
+            ctx.fillText('P_i = X_i · P_total', w / 2, h - 6);
+        });
+    },
+
+    // 14. VELOCIDAD DE REACCIÓN — Gráfica v vs [A] según orden
+    velocidad_reaccion: function(canvas, k, conc, n, v) {
+        if (!canvas.id) canvas.id = 'canvas_quim_vel';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const time = Date.now() * 0.001;
+            const pad = 30;
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w * 0.5);
+            grad.addColorStop(0, 'rgba(100,200,255,0.1)');
+            grad.addColorStop(1, 'rgba(10,15,30,0.3)');
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+            const gW = w - 2 * pad, gH = h - 2 * pad;
+            ctx.strokeStyle = '#2a3345'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(pad, pad); ctx.lineTo(pad, pad + gH); ctx.lineTo(pad + gW, pad + gH); ctx.stroke();
+            ctx.strokeStyle = 'rgba(79,249,123,0.4)'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let x = 0; x <= gW; x++) {
+                const c = (x / gW) * 2;
+                let rate = 0;
+                if (n === 0) rate = k;
+                else if (n === 1) rate = k * c;
+                else rate = k * c * c;
+                const y = pad + gH - (rate / (k * Math.pow(2, n) || 1)) * gH;
+                x === 0 ? ctx.moveTo(pad + x, y) : ctx.lineTo(pad + x, y);
+            }
+            ctx.stroke();
+            const cx = pad + (conc / 2) * gW;
+            const rateV = k * Math.pow(conc, n);
+            const cy = pad + gH - (rateV / (k * Math.pow(2, n) || 1)) * gH;
+            ctx.shadowColor = '#4fffa0'; ctx.shadowBlur = 8;
+            ctx.fillStyle = '#4fffa0';
+            ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#e8edf5'; ctx.font = '9px monospace'; ctx.textAlign = 'left';
+            ctx.fillText(`k=${k}  n=${n}  [A]=${conc}M`, 10, 14);
+            ctx.fillText(`v=${v.toExponential(4)}`, 10, 28);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '7px monospace'; ctx.textAlign = 'center';
+            ctx.fillText('[A]', w - 10, pad + gH + 12);
+        });
+    },
+
+    // 15. AVOGADRO — Partículas animadas (N = n · Nₐ)
+    numero_avogadro: function(canvas, moles, moleculas) {
+        if (!canvas.id) canvas.id = 'canvas_quim_avogadro';
+        this.startLoop(canvas.id, () => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const time = Date.now() * 0.001;
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w * 0.6);
+            grad.addColorStop(0, 'rgba(250,200,100,0.12)');
+            grad.addColorStop(1, 'rgba(100,150,255,0.05)');
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+            const n = Math.min(30, Math.max(4, Math.round(moles * 8)));
+            for (let i = 0; i < n; i++) {
+                const col = 6, row = Math.ceil(n / col);
+                const sepX = (w - 30) / col, sepY = (h - 40) / row;
+                const ix = i % col, iy = Math.floor(i / col);
+                const px = 15 + ix * sepX + sepX / 2 + Math.sin(time + i * 1.7) * 5;
+                const py = 20 + iy * sepY + sepY / 2 + Math.cos(time * 0.8 + i * 2.3) * 4;
+                const r = 5 + Math.sin(time * 0.5 + i) * 1.5;
+                const colores = ['#4f9cf9', '#f9c74f', '#4fffa0', '#f94f4f', '#a78bfa'];
+                ctx.fillStyle = colores[i % colores.length];
+                ctx.shadowColor = ctx.fillStyle;
+                ctx.shadowBlur = 4;
+                ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2); ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            ctx.fillStyle = '#e8edf5'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`${moles.toFixed(4)} mol → ${moleculas.toExponential(4)} moléculas`, w / 2, h - 8);
+            ctx.fillStyle = '#94a3b8'; ctx.font = '8px monospace';
+            ctx.fillText('Nₐ = 6.022×10²³', w / 2, 12);
+        });
+    },
+
+    // ─── Q11. MASA MOLAR — Balanza con moléculas ─────────────────────────
+    masa_molar: function(canvas, m, n, M) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const W = canvas.width / (window.devicePixelRatio || 1);
+        const H = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, W, H);
+            t += 0.02;
+
+            const cx = W / 2, by = H - 30;
+            const platW = 60, platH = 6;
+
+            // Balanza (brazo)
+            ctx.strokeStyle = '#4a5570'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(cx - 70, by - 80); ctx.lineTo(cx + 70, by - 80); ctx.stroke();
+
+            // Soporte central
+            ctx.beginPath(); ctx.moveTo(cx, by - 80); ctx.lineTo(cx, by - 30); ctx.stroke();
+            ctx.fillStyle = '#4a5570'; ctx.fillRect(cx - 2, by - 30, 4, 10);
+
+            // Plato izquierdo (masa)
+            const swing = 6 * Math.sin(t * 2);
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath(); ctx.rect(cx - 70 - platW / 2 + 1, by - 80 + platW / 2, platW, platH); ctx.fill();
+            ctx.fillStyle = '#4f9cf9'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`${m}g`, cx - 70, by - 80 + platW / 2 - 6);
+
+            // Plato derecho (moles)
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath(); ctx.rect(cx + 70 - platW / 2 - 1, by - 80 + platW / 2, platW, platH); ctx.fill();
+            ctx.fillStyle = '#f9c74f'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`${n}mol`, cx + 70, by - 80 + platW / 2 - 6);
+
+            // Resultado
+            ctx.fillStyle = '#4fffa0'; ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`M = ${M.toFixed(2)} g/mol`, cx, by - 6);
+
+            // Partículas animadas
+            const colores = ['#4f9cf9', '#f9c74f', '#a78bfa', '#4fffa0'];
+            for (let i = 0; i < 8; i++) {
+                const px = 10 + (W - 20) * ((i + 0.5 * Math.sin(t + i * 2)) / 8);
+                const py = 10 + Math.sin(t * 1.5 + i) * 4;
+                ctx.fillStyle = colores[i % 4];
+                ctx.globalAlpha = 0.3 + 0.3 * Math.sin(t + i);
+                ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI * 2); ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        });
+    },
+
+    // ─── Q12. RENDIMIENTO — Barra de porcentaje con animación ────────────
+    rendimiento: function(canvas, real, teor, pct) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const W = canvas.width / (window.devicePixelRatio || 1);
+        const H = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, W, H);
+            t += 0.03;
+
+            const pad = 30, cy = H / 2, barW = W - 2 * pad, barH = 30;
+            const color = pct < 50 ? '#f94f4f' : pct < 80 ? '#f9c74f' : '#4fffa0';
+
+            // Fondo de barra
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath(); ctx.roundRect(pad, cy - barH / 2, barW, barH, 8); ctx.fill();
+
+            const anim = Math.min(t * 2, 1);
+            const fillW = barW * (pct / 100) * anim;
+
+            ctx.fillStyle = color;
+            ctx.shadowColor = color; ctx.shadowBlur = 6;
+            ctx.beginPath(); ctx.roundRect(pad, cy - barH / 2, fillW, barH, [8, 0, 0, 8]); ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Línea divisoria 50%
+            ctx.strokeStyle = '#f94f4f44'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+            ctx.beginPath(); ctx.moveTo(pad + barW * 0.5, cy - barH / 2 - 4); ctx.lineTo(pad + barW * 0.5, cy + barH / 2 + 4); ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Etiqueta
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 14px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`${pct.toFixed(1)}%`, W / 2, cy + 4);
+
+            // Matraz ilustrativo
+            const mx = W * 0.2, my = H * 0.85;
+            ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(mx - 16, my); ctx.lineTo(mx - 16, my - 30);
+            ctx.quadraticCurveTo(mx - 16, my - 40, mx, my - 40);
+            ctx.quadraticCurveTo(mx + 16, my - 40, mx + 16, my - 30);
+            ctx.lineTo(mx + 16, my); ctx.closePath(); ctx.stroke();
+
+            ctx.fillStyle = color + '44';
+            ctx.fillRect(mx - 14, my - 20 * (pct / 100), 28, 20);
+            this._label(ctx, `Rendimiento`, mx, my + 14, '#8a97b0', 7);
+        });
+    },
+
+    // ─── Q13. HENDERSON–HASSELBALCH — Gráfico de titulación ─────────────
+    henderson: function(canvas, pka, base, acido, pH) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const W = canvas.width / (window.devicePixelRatio || 1);
+        const H = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, W, H);
+            t += 0.02;
+
+            const pad = 25, gW = W - 2 * pad, gH = H - 2 * pad;
+
+            // Ejes
+            ctx.strokeStyle = '#2a3040'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(pad, pad); ctx.lineTo(pad, pad + gH); ctx.lineTo(pad + gW, pad + gH); ctx.stroke();
+
+            // Curva sigmoidea de titulación
+            ctx.strokeStyle = '#4f9cf9'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = 0; i <= 100; i++) {
+                const x = pad + (i / 100) * gW;
+                const logR = -3 + (i / 100) * 6;
+                const y = pad + gH - (pka + logR) / 14 * gH;
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Punto actual
+            const logRel = Math.log10(base / acido);
+            const px = pad + (logRel + 3) / 6 * gW;
+            const py = pad + gH - pH / 14 * gH;
+            if (px >= pad && px <= pad + gW) {
+                ctx.shadowColor = '#f9c74f'; ctx.shadowBlur = 8;
+                ctx.fillStyle = '#f9c74f';
+                ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2); ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            // Línea pH = pKa
+            const pkaY = pad + gH - pka / 14 * gH;
+            ctx.strokeStyle = '#f9c74f44'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+            ctx.beginPath(); ctx.moveTo(pad, pkaY); ctx.lineTo(pad + gW, pkaY); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#f9c74f'; ctx.font = '7px monospace'; ctx.textAlign = 'left';
+            ctx.fillText(`pKa=${pka}`, pad + gW - 30, pkaY - 2);
+
+            ctx.fillStyle = '#e8edf5'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`pH = ${pH.toFixed(2)}`, W / 2, 12);
+        });
+    },
+
+    // ─── Q14. LEY DE GRAHAM — Dos moléculas con velocidades ──────────────
+    graham: function(canvas, M1, M2, ratio) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const W = canvas.width / (window.devicePixelRatio || 1);
+        const H = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, W, H);
+            t += 0.02;
+
+            const cx = W / 2, cy = H / 2;
+
+            // Partícula gas 1 (izquierda)
+            const x1 = cx / 2 + Math.sin(t * 4) * 40;
+            const y1 = cy + Math.cos(t * 3) * 20;
+            ctx.shadowColor = '#4f9cf9'; ctx.shadowBlur = 10;
+            ctx.fillStyle = '#4f9cf9';
+            ctx.beginPath(); ctx.arc(x1, y1, M1 < M2 ? 12 : 6, 0, Math.PI * 2); ctx.fill();
+
+            // Partícula gas 2 (derecha)
+            const x2 = cx + cx / 2 + Math.sin(t * 6 + 2) * 40;
+            const y2 = cy + Math.cos(t * 5 + 1) * 20;
+            ctx.shadowColor = '#f9c74f'; ctx.shadowBlur = 10;
+            ctx.fillStyle = '#f9c74f';
+            ctx.beginPath(); ctx.arc(x2, y2, M2 < M1 ? 12 : 6, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Etiquetas
+            ctx.fillStyle = '#4f9cf9'; ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`Gas 1 (M=${M1})`, cx / 2, cy - 40);
+            ctx.fillStyle = '#f9c74f'; ctx.font = 'bold 9px monospace';
+            ctx.fillText(`Gas 2 (M=${M2})`, cx + cx / 2, cy - 40);
+
+            // Línea de efusión (porosa)
+            ctx.strokeStyle = '#2a3040'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
+            ctx.strokeStyle = '#1a1f2e'; ctx.lineWidth = 1;
+            ctx.setLineDash([2, 4]);
+            ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#8a97b0'; ctx.font = '7px monospace';
+            ctx.fillText('pared porosa', cx, 8);
+
+            // Resultado
+            ctx.fillStyle = '#4fffa0'; ctx.font = 'bold 12px monospace';
+            ctx.fillText(`v₁/v₂ = ${ratio.toFixed(4)}`, cx, H - 12);
+        });
+    },
+
+    // ─── Q15. ARRHENIUS — Gráfico de energía de activación ──────────────
+    arrhenius: function(canvas, Ea, T, A, k) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const W = canvas.width / (window.devicePixelRatio || 1);
+        const H = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, W, H);
+            t += 0.02;
+
+            const pad = 30, gW = W - 2 * pad, gH = H - 2 * pad;
+
+            // Perfil energético (curva de reacción)
+            ctx.strokeStyle = '#4f9cf9'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            const cp = [
+                { x: 0, y: 0.1 },
+                { x: 0.2, y: 0.05 },
+                { x: 0.45, y: 0.85 },
+                { x: 0.55, y: 0.85 },
+                { x: 0.8, y: 0.05 },
+                { x: 1, y: 0.1 }
+            ];
+            cp.forEach((p, i) => {
+                const x = pad + p.x * gW;
+                const y = pad + (1 - p.y) * gH;
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // Flecha de Ea
+            const eaX1 = pad + 0.25 * gW, eaX2 = pad + 0.45 * gW;
+            const eaY = pad + (1 - 0.6) * gH;
+            ctx.strokeStyle = '#f9c74f'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(eaX1, eaY); ctx.lineTo(eaX2, eaY); ctx.stroke();
+            ctx.fillStyle = '#f9c74f'; ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`Ea = ${(Ea / 1000).toFixed(2)} kJ/mol`, (eaX1 + eaX2) / 2, eaY - 6);
+
+            // Punto de la cima (complejo activado)
+            ctx.shadowColor = '#f94f4f'; ctx.shadowBlur = 8;
+            ctx.fillStyle = '#f94f4f';
+            ctx.beginPath(); ctx.arc(pad + 0.5 * gW, pad + (1 - 0.85) * gH, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Etiqueta resultado
+            ctx.fillStyle = '#4fffa0'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(`k = ${k.toExponential(4)} s⁻¹  (T=${T} K)`, W / 2, H - 6);
+
+            ctx.fillStyle = '#8a97b0'; ctx.font = '7px monospace';
+            ctx.fillText('Reactivos →', pad + 5, pad + (1 - 0.1) * gH + 12);
+            ctx.fillText('← Productos', pad + gW - 30, pad + (1 - 0.1) * gH + 12);
+        });
+    }
+};

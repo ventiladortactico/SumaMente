@@ -1,1 +1,423 @@
-const UnidadesVisual={initCanvas:function(o){const e=window.devicePixelRatio||1,t=o.getBoundingClientRect();o.width=t.width*e,o.height=t.height*e;const l=o.getContext("2d");return l.scale(e,e),l},_loop:{},_startLoop:function(o,e){this._loop[o.id]&&cancelAnimationFrame(this._loop[o.id]);const t=()=>{e(),this._loop[o.id]=requestAnimationFrame(t)};t()},_stopLoop:function(o){this._loop[o.id]&&(cancelAnimationFrame(this._loop[o.id]),delete this._loop[o.id])},_bar:function(o,e,t,l,n,a,f){const i=this.initCanvas(o),d=o.width/(window.devicePixelRatio||1),s=o.height/(window.devicePixelRatio||1),c=25,x=d-2*c,r=18,h=s/2-r/2;f=f||Math.max(Math.abs(e)*2,1);let p=0;this._startLoop(o,()=>{i.clearRect(0,0,d,s),p+=.03;const _=i.createRadialGradient(d/2,s/2,5,d/2,s/2,d*.4);_.addColorStop(0,`${t}11`),_.addColorStop(1,"rgba(10, 11, 14, 0)"),i.fillStyle=_,i.fillRect(0,0,d,s);const b=Math.min(p,1),m=Math.min(Math.abs(e)/f,1);i.fillStyle="#1a1f2e",i.beginPath(),i.roundRect(c,h,x,r,6),i.fill();const g=i.createLinearGradient(c,0,c+x,0);g.addColorStop(0,t),g.addColorStop(1,t.replace(")",", 0.7)").replace("rgb","rgba")),i.fillStyle=t,i.shadowColor=t,i.shadowBlur=4,i.beginPath(),i.roundRect(c,h,x*m*b,r,[6,0,0,6]),i.fill(),i.shadowBlur=0,i.fillStyle="#fff",i.font="bold 11px JetBrains Mono",i.textAlign="center",i.textBaseline="middle",i.fillText(`${e.toFixed(4)} ${l}`,d/2,h+r/2),n&&(i.fillStyle="#8a99ad",i.font="7px JetBrains Mono",i.textAlign="left",i.textBaseline="top",i.fillText(n,c,h+r+4)),a&&(i.fillStyle="#8a99ad",i.font="7px JetBrains Mono",i.textAlign="right",i.textBaseline="top",i.fillText(a,c+x,h+r+4))})},longitud:function(o,e){this._stopLoop(o),this._bar(o,e,"#4f9cf9","m",`${(e*100).toFixed(2)} cm`,`${(e/.3048).toFixed(2)} ft`)},masa:function(o,e){this._stopLoop(o),this._bar(o,e,"#a78bfa","kg",`${(e*1e3).toFixed(1)} g`,`${(e/.453592).toFixed(2)} lb`)},temp:function(o,e){this._stopLoop(o);const t=this.initCanvas(o),l=o.width/(window.devicePixelRatio||1),n=o.height/(window.devicePixelRatio||1),a=25,f=l-2*a,i=18;let d=0;this._startLoop(o,()=>{t.clearRect(0,0,l,n),d+=.03;const s=t.createRadialGradient(l/2,n/2,5,l/2,n/2,l*.4);s.addColorStop(0,"rgba(249, 79, 79, 0.04)"),s.addColorStop(1,"rgba(10, 11, 14, 0)"),t.fillStyle=s,t.fillRect(0,0,l,n);const c=n/2-i/2,x=-50,r=150,h=r-x,p=Math.max(0,Math.min(1,(e-x)/h)),_=Math.min(d,1);t.fillStyle="#1a1f2e",t.beginPath(),t.roundRect(a,c,f,i,6),t.fill();const b=t.createLinearGradient(a,0,a+f,0);b.addColorStop(0,"#4f9cf9"),b.addColorStop(.35,"#4ff97b"),b.addColorStop(.55,"#f9c74f"),b.addColorStop(.75,"#f97b4f"),b.addColorStop(1,"#f94f4f"),t.fillStyle=b,t.shadowColor=e>50?"#f94f4f":"#4f9cf9",t.shadowBlur=6,t.beginPath(),t.roundRect(a,c,f*p*_,i,[6,0,0,6]),t.fill(),t.shadowBlur=0,t.fillStyle="#fff",t.font="bold 12px JetBrains Mono",t.textAlign="center",t.textBaseline="middle",t.fillText(`${e.toFixed(1)} \xB0C`,l/2,c+i/2),t.fillStyle="#8a99ad",t.font="7px JetBrains Mono",t.textBaseline="top",t.textAlign="left",t.fillText("-50\xB0C",a,c+i+4),t.textAlign="right",t.fillText("150\xB0C",a+f,c+i+4)})},area_vol:function(o,e,t){this._stopLoop(o);const l=t?"m\xB2":"m\xB3",n=t?"#4ff97b":"#4f9cf9",a=t?`${(e*1e4).toFixed(1)} cm\xB2`:`${(e*1e3).toFixed(2)} L`;this._bar(o,e,n,l,a)},presion:function(o,e){this._stopLoop(o);const t=this.initCanvas(o),l=o.width/(window.devicePixelRatio||1),n=o.height/(window.devicePixelRatio||1),a=25,f=l-2*a,i=18;let d=0;this._startLoop(o,()=>{t.clearRect(0,0,l,n),d+=.03;const s=n/2-i/2,c=Math.max(Math.abs(e)*2,101325),x=Math.min(Math.abs(e)/c,1),r=Math.min(d,1),h=e>101325?"#f94f4f":"#4f9cf9";t.fillStyle="#1a1f2e",t.beginPath(),t.roundRect(a,s,f,i,6),t.fill(),t.fillStyle=h,t.shadowColor=h,t.shadowBlur=6,t.beginPath(),t.roundRect(a,s,f*x*r,i,[6,0,0,6]),t.fill(),t.shadowBlur=0;const p=a+101325/c*f;t.strokeStyle="#f9c74f",t.lineWidth=1.5,t.setLineDash([4,4]),t.beginPath(),t.moveTo(p,s-4),t.lineTo(p,s+i+4),t.stroke(),t.setLineDash([]),t.fillStyle="#fff",t.font="bold 11px JetBrains Mono",t.textAlign="center",t.textBaseline="middle",t.fillText(`${e.toFixed(1)} Pa`,l/2,s+i/2),t.fillStyle="#f9c74f",t.font="7px JetBrains Mono",t.textBaseline="bottom",t.textAlign="center",t.fillText("1 atm",p,s-6)})},velocidad:function(o,e){this._stopLoop(o);const t=e>100?"#f94f4f":e>30?"#f9c74f":"#4f9cf9";this._bar(o,e,t,"m/s",`${(e*3.6).toFixed(2)} km/h`)},energia:function(o,e,t){this._stopLoop(o);const l=t?"J":"W",n=t?"#f9c74f":"#a78bfa",a=t?`${(e/4184).toFixed(3)} kcal`:`${(e/745.7).toFixed(4)} HP`;this._bar(o,e,n,l,a)},angulos:function(o,e){this._stopLoop(o);const t=this.initCanvas(o),l=o.width/(window.devicePixelRatio||1),n=o.height/(window.devicePixelRatio||1),a=l/2,f=n/2,i=Math.min(l,n)/2-24;let d=0;this._startLoop(o,()=>{t.clearRect(0,0,l,n),d+=.03;const s=(e%360+360)%360,c=s*Math.PI/180,x=Math.min(d*2,1),r=-Math.PI/2+c*x,h=t.createRadialGradient(a,f,5,a,f,i+20);h.addColorStop(0,"rgba(79, 156, 249, 0.06)"),h.addColorStop(1,"rgba(10, 11, 14, 0)"),t.fillStyle=h,t.fillRect(0,0,l,n),t.strokeStyle="#334155",t.lineWidth=2,t.beginPath(),t.arc(a,f,i,0,Math.PI*2),t.stroke(),t.fillStyle="#4f9cf9",t.beginPath(),t.moveTo(a,f),t.arc(a,f,i,-Math.PI/2,r),t.closePath(),t.fill(),t.strokeStyle="#93c5fd",t.lineWidth=2,t.beginPath(),t.moveTo(a,f),t.lineTo(a+i*Math.cos(r),f+i*Math.sin(r)),t.stroke(),t.strokeStyle="#93c5fd",t.beginPath(),t.moveTo(a,f),t.lineTo(a,f-i),t.stroke(),t.fillStyle="#fff",t.font="bold 12px JetBrains Mono",t.textAlign="center",t.fillText(`${s.toFixed(1)}\xB0`,a,f+i+18),t.fillStyle="#94a3b8",t.font="9px JetBrains Mono",t.fillText(`${(s*Math.PI/180).toFixed(4)} rad`,a,f+i+32)})},datos:function(o,e){this._stopLoop(o);const t=["B","KB","MB","GB","TB","PB"];let l=0,n=Math.abs(e);for(;n>=1024&&l<t.length-1;)n/=1024,l++;this._bar(o,n,"#4ff97b",t[l],`${e.toFixed(0)} bytes`,"",1024)},flujo:function(o,e){this._stopLoop(o);const t=Math.max(Math.abs(e)*2,.001);this._bar(o,e,"#4f9cf9","m\xB3/s",`${(e*6e4).toFixed(2)} L/min`,"",t)},tiempo:function(o,e){this._stopLoop(o),this._bar(o,e,"#4fdbf9","s",`${(e/3600).toFixed(4)} h`,`${(e/60).toFixed(2)} min`,e*2)},densidad:function(o,e){this._stopLoop(o),this._bar(o,e,"#4ff97b","kg/m\xB3",`${(e/1e3).toFixed(6)} g/cm\xB3`,"",e*2)},frecuencia_hz:function(o,e){this._stopLoop(o);const t=this.initCanvas(o),l=o.width/(window.devicePixelRatio||1),n=o.height/(window.devicePixelRatio||1),a=25;let f=0;this._startLoop(o,()=>{t.clearRect(0,0,l,n),f+=.03;const i=n/2-9,d=l-2*a,s=Math.max(Math.abs(e)*2,1),c=Math.min(Math.abs(e)/s,1),x=Math.min(f,1);t.fillStyle="#1a1f2e",t.beginPath(),t.roundRect(a,i,d,18,6),t.fill(),t.strokeStyle="#f9c74f55",t.lineWidth=1.5,t.beginPath();for(let h=a;h<a+d;h+=2){const p=i+9+Math.sin((h+f*40)*.05)*6;h===a?t.moveTo(h,p):t.lineTo(h,p)}t.stroke();const r=t.createLinearGradient(a,0,a+d,0);r.addColorStop(0,"#f9c74f"),r.addColorStop(1,"#f97b4f"),t.fillStyle=r,t.shadowColor="#f9c74f",t.shadowBlur=4,t.beginPath(),t.roundRect(a,i,d*c*x,18,[6,0,0,6]),t.fill(),t.shadowBlur=0,t.fillStyle="#fff",t.font="bold 11px JetBrains Mono",t.textAlign="center",t.textBaseline="middle",t.fillText(`${e.toFixed(4)} Hz`,l/2,i+9)})},fuerza_newton:function(o,e){this._stopLoop(o),this._bar(o,e,"#f97b4f","N",`${(e/9.80665).toFixed(4)} kgf`,`${(e/4.44822).toFixed(4)} lbf`,e*2)},carga_electrica:function(o,e){this._stopLoop(o),this._bar(o,e,"#a78bfa","C",`${(e/3.6).toFixed(4)} mAh`,`${(e/3600).toFixed(6)} Ah`,e*2)},torque:function(o,e){this._stopLoop(o),this._bar(o,e,"#f97b4f","N\xB7m",`${(e/1.35582).toFixed(4)} lb\xB7ft`,"",e*2)},flops:function(o,e){this._stopLoop(o);const t=["FLOPS","kFLOPS","MFLOPS","GFLOPS","TFLOPS","PFLOPS"];let l=0,n=Math.abs(e);for(;n>=1e3&&l<t.length-1;)n/=1e3,l++;this._bar(o,n,"#4ff97b",t[l],`${e.toFixed(0)} FLOPS`,"",1024)},viscosidad:function(o,e){this._stopLoop(o),this._bar(o,e,"#a78bfa","P",`${(e*100).toFixed(4)} cP`,`${(e/1).toFixed(4)} St`,e*2||1)},conductividad:function(o,e){this._stopLoop(o),this._bar(o,e,"#4f9cf9","S/m",`${(e*10).toFixed(4)} mS/cm`,`${(e*1e4).toFixed(2)} \xB5S/cm`,e*2||1)},iluminancia:function(o,e){this._stopLoop(o),this._bar(o,e,"#f9c74f","lux",`${(e/10.7639).toFixed(4)} fc`,"",e*2||1)}};
+const UnidadesVisual = {
+    initCanvas: function(canvas) {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return ctx;
+    },
+
+    _loop: {},
+    _startLoop: function(canvas, fn) {
+        if (this._loop[canvas.id]) cancelAnimationFrame(this._loop[canvas.id]);
+        const animate = () => { fn(); this._loop[canvas.id] = requestAnimationFrame(animate); };
+        animate();
+    },
+    _stopLoop: function(canvas) {
+        if (this._loop[canvas.id]) { cancelAnimationFrame(this._loop[canvas.id]); delete this._loop[canvas.id]; }
+    },
+
+    _bar: function(canvas, val, color, unit, subLeft, subRight, maxV) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 25, barW = w - 2 * pad, barH = 18;
+        const cy = h / 2 - barH / 2;
+        maxV = maxV || Math.max(Math.abs(val) * 2, 1);
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.4);
+            grad.addColorStop(0, `${color}11`);
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            const anim = Math.min(phase, 1);
+            const fillPct = Math.min(Math.abs(val) / maxV, 1);
+
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, barW, barH, 6);
+            ctx.fill();
+
+            const g = ctx.createLinearGradient(pad, 0, pad + barW, 0);
+            g.addColorStop(0, color);
+            g.addColorStop(1, color.replace(')', ', 0.7)').replace('rgb', 'rgba'));
+            ctx.fillStyle = color;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 4;
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, barW * fillPct * anim, barH, [6, 0, 0, 6]);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 11px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${val.toFixed(4)} ${unit}`, w / 2, cy + barH / 2);
+
+            if (subLeft) {
+                ctx.fillStyle = '#8a99ad';
+                ctx.font = '7px JetBrains Mono';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillText(subLeft, pad, cy + barH + 4);
+            }
+            if (subRight) {
+                ctx.fillStyle = '#8a99ad';
+                ctx.font = '7px JetBrains Mono';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'top';
+                ctx.fillText(subRight, pad + barW, cy + barH + 4);
+            }
+        });
+    },
+
+    longitud: function(canvas, metros) {
+        this._stopLoop(canvas);
+        this._bar(canvas, metros, '#4f9cf9', 'm',
+            `${(metros * 100).toFixed(2)} cm`,
+            `${(metros / 0.3048).toFixed(2)} ft`);
+    },
+
+    masa: function(canvas, kg) {
+        this._stopLoop(canvas);
+        this._bar(canvas, kg, '#a78bfa', 'kg',
+            `${(kg * 1000).toFixed(1)} g`,
+            `${(kg / 0.453592).toFixed(2)} lb`);
+    },
+
+    temp: function(canvas, celsius) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 25, barW = w - 2 * pad, barH = 18;
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 5, w / 2, h / 2, w * 0.4);
+            grad.addColorStop(0, 'rgba(249, 79, 79, 0.04)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            const cy = h / 2 - barH / 2;
+            const minC = -50, maxC = 150, range = maxC - minC;
+            const pct = Math.max(0, Math.min(1, (celsius - minC) / range));
+            const anim = Math.min(phase, 1);
+
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, barW, barH, 6);
+            ctx.fill();
+
+            const tg = ctx.createLinearGradient(pad, 0, pad + barW, 0);
+            tg.addColorStop(0, '#4f9cf9');
+            tg.addColorStop(0.35, '#4ff97b');
+            tg.addColorStop(0.55, '#f9c74f');
+            tg.addColorStop(0.75, '#f97b4f');
+            tg.addColorStop(1, '#f94f4f');
+            ctx.fillStyle = tg;
+            ctx.shadowColor = celsius > 50 ? '#f94f4f' : '#4f9cf9';
+            ctx.shadowBlur = 6;
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, barW * pct * anim, barH, [6, 0, 0, 6]);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 12px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${celsius.toFixed(1)} °C`, w / 2, cy + barH / 2);
+
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '7px JetBrains Mono';
+            ctx.textBaseline = 'top';
+            ctx.textAlign = 'left';
+            ctx.fillText('-50°C', pad, cy + barH + 4);
+            ctx.textAlign = 'right';
+            ctx.fillText('150°C', pad + barW, cy + barH + 4);
+        });
+    },
+
+    area_vol: function(canvas, base, esArea) {
+        this._stopLoop(canvas);
+        const unit = esArea ? 'm²' : 'm³';
+        const color = esArea ? '#4ff97b' : '#4f9cf9';
+        const sub = esArea ? `${(base * 1e4).toFixed(1)} cm²` : `${(base * 1000).toFixed(2)} L`;
+        this._bar(canvas, base, color, unit, sub);
+    },
+
+    presion: function(canvas, pa) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 25, barW = w - 2 * pad, barH = 18;
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+
+            const cy = h / 2 - barH / 2;
+            const maxV = Math.max(Math.abs(pa) * 2, 101325);
+            const pct = Math.min(Math.abs(pa) / maxV, 1);
+            const anim = Math.min(phase, 1);
+            const color = pa > 101325 ? '#f94f4f' : '#4f9cf9';
+
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, barW, barH, 6);
+            ctx.fill();
+
+            ctx.fillStyle = color;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 6;
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, barW * pct * anim, barH, [6, 0, 0, 6]);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            const atmX = pad + (101325 / maxV) * barW;
+            ctx.strokeStyle = '#f9c74f';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(atmX, cy - 4);
+            ctx.lineTo(atmX, cy + barH + 4);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 11px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${pa.toFixed(1)} Pa`, w / 2, cy + barH / 2);
+
+            ctx.fillStyle = '#f9c74f';
+            ctx.font = '7px JetBrains Mono';
+            ctx.textBaseline = 'bottom';
+            ctx.textAlign = 'center';
+            ctx.fillText('1 atm', atmX, cy - 6);
+        });
+    },
+
+    velocidad: function(canvas, ms) {
+        this._stopLoop(canvas);
+        const color = ms > 100 ? '#f94f4f' : ms > 30 ? '#f9c74f' : '#4f9cf9';
+        this._bar(canvas, ms, color, 'm/s',
+            `${(ms * 3.6).toFixed(2)} km/h`);
+    },
+
+    energia: function(canvas, base, esEnergia) {
+        this._stopLoop(canvas);
+        const unit = esEnergia ? 'J' : 'W';
+        const color = esEnergia ? '#f9c74f' : '#a78bfa';
+        const sub = esEnergia ? `${(base / 4184).toFixed(3)} kcal` : `${(base / 745.7).toFixed(4)} HP`;
+        this._bar(canvas, base, color, unit, sub);
+    },
+
+    angulos: function(canvas, deg) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const cx = w / 2, cy = h / 2;
+        const r = Math.min(w, h) / 2 - 24;
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+
+            const norm = ((deg % 360) + 360) % 360;
+            const rad = norm * Math.PI / 180;
+            const anim = Math.min(phase * 2, 1);
+            const animAngle = -Math.PI / 2 + rad * anim;
+
+            const grad = ctx.createRadialGradient(cx, cy, 5, cx, cy, r + 20);
+            grad.addColorStop(0, 'rgba(79, 156, 249, 0.06)');
+            grad.addColorStop(1, 'rgba(10, 11, 14, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.fillStyle = '#4f9cf9';
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, r, -Math.PI / 2, animAngle);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = '#93c5fd';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + r * Math.cos(animAngle), cy + r * Math.sin(animAngle));
+            ctx.stroke();
+
+            ctx.strokeStyle = '#93c5fd';
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx, cy - r);
+            ctx.stroke();
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 12px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${norm.toFixed(1)}°`, cx, cy + r + 18);
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '9px JetBrains Mono';
+            ctx.fillText(`${(norm * Math.PI / 180).toFixed(4)} rad`, cx, cy + r + 32);
+        });
+    },
+
+    datos: function(canvas, bytes) {
+        this._stopLoop(canvas);
+        const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+        let idx = 0, disp = Math.abs(bytes);
+        while (disp >= 1024 && idx < units.length - 1) { disp /= 1024; idx++; }
+        this._bar(canvas, disp, '#4ff97b', units[idx], `${bytes.toFixed(0)} bytes`, '', 1024);
+    },
+
+    flujo: function(canvas, m3s) {
+        this._stopLoop(canvas);
+        const maxV = Math.max(Math.abs(m3s) * 2, 0.001);
+        this._bar(canvas, m3s, '#4f9cf9', 'm³/s',
+            `${(m3s * 60000).toFixed(2)} L/min`, '', maxV);
+    },
+
+    tiempo: function(canvas, segundos) {
+        this._stopLoop(canvas);
+        this._bar(canvas, segundos, '#4fdbf9', 's',
+            `${(segundos/3600).toFixed(4)} h`,
+            `${(segundos/60).toFixed(2)} min`, segundos * 2);
+    },
+
+    densidad: function(canvas, base) {
+        this._stopLoop(canvas);
+        this._bar(canvas, base, '#4ff97b', 'kg/m³',
+            `${(base/1000).toFixed(6)} g/cm³`, '', base * 2);
+    },
+
+    frecuencia_hz: function(canvas, hz) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const pad = 25;
+        let phase = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            phase += 0.03;
+
+            const cy = h / 2 - 9;
+            const barW = w - 2 * pad;
+            const maxV = Math.max(Math.abs(hz) * 2, 1);
+            const pct = Math.min(Math.abs(hz) / maxV, 1);
+            const anim = Math.min(phase, 1);
+
+            ctx.fillStyle = '#1a1f2e';
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, barW, 18, 6);
+            ctx.fill();
+
+            ctx.strokeStyle = '#f9c74f55';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            for (let x = pad; x < pad + barW; x += 2) {
+                const waveY = cy + 9 + Math.sin((x + phase * 40) * 0.05) * 6;
+                x === pad ? ctx.moveTo(x, waveY) : ctx.lineTo(x, waveY);
+            }
+            ctx.stroke();
+
+            const g = ctx.createLinearGradient(pad, 0, pad + barW, 0);
+            g.addColorStop(0, '#f9c74f');
+            g.addColorStop(1, '#f97b4f');
+            ctx.fillStyle = g;
+            ctx.shadowColor = '#f9c74f';
+            ctx.shadowBlur = 4;
+            ctx.beginPath();
+            ctx.roundRect(pad, cy, barW * pct * anim, 18, [6, 0, 0, 6]);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 11px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${hz.toFixed(4)} Hz`, w / 2, cy + 9);
+        });
+    },
+
+    fuerza_newton: function(canvas, n) {
+        this._stopLoop(canvas);
+        this._bar(canvas, n, '#f97b4f', 'N',
+            `${(n/9.80665).toFixed(4)} kgf`,
+            `${(n/4.44822).toFixed(4)} lbf`, n * 2);
+    },
+
+    carga_electrica: function(canvas, c) {
+        this._stopLoop(canvas);
+        this._bar(canvas, c, '#a78bfa', 'C',
+            `${(c/3.6).toFixed(4)} mAh`,
+            `${(c/3600).toFixed(6)} Ah`, c * 2);
+    },
+
+    torque: function(canvas, nm) {
+        this._stopLoop(canvas);
+        this._bar(canvas, nm, '#f97b4f', 'N·m',
+            `${(nm/1.35582).toFixed(4)} lb·ft`,
+            '', nm * 2);
+    },
+
+    flops: function(canvas, flops) {
+        this._stopLoop(canvas);
+        const units = ['FLOPS','kFLOPS','MFLOPS','GFLOPS','TFLOPS','PFLOPS'];
+        let idx = 0, disp = Math.abs(flops);
+        while (disp >= 1000 && idx < units.length - 1) { disp /= 1000; idx++; }
+        this._bar(canvas, disp, '#4ff97b', units[idx],
+            `${flops.toFixed(0)} FLOPS`, '', 1024);
+    },
+
+    viscosidad: function(canvas, poise) {
+        this._stopLoop(canvas);
+        this._bar(canvas, poise, '#a78bfa', 'P',
+            `${(poise*100).toFixed(4)} cP`,
+            `${(poise/1).toFixed(4)} St`, poise * 2 || 1);
+    },
+
+    conductividad: function(canvas, sm) {
+        this._stopLoop(canvas);
+        this._bar(canvas, sm, '#4f9cf9', 'S/m',
+            `${(sm*10).toFixed(4)} mS/cm`,
+            `${(sm*10000).toFixed(2)} µS/cm`, sm * 2 || 1);
+    },
+
+    iluminancia: function(canvas, lux) {
+        this._stopLoop(canvas);
+        this._bar(canvas, lux, '#f9c74f', 'lux',
+            `${(lux/10.7639).toFixed(4)} fc`,
+            '', lux * 2 || 1);
+    }
+};

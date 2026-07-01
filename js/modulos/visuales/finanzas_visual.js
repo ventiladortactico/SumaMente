@@ -1,1 +1,800 @@
-const FinanzasVisual={animations:{},initCanvas:function(n){const c=window.devicePixelRatio||1,d=n.getBoundingClientRect();n.width=d.width*c,n.height=d.height*c;const a=n.getContext("2d");return a.scale(c,c),a},animate:function(n,c){this.animations[n]&&cancelAnimationFrame(this.animations[n]);let d=null;const a=650,l=t=>{d||(d=t);let e=(t-d)/a;e>1&&(e=1);let o=1-Math.pow(1-e,3);c(o),e<1&&(this.animations[n]=requestAnimationFrame(l))};this.animations[n]=requestAnimationFrame(l)},prestamo:function(n,c,d,a,l){const t=this.initCanvas(n),e=n.width/(window.devicePixelRatio||1),o=n.height/(window.devicePixelRatio||1);t.clearRect(0,0,e,o);const i=25,x=c*a,f=x-d,s=e-2*i,h=28,r=d/x*s,m=f/x*s,S=o/2-10;t.fillStyle="#4f9cf9",t.fillRect(i,S,r,h),t.fillStyle="#f94f4f",t.fillRect(i+r,S,m,h),t.strokeStyle="#4a5570",t.lineWidth=1,t.strokeRect(i,S,s,h),t.fillStyle="#e8edf5",t.font="9px JetBrains Mono",t.textAlign="center",t.fillText("Capital $"+d.toLocaleString("es-AR",{maximumFractionDigits:0}),i+r/2,S+19),t.fillText("Int. $"+f.toLocaleString("es-AR",{maximumFractionDigits:0}),i+r+m/2,S+19),t.fillStyle="#8a99ad",t.font="8px JetBrains Mono",t.textAlign="left",t.fillText("Cuota: $"+c.toLocaleString("es-AR",{maximumFractionDigits:2})+"/mes",i,S+h+16),t.textAlign="right",t.fillText(a+" meses",i+s,S+h+16),t.fillStyle="#4ff97b",t.font="8px JetBrains Mono",t.textAlign="center",t.fillText("\u25A0 Capital  \u25A0 Inter\xE9s",e/2,15)},tasas:function(n,c,d){const a=this.initCanvas(n),l=n.width/(window.devicePixelRatio||1),t=n.height/(window.devicePixelRatio||1);a.clearRect(0,0,l,t);const e=l/2,o=50,i=t-60,x=Math.min((c||0)/Math.max(c||0,d||.01)*i,i),f=Math.min((d||0)/Math.max(c||0,d||.01)*i,i);a.fillStyle="#22293a",a.fillRect(e-60,t-30-i,o,i),a.fillRect(e+10,t-30-i,o,i),a.fillStyle="#4f9cf9",a.fillRect(e-60,t-30-x,o,x),a.fillStyle="#a78bfa",a.fillRect(e+10,t-30-f,o,f),a.strokeStyle="#4a5570",a.lineWidth=1,a.strokeRect(e-60,t-30-i,o,i),a.strokeRect(e+10,t-30-i,o,i),a.fillStyle="#e8edf5",a.font="9px JetBrains Mono",a.textAlign="center",a.fillText("TNA",e-35,t-30-i-6),a.fillText("TEA",e+35,t-30-i-6),a.fillStyle="#4ff97b",a.font="bold 10px JetBrains Mono",a.fillText(((c||0)*100).toFixed(1)+"%",e-35,t-30-x+14),a.fillText(((d||0)*100).toFixed(1)+"%",e+35,t-30-f+14),a.fillStyle="#8a99ad",a.font="8px JetBrains Mono",a.fillText("TNA \u2192 TEA",e,t-6)},equilibrio:function(n,c,d,a,l){const t=this.initCanvas(n),e=n.width/(window.devicePixelRatio||1),o=n.height/(window.devicePixelRatio||1);t.clearRect(0,0,e,o);const i=25,x=e-2*i,f=o-2*i,s=d-a,h=l*d,r=h*1.2;t.strokeStyle="#3f495e",t.lineWidth=1,t.beginPath(),t.moveTo(i,i),t.lineTo(i,i+f),t.lineTo(i+x,i+f),t.stroke();const m=i+f-c/r*f;t.strokeStyle="#627284",t.lineWidth=1.5,t.beginPath(),t.moveTo(i,m),t.lineTo(i+x,m),t.stroke(),t.fillStyle="#8a99ad",t.font="7px JetBrains Mono",t.fillText("CF",i+2,m-3);const S=i+x,g=i+f-(c+s*l)/r*f;t.strokeStyle="#f94f4f",t.beginPath(),t.moveTo(i,m),t.lineTo(S,g),t.stroke();const R=i+f-d*l/r*f;t.strokeStyle="#4ff97b",t.beginPath(),t.moveTo(i,i+f),t.lineTo(i+x,R),t.stroke();const y=i+l/(l*1.5)*x*.6,u=i+f-h/r*f;t.fillStyle="#e8edf5",t.beginPath(),t.arc(i+x*.55,i+f*.35,4,0,Math.PI*2),t.fill(),t.font="8px JetBrains Mono",t.fillText("Q: "+Math.ceil(l)+" uds",i+x*.55,i+f*.35-8),t.fillStyle="#f94f4f",t.font="7px JetBrains Mono",t.fillText("\u25A0 CT",i,14),t.fillStyle="#4ff97b",t.fillText("\u25A0 Ingresos",i+40,14),t.fillStyle="#627284",t.fillText("\u25A0 CF",i+100,14)},van:function(n,c,d,a){const l=this.initCanvas(n),t=n.width/(window.devicePixelRatio||1),e=n.height/(window.devicePixelRatio||1);l.clearRect(0,0,t,e);const o=20,i=d.length+1,x=(t-2*o)/i,f=Math.min(x-6,20),s=Math.max(c,...d)*1.3,h=e/2+10;l.strokeStyle="#3f495e",l.lineWidth=1,l.beginPath(),l.moveTo(o,h),l.lineTo(t-o,h),l.stroke(),l.fillStyle="#f94f4f";const r=c/s*(e/2.8);l.fillRect(o+5,h,f,r),l.fillStyle="#4f9cf9",d.forEach(function(m,S){var g=o+(S+2)*x-f/2,R=m/s*(e/2.8);l.fillRect(g,h-R,f,R),l.fillStyle="#8a99ad",l.font="6px JetBrains Mono",l.textAlign="center",l.fillText("A"+(S+1),g+f/2,h+10),l.fillStyle="#4f9cf9"}),l.fillStyle="#8a99ad",l.font="7px JetBrains Mono",l.textAlign="center",l.fillText("Inv.",o+5+f/2,h+r+12),l.font="bold 9px JetBrains Mono",l.fillStyle=a>=0?"#4ff97b":"#f94f4f",l.fillText(a>=0?"\u2714 VIABLE":"\u2718 RECHAZADO",t/2,15),l.fillStyle="#e8edf5",l.font="8px JetBrains Mono",l.fillText("VAN: $"+a.toLocaleString("es-AR",{maximumFractionDigits:0}),t/2,e-6)},iva:function(n,c,d,a,l){const t=this.initCanvas(n),e=n.width/(window.devicePixelRatio||1),o=n.height/(window.devicePixelRatio||1);t.clearRect(0,0,e,o);const i=e/2,x=c+d,f=c/x*(o-60),s=d/x*(o-60);t.fillStyle="#1e232f",t.fillRect(i-50,o-30-f-s,100,f+s),t.fillStyle="#4f9cf9",t.fillRect(i-50,o-30-f-s,100,f),t.fillStyle="#f9c74f",t.fillRect(i-50,o-30-s,100,s),t.strokeStyle="#4a5570",t.lineWidth=1,t.strokeRect(i-50,o-30-f-s,100,f+s),t.fillStyle="#e8edf5",t.font="9px JetBrains Mono",t.textAlign="center",t.fillText("Neto $"+c.toLocaleString("es-AR",{maximumFractionDigits:0}),i,o-30-s-f/2+3),t.fillStyle="#e8edf5",t.fillText("IVA $"+d.toLocaleString("es-AR",{maximumFractionDigits:0}),i,o-30-s/2+3),t.fillStyle="#8a99ad",t.font="8px JetBrains Mono",t.fillText("Tasa: "+(l*100).toFixed(1)+"%",i,o-5)},depreciacion:function(n,c,d){const a=this.initCanvas(n),l=n.width/(window.devicePixelRatio||1),t=n.height/(window.devicePixelRatio||1);a.clearRect(0,0,l,t);const e=25,o=c.length,i=Math.min((l-2*e)/o-4,30),x=Math.max(...c.map(function(s){return s.depreciacion}),1),f=t-2*e-20;for(let s=0;s<o;s++){let h=e+s*((l-2*e)/o),r=c[s].depreciacion/x*f;a.fillStyle="#22293a",a.fillRect(h,t-e-r,i,r),a.strokeStyle="#4f9cf9",a.lineWidth=1.5,a.strokeRect(h,t-e-r,i,r),a.fillStyle="#8a99ad",a.font="7px JetBrains Mono",a.textAlign="center",a.fillText("A"+c[s].anio,h+i/2,t-e+10)}a.fillStyle="#4ff97b",a.font="8px JetBrains Mono",a.textAlign="left",a.fillText("Depreciaci\xF3n ("+d+")",e,15)},tablaAmort:function(n,c,d){const a=this.initCanvas(n),l=n.width/(window.devicePixelRatio||1),t=n.height/(window.devicePixelRatio||1);a.clearRect(0,0,l,t);const e=25,o=Math.min(c.length,24),i=Math.max(...c.map(function(s){return s.cuota}),1),x=Math.min((l-2*e)/o-3,18),f=t-2*e-15;for(let s=0;s<o;s++){let h=e+s*((l-2*e)/o),r=c[s].interes/i*f,m=c[s].amort/i*f;a.fillStyle="#f94f4f",a.fillRect(h,t-e-r-m,x,r),a.fillStyle="#4f9cf9",a.fillRect(h,t-e-m,x,m)}a.fillStyle="#8a99ad",a.font="7px JetBrains Mono",a.textAlign="center",a.fillText("Capital: $"+d.toLocaleString("es-AR",{maximumFractionDigits:0}),l/2,t-4),a.fillStyle="#f94f4f",a.fillText("\u25A0 Int",e,15),a.fillStyle="#4f9cf9",a.fillText("\u25A0 Amort",e+50,15)},roi:function(n,c,d,a,l){const t=this.initCanvas(n),e=n.width/(window.devicePixelRatio||1),o=n.height/(window.devicePixelRatio||1);t.clearRect(0,0,e,o);const i=e/2,x=o/2,f=40,s=Math.min(Math.abs(l),f);t.strokeStyle="#3f495e",t.lineWidth=3,t.beginPath(),t.arc(i,x-5,f,0,Math.PI*2),t.stroke(),t.strokeStyle=l>=0?"#4ff97b":"#f94f4f",t.lineWidth=4,t.lineCap="round",t.beginPath(),t.arc(i,x-5,s,-Math.PI/2,-Math.PI/2+Math.PI*2*Math.min(Math.abs(l)/100,1)),t.stroke(),t.fillStyle="#e8edf5",t.font="bold 14px JetBrains Mono",t.textAlign="center",t.fillText(l.toFixed(1)+"%",i,x+22),t.fillStyle="#8a99ad",t.font="8px JetBrains Mono",t.fillText("Inversi\xF3n: $"+c.toLocaleString("es-AR",{maximumFractionDigits:0}),i,o-10),t.fillText("Flujo: $"+d.toLocaleString("es-AR",{maximumFractionDigits:0})+"/a\xF1o \xD7 "+a+" a\xF1os",i,18)},inflacion:function(n,c,d,a,l){const t=this.initCanvas(n),e=n.width/(window.devicePixelRatio||1),o=n.height/(window.devicePixelRatio||1);t.clearRect(0,0,e,o);const i=25,x=12,f=(e-2*i)/(x-1);t.beginPath(),t.strokeStyle="#4f9cf9",t.lineWidth=2;for(let s=0;s<x;s++){let h=s/(x-1),r=c*Math.pow(1+d,h*a),m=c*Math.pow(1+d,a),S=o-i-(r-c)/(m-c||1)*(o-2*i),g=i+s*f;s===0?t.moveTo(g,o-i):t.lineTo(g,S)}t.stroke(),t.fillStyle="#e8edf5",t.font="9px JetBrains Mono",t.textAlign="center",t.fillText("$"+c.toLocaleString("es-AR",{maximumFractionDigits:0}),i,o-i+12),t.fillText("$"+l.toLocaleString("es-AR",{maximumFractionDigits:0})+" (inflado)",e-i,15),t.fillStyle="#f9c74f",t.font="8px JetBrains Mono",t.fillText("Inflaci\xF3n: "+(d*100).toFixed(1)+"% mensual \xD7 "+a+" meses",e/2,o-6)},interesSimple:function(n,c,d,a){n.id||(n.id="canvas_int_simple"),this.animate(n.id,l=>{const t=this.initCanvas(n),e=n.width/(window.devicePixelRatio||1),o=n.height/(window.devicePixelRatio||1);t.clearRect(0,0,e,o);const i=20,x=c+d,f=e-2*i,s=c/x*f*l,h=d/x*f*l,r=o/2-10;t.fillStyle="#4f9cf9",t.fillRect(i,r,s,26),t.fillStyle="#f94f4f",t.fillRect(i+s,r,h,26),t.strokeStyle="#4a5570",t.strokeRect(i,r,f*l,26),t.fillStyle="#e8edf5",t.font="9px JetBrains Mono",t.textAlign="center",t.fillText("Capital $"+c.toLocaleString("es-AR",{maximumFractionDigits:0}),i+s/2,r+18),t.fillText("Int. $"+d.toLocaleString("es-AR",{maximumFractionDigits:0}),i+s+h/2,r+18),t.fillStyle="#8a99ad",t.font="8px JetBrains Mono",t.textAlign="left",t.fillText("Inter\xE9s Simple \u2014 "+a+" a\xF1os",i,16)})},interesCompuesto:function(n,c,d,a){n.id||(n.id="canvas_int_comp"),this.animate(n.id,l=>{const t=this.initCanvas(n),e=n.width/(window.devicePixelRatio||1),o=n.height/(window.devicePixelRatio||1);t.clearRect(0,0,e,o);const i=25,x=e-2*i,f=o-40,s=Math.max(d,c*1.2),h=20;t.beginPath(),t.strokeStyle="#4ff97b",t.lineWidth=2.5;for(let r=0;r<h;r++){const m=r/(h-1)*a*l,S=c*Math.pow(d/c,m/Math.max(a,1)),g=i+r/(h-1)*x*l,R=o-15-S/s*f;r===0?t.moveTo(g,o-15):t.lineTo(g,R)}t.stroke(),t.fillStyle="#e8edf5",t.font="9px JetBrains Mono",t.textAlign="center",t.fillText("$"+c.toLocaleString("es-AR",{maximumFractionDigits:0}),i,o-2),t.fillText("$"+d.toLocaleString("es-AR",{maximumFractionDigits:0})+" (final)",e-i,16),t.fillStyle="#8a99ad",t.font="8px JetBrains Mono",t.fillText("Inter\xE9s Compuesto \u2014 "+a+" a\xF1os",e/2,o-2)})},descuento:function(n,c,d,a){n.id||(n.id="canvas_descuento"),this.animate(n.id,l=>{const t=this.initCanvas(n),e=n.width/(window.devicePixelRatio||1),o=n.height/(window.devicePixelRatio||1);t.clearRect(0,0,e,o);const i=20,x=e-2*i,f=a/c*x*l,s=d/c*x*l,h=o/2-10;t.fillStyle="#4f9cf9",t.fillRect(i,h,f,26),t.fillStyle="#f94f4f",t.fillRect(i+f,h,s,26),t.strokeStyle="#4a5570",t.strokeRect(i,h,f+s,26),t.fillStyle="#e8edf5",t.font="9px JetBrains Mono",t.textAlign="center",t.fillText("Efectivo $"+a.toLocaleString("es-AR",{maximumFractionDigits:0}),i+f/2,h+18),t.fillText("Desc. $"+d.toLocaleString("es-AR",{maximumFractionDigits:0}),i+f+s/2,h+18),t.fillStyle="#8a99ad",t.font="8px JetBrains Mono",t.textAlign="left",t.fillText("Descuento \u2014 Nominal: $"+c.toLocaleString("es-AR",{maximumFractionDigits:0}),i,16)})},sueldoNeto:function(n,c,d,a){n.id||(n.id="canvas_sueldo"),this.animate(n.id,l=>{const t=this.initCanvas(n),e=n.width/(window.devicePixelRatio||1),o=n.height/(window.devicePixelRatio||1);t.clearRect(0,0,e,o);const i=20,x=e-2*i,f=d/c*x*l,s=a/c*x*l,h=o/2-10;t.fillStyle="#4ff97b",t.fillRect(i,h,f,26),t.fillStyle="#f94f4f",t.fillRect(i+f,h,s,26),t.strokeStyle="#4a5570",t.strokeRect(i,h,x*l,26),t.fillStyle="#e8edf5",t.font="9px JetBrains Mono",t.textAlign="center",t.fillText("Neto $"+d.toLocaleString("es-AR",{maximumFractionDigits:0}),i+f/2,h+18),t.fillText("Desc. $"+a.toLocaleString("es-AR",{maximumFractionDigits:0}),i+f+s/2,h+18),t.fillStyle="#8a99ad",t.font="8px JetBrains Mono",t.textAlign="left",t.fillText("Sueldo Bruto: $"+c.toLocaleString("es-AR",{maximumFractionDigits:0}),i,16)})},margenBruto:function(n,c,d,a){n.id||(n.id="canvas_margen"),this.animate(n.id,l=>{const t=this.initCanvas(n),e=n.width/(window.devicePixelRatio||1),o=n.height/(window.devicePixelRatio||1);t.clearRect(0,0,e,o);const i=e/2,x=o/2-5,f=Math.min(e,o)*.3,s=a/100*Math.PI*2*l;t.strokeStyle="#3f495e",t.lineWidth=3,t.beginPath(),t.arc(i,x,f,0,Math.PI*2),t.stroke(),t.strokeStyle=a>=0?"#4ff97b":"#f94f4f",t.lineWidth=5,t.lineCap="round",t.beginPath(),t.arc(i,x,f,-Math.PI/2,-Math.PI/2+Math.min(s,Math.PI*2)),t.stroke(),t.fillStyle="#e8edf5",t.font="bold 14px JetBrains Mono",t.textAlign="center",t.fillText(a.toFixed(1)+"%",i,x+5),t.fillStyle="#8a99ad",t.font="8px JetBrains Mono",t.fillText("Ventas: $"+c.toLocaleString("es-AR",{maximumFractionDigits:0}),i,x+f+22),t.fillText("Costo: $"+d.toLocaleString("es-AR",{maximumFractionDigits:0}),i,x+f+36)})},tir:function(n,c,d,a,l){n.id||(n.id="canvas_tir"),this.animate(n.id,t=>{const e=this.initCanvas(n),o=n.width/(window.devicePixelRatio||1),i=n.height/(window.devicePixelRatio||1);e.clearRect(0,0,o,i);const x=d*a,f=x-c,s=Math.max(x,c)*1.2,h=20,r=40,m=i-50,S=c/s*m*t,g=x/s*m*t,R=o/3;e.fillStyle="#f94f4f",e.fillRect(R-r/2,i-20-S,r,S),e.fillStyle="#4ff97b",e.fillRect(R*2-r/2,i-20-g,r,g),e.strokeStyle="#4a5570",e.lineWidth=1,e.strokeRect(R-r/2,i-20-S,r,S),e.strokeRect(R*2-r/2,i-20-g,r,g),e.fillStyle="#e8edf5",e.font="9px JetBrains Mono",e.textAlign="center",e.fillText("Inversi\xF3n",R,i-4),e.fillText("Retorno",R*2,i-4),e.fillStyle="#8a99ad",e.font="8px JetBrains Mono",e.fillText("$"+c.toLocaleString("es-AR",{maximumFractionDigits:0}),R,i-20-S-6),e.fillText("$"+x.toLocaleString("es-AR",{maximumFractionDigits:0}),R*2,i-20-g-6),e.fillStyle=l>=0?"#4ff97b":"#f94f4f",e.font="bold 10px JetBrains Mono",e.fillText("TIR: "+l.toFixed(1)+"%",o/2,16),e.fillStyle="#8a99ad",e.font="8px JetBrains Mono",e.fillText(a+" a\xF1os  |  Flujo: $"+d.toLocaleString("es-AR",{maximumFractionDigits:0})+"/a\xF1o",o/2,32)})},valorFuturo:function(n,c,d,a){n.id||(n.id="canvas_vf"),this.animate(n.id,l=>{const t=this.initCanvas(n),e=n.width/(window.devicePixelRatio||1),o=n.height/(window.devicePixelRatio||1);t.clearRect(0,0,e,o);const i=25,x=e-2*i,f=o-40,s=Math.max(d,c*1.2),h=20;t.beginPath(),t.strokeStyle="#4ff97b",t.lineWidth=2.5;for(let r=0;r<h;r++){const m=r/(h-1)*a*l,S=c*Math.pow(d/c,m/Math.max(a,1)),g=i+r/(h-1)*x*l,R=o-15-S/s*f;r===0?t.moveTo(g,o-15):t.lineTo(g,R)}t.stroke(),t.fillStyle="#e8edf5",t.font="9px JetBrains Mono",t.textAlign="center",t.fillText("$"+c.toLocaleString("es-AR",{maximumFractionDigits:0}),i,o-2),t.fillText("$"+d.toLocaleString("es-AR",{maximumFractionDigits:0})+" (VF)",e-i,16),t.fillStyle="#8a99ad",t.font="8px JetBrains Mono",t.fillText("Valor Futuro \u2014 "+a+" per\xEDodos",e/2,o-2)})},vpnSimple:function(n,c,d,a){n.id||(n.id="canvas_vpn_s"),this.animate(n.id,l=>{const t=this.initCanvas(n),e=n.width/(window.devicePixelRatio||1),o=n.height/(window.devicePixelRatio||1);t.clearRect(0,0,e,o);const i=20,x=d.length+1,f=(e-2*i)/x,s=Math.min(f-6,20),h=Math.max(c,...d)*1.3,r=o/2+10;t.strokeStyle="#3f495e",t.lineWidth=1,t.beginPath(),t.moveTo(i,r),t.lineTo(e-i,r),t.stroke(),t.fillStyle="#f94f4f";const m=c/h*(o/2.8)*l;t.fillRect(i+5,r,s,m),t.fillStyle="#4f9cf9",d.forEach(function(S,g){var R=i+(g+2)*f-s/2,y=S/h*(o/2.8)*l;t.fillRect(R,r-y,s,y),t.fillStyle="#8a99ad",t.font="6px JetBrains Mono",t.textAlign="center",t.fillText("A"+(g+1),R+s/2,r+10),t.fillStyle="#4f9cf9"}),t.fillStyle="#8a99ad",t.font="7px JetBrains Mono",t.textAlign="center",t.fillText("Inv.",i+5+s/2,r+m+12),t.font="bold 9px JetBrains Mono",t.fillStyle=a>=0?"#4ff97b":"#f94f4f",t.fillText(a>=0?"\u2714 VIABLE":"\u2718 RECHAZADO",e/2,15),t.fillStyle="#e8edf5",t.font="8px JetBrains Mono",t.fillText("VAN: $"+a.toLocaleString("es-AR",{maximumFractionDigits:0}),e/2,o-6)})},payback:function(n,c,d,a){n.id||(n.id="canvas_payback"),this.animate(n.id,l=>{const t=this.initCanvas(n),e=n.width/(window.devicePixelRatio||1),o=n.height/(window.devicePixelRatio||1);t.clearRect(0,0,e,o);const i=20,x=e-2*i,f=o/2-10,s=10,h=Math.min(a/s,1)*l;t.fillStyle="#1e232f",t.fillRect(i,f,x,26),t.fillStyle="#4f9cf9",t.fillRect(i,f,x*h,26),t.strokeStyle="#4a5570",t.strokeRect(i,f,x,26);for(let r=1;r<=s;r++){const m=i+r/s*x;t.strokeStyle="#3f495e",t.lineWidth=1,t.beginPath(),t.moveTo(m,f-3),t.lineTo(m,f+29),t.stroke(),t.fillStyle="#8a99ad",t.font="6px JetBrains Mono",t.textAlign="center",t.fillText(r+"a",m,f+40)}t.fillStyle="#e8edf5",t.font="bold 10px JetBrains Mono",t.textAlign="center",t.fillText(a.toFixed(1)+" a\xF1os",i+x*h/2,f+19),t.fillStyle="#8a99ad",t.font="8px JetBrains Mono",t.textAlign="left",t.fillText("Payback Period",i,16)})},cuotaAleman:function(n,c,d){n.id||(n.id="canvas_cuota_al"),this.animate(n.id,a=>{const l=this.initCanvas(n),t=n.width/(window.devicePixelRatio||1),e=n.height/(window.devicePixelRatio||1);l.clearRect(0,0,t,e);const o=25,i=Math.min(c.length,12),x=Math.max(...c.map(h=>h.cuota),1),f=Math.min((t-2*o)/i-3,25),s=e-2*o-15;for(let h=0;h<i;h++){const r=o+h*((t-2*o)/i),m=c[h].cuota/x*s*a,S=c[h].interes/x*s*a;l.fillStyle="#f94f4f",l.fillRect(r,e-o-m,f,S),l.fillStyle="#4f9cf9",l.fillRect(r,e-o-m+S,f,m-S),l.strokeStyle="#4a5570",l.lineWidth=1,l.strokeRect(r,e-o-m,f,m),l.fillStyle="#8a99ad",l.font="6px JetBrains Mono",l.textAlign="center",l.fillText("M"+c[h].mes,r+f/2,e-o+10)}l.fillStyle="#f94f4f",l.font="8px JetBrains Mono",l.textAlign="left",l.fillText("\u25A0 Inter\xE9s",o,15),l.fillStyle="#4f9cf9",l.fillText("\u25A0 Amort.",o+80,15),l.fillStyle="#8a99ad",l.font="8px JetBrains Mono",l.fillText("Sistema Alem\xE1n",t/2,15)})},cuotaAmericano:function(n,c,d,a){n.id||(n.id="canvas_cuota_am"),this.animate(n.id,l=>{const t=this.initCanvas(n),e=n.width/(window.devicePixelRatio||1),o=n.height/(window.devicePixelRatio||1);t.clearRect(0,0,e,o);const i=25,x=Math.min(a,12),f=o-2*i-20,s=Math.min((e-2*i)/x-3,30),h=Math.min(d/Math.max(c,1)*f,f*.4)*l,r=Math.min(c/Math.max(c,1)*f,f*.8)*l;for(let m=0;m<x;m++){const S=i+m*((e-2*i)/x),g=m===x-1;t.fillStyle="#f94f4f",t.fillRect(S,o-i-h-(g?r:0),s,h),g&&(t.fillStyle="#4f9cf9",t.fillRect(S,o-i-r,s,r)),t.strokeStyle="#4a5570",t.lineWidth=1,t.strokeRect(S,o-i-h-(g?r:0),s,h+(g?r:0)),t.fillStyle="#8a99ad",t.font="6px JetBrains Mono",t.textAlign="center",t.fillText("M"+(m+1),S+s/2,o-i+10)}t.fillStyle="#f94f4f",t.font="8px JetBrains Mono",t.textAlign="left",t.fillText("\u25A0 Inter\xE9s",i,15),t.fillStyle="#4f9cf9",t.fillText("\u25A0 Capital",i+80,15),t.fillStyle="#8a99ad",t.font="8px JetBrains Mono",t.fillText("Sistema Americano \u2014 Capital al final",e/2,30)})}};
+const FinanzasVisual = {
+    // Almacén global interno para manejar transiciones fluidas e impedir superposiciones
+    animations: {},
+
+    initCanvas: function(canvas) {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return ctx;
+    },
+
+    // Generador de bucle de animación reutilizable por componente (Evita gráficos rígidos)
+    animate: function(canvasId, renderFrame) {
+        if (this.animations[canvasId]) {
+            cancelAnimationFrame(this.animations[canvasId]);
+        }
+        let start = null;
+        const duration = 650; // Duración de la transición en milisegundos
+
+        const loop = (timestamp) => {
+            if (!start) start = timestamp;
+            let progress = (timestamp - start) / duration;
+            if (progress > 1) progress = 1;
+
+            // Función de easing out (Desaceleración estática suave al final)
+            let ease = 1 - Math.pow(1 - progress, 3);
+
+            renderFrame(ease);
+
+            if (progress < 1) {
+                this.animations[canvasId] = requestAnimationFrame(loop);
+            }
+        };
+        this.animations[canvasId] = requestAnimationFrame(loop);
+    },
+
+    // 1. Préstamo Francés - Estático
+    prestamo: function(canvas, cuota, capital, plazo, tna) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 25;
+        const total = cuota * plazo;
+        const interes = total - capital;
+        const totalW = w - 2 * pad;
+        const barH = 28;
+        const capW = (capital / total) * totalW;
+        const intW = (interes / total) * totalW;
+        const cy = h / 2 - 10;
+        ctx.fillStyle = '#4f9cf9';
+        ctx.fillRect(pad, cy, capW, barH);
+        ctx.fillStyle = '#f94f4f';
+        ctx.fillRect(pad + capW, cy, intW, barH);
+        ctx.strokeStyle = '#4a5570';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(pad, cy, totalW, barH);
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = '9px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText('Capital $' + capital.toLocaleString('es-AR', {maximumFractionDigits:0}), pad + capW / 2, cy + 19);
+        ctx.fillText('Int. $' + interes.toLocaleString('es-AR', {maximumFractionDigits:0}), pad + capW + intW / 2, cy + 19);
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '8px JetBrains Mono';
+        ctx.textAlign = 'left';
+        ctx.fillText('Cuota: $' + cuota.toLocaleString('es-AR', {maximumFractionDigits:2}) + '/mes', pad, cy + barH + 16);
+        ctx.textAlign = 'right';
+        ctx.fillText(plazo + ' meses', pad + totalW, cy + barH + 16);
+        ctx.fillStyle = '#4ff97b';
+        ctx.font = '8px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText('■ Capital  ■ Interés', w / 2, 15);
+    },
+
+    // 2. Conversor de Tasas - Estático
+    tasas: function(canvas, tna, tea) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2;
+        const barW = 50;
+        const maxH = h - 60;
+        const tnaH = Math.min(((tna || 0) / Math.max(tna || 0, tea || 0.01)) * maxH, maxH);
+        const teaH = Math.min(((tea || 0) / Math.max(tna || 0, tea || 0.01)) * maxH, maxH);
+        ctx.fillStyle = '#22293a';
+        ctx.fillRect(cx - 60, h - 30 - maxH, barW, maxH);
+        ctx.fillRect(cx + 10, h - 30 - maxH, barW, maxH);
+        ctx.fillStyle = '#4f9cf9';
+        ctx.fillRect(cx - 60, h - 30 - tnaH, barW, tnaH);
+        ctx.fillStyle = '#a78bfa';
+        ctx.fillRect(cx + 10, h - 30 - teaH, barW, teaH);
+        ctx.strokeStyle = '#4a5570';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(cx - 60, h - 30 - maxH, barW, maxH);
+        ctx.strokeRect(cx + 10, h - 30 - maxH, barW, maxH);
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = '9px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText('TNA', cx - 35, h - 30 - maxH - 6);
+        ctx.fillText('TEA', cx + 35, h - 30 - maxH - 6);
+        ctx.fillStyle = '#4ff97b';
+        ctx.font = 'bold 10px JetBrains Mono';
+        ctx.fillText(((tna || 0) * 100).toFixed(1) + '%', cx - 35, h - 30 - tnaH + 14);
+        ctx.fillText(((tea || 0) * 100).toFixed(1) + '%', cx + 35, h - 30 - teaH + 14);
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText('TNA → TEA', cx, h - 6);
+    },
+
+    // 3. Punto de Equilibrio - Estático
+    equilibrio: function(canvas, cf, pv, cv, q) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 25;
+        const gw = w - 2 * pad, gh = h - 2 * pad;
+        const margen = pv - cv;
+        const ingresoEq = q * pv;
+        const maxY = ingresoEq * 1.2;
+        ctx.strokeStyle = '#3f495e';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pad, pad);
+        ctx.lineTo(pad, pad + gh);
+        ctx.lineTo(pad + gw, pad + gh);
+        ctx.stroke();
+        const cfY = pad + gh - (cf / maxY) * gh;
+        ctx.strokeStyle = '#627284';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(pad, cfY);
+        ctx.lineTo(pad + gw, cfY);
+        ctx.stroke();
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '7px JetBrains Mono';
+        ctx.fillText('CF', pad + 2, cfY - 3);
+        const ctX2 = pad + gw;
+        const ctY2 = pad + gh - ((cf + margen * q) / maxY) * gh;
+        ctx.strokeStyle = '#f94f4f';
+        ctx.beginPath();
+        ctx.moveTo(pad, cfY);
+        ctx.lineTo(ctX2, ctY2);
+        ctx.stroke();
+        const inY2 = pad + gh - (pv * q / maxY) * gh;
+        ctx.strokeStyle = '#4ff97b';
+        ctx.beginPath();
+        ctx.moveTo(pad, pad + gh);
+        ctx.lineTo(pad + gw, inY2);
+        ctx.stroke();
+        const eqX = pad + (q / (q * 1.5)) * gw * 0.6;
+        const eqY = pad + gh - (ingresoEq / maxY) * gh;
+        ctx.fillStyle = '#e8edf5';
+        ctx.beginPath();
+        ctx.arc(pad + gw * 0.55, pad + gh * 0.35, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText('Q: ' + Math.ceil(q) + ' uds', pad + gw * 0.55, pad + gh * 0.35 - 8);
+        ctx.fillStyle = '#f94f4f';
+        ctx.font = '7px JetBrains Mono';
+        ctx.fillText('■ CT', pad, 14);
+        ctx.fillStyle = '#4ff97b';
+        ctx.fillText('■ Ingresos', pad + 40, 14);
+        ctx.fillStyle = '#627284';
+        ctx.fillText('■ CF', pad + 100, 14);
+    },
+
+    // 4. VAN / VPN - Estático
+    van: function(canvas, inv, flujos, van) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 20;
+        const total = flujos.length + 1;
+        const stepX = (w - 2 * pad) / total;
+        const barW = Math.min(stepX - 6, 20);
+        const maxFlujo = Math.max(inv, ...flujos) * 1.3;
+        const midY = h / 2 + 10;
+        ctx.strokeStyle = '#3f495e';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pad, midY);
+        ctx.lineTo(w - pad, midY);
+        ctx.stroke();
+        ctx.fillStyle = '#f94f4f';
+        const invH = (inv / maxFlujo) * (h / 2.8);
+        ctx.fillRect(pad + 5, midY, barW, invH);
+        ctx.fillStyle = '#4f9cf9';
+        flujos.forEach(function(f, i) {
+            var x = pad + (i + 2) * stepX - barW / 2;
+            var fH = (f / maxFlujo) * (h / 2.8);
+            ctx.fillRect(x, midY - fH, barW, fH);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '6px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('A' + (i + 1), x + barW / 2, midY + 10);
+            ctx.fillStyle = '#4f9cf9';
+        });
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '7px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText('Inv.', pad + 5 + barW / 2, midY + invH + 12);
+        ctx.font = 'bold 9px JetBrains Mono';
+        ctx.fillStyle = van >= 0 ? '#4ff97b' : '#f94f4f';
+        ctx.fillText(van >= 0 ? '✔ VIABLE' : '✘ RECHAZADO', w / 2, 15);
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText('VAN: $' + van.toLocaleString('es-AR', {maximumFractionDigits:0}), w / 2, h - 6);
+    },
+    iva: function(canvas, neto, iva, bruto, tasa) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2;
+        const total = neto + iva;
+        const netoH = (neto / total) * (h - 60);
+        const ivaH = (iva / total) * (h - 60);
+        ctx.fillStyle = '#1e232f';
+        ctx.fillRect(cx - 50, h - 30 - netoH - ivaH, 100, netoH + ivaH);
+        ctx.fillStyle = '#4f9cf9';
+        ctx.fillRect(cx - 50, h - 30 - netoH - ivaH, 100, netoH);
+        ctx.fillStyle = '#f9c74f';
+        ctx.fillRect(cx - 50, h - 30 - ivaH, 100, ivaH);
+        ctx.strokeStyle = '#4a5570';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(cx - 50, h - 30 - netoH - ivaH, 100, netoH + ivaH);
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = '9px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText('Neto $' + neto.toLocaleString('es-AR', {maximumFractionDigits:0}), cx, h - 30 - ivaH - netoH/2 + 3);
+        ctx.fillStyle = '#e8edf5';
+        ctx.fillText('IVA $' + iva.toLocaleString('es-AR', {maximumFractionDigits:0}), cx, h - 30 - ivaH/2 + 3);
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText('Tasa: ' + (tasa*100).toFixed(1) + '%', cx, h - 5);
+    },
+
+    depreciacion: function(canvas, tabla, metodo) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 25;
+        const count = tabla.length;
+        const barW = Math.min((w - 2*pad) / count - 4, 30);
+        const maxDep = Math.max(...tabla.map(function(t) { return t.depreciacion; }), 1);
+        const maxH = h - 2*pad - 20;
+        for (let i = 0; i < count; i++) {
+            let x = pad + i * ((w - 2*pad) / count);
+            let depH = (tabla[i].depreciacion / maxDep) * maxH;
+            ctx.fillStyle = '#22293a';
+            ctx.fillRect(x, h - pad - depH, barW, depH);
+            ctx.strokeStyle = '#4f9cf9';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(x, h - pad - depH, barW, depH);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '7px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('A' + tabla[i].anio, x + barW/2, h - pad + 10);
+        }
+        ctx.fillStyle = '#4ff97b';
+        ctx.font = '8px JetBrains Mono';
+        ctx.textAlign = 'left';
+        ctx.fillText('Depreciación (' + metodo + ')', pad, 15);
+    },
+
+    tablaAmort: function(canvas, tabla, P) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 25;
+        const count = Math.min(tabla.length, 24);
+        const maxVal = Math.max(...tabla.map(function(t) { return t.cuota; }), 1);
+        const barW = Math.min((w - 2*pad) / count - 3, 18);
+        const maxH = h - 2*pad - 15;
+        for (let i = 0; i < count; i++) {
+            let x = pad + i * ((w - 2*pad) / count);
+            let intH = (tabla[i].interes / maxVal) * maxH;
+            let amortH = (tabla[i].amort / maxVal) * maxH;
+            ctx.fillStyle = '#f94f4f';
+            ctx.fillRect(x, h - pad - intH - amortH, barW, intH);
+            ctx.fillStyle = '#4f9cf9';
+            ctx.fillRect(x, h - pad - amortH, barW, amortH);
+        }
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '7px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText('Capital: $' + P.toLocaleString('es-AR', {maximumFractionDigits:0}), w/2, h - 4);
+        ctx.fillStyle = '#f94f4f';
+        ctx.fillText('■ Int', pad, 15);
+        ctx.fillStyle = '#4f9cf9';
+        ctx.fillText('■ Amort', pad + 50, 15);
+    },
+
+    roi: function(canvas, inv, flujo, anios, roi) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2, cy = h / 2;
+        const maxR = 40;
+        const radius = Math.min(Math.abs(roi), maxR);
+        ctx.strokeStyle = '#3f495e';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(cx, cy - 5, maxR, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.strokeStyle = roi >= 0 ? '#4ff97b' : '#f94f4f';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.arc(cx, cy - 5, radius, -Math.PI/2, -Math.PI/2 + (Math.PI * 2 * Math.min(Math.abs(roi)/100, 1)));
+        ctx.stroke();
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = 'bold 14px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(roi.toFixed(1) + '%', cx, cy + 22);
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText('Inversión: $' + inv.toLocaleString('es-AR', {maximumFractionDigits:0}), cx, h - 10);
+        ctx.fillText('Flujo: $' + flujo.toLocaleString('es-AR', {maximumFractionDigits:0}) + '/año × ' + anios + ' años', cx, 18);
+    },
+
+    inflacion: function(canvas, vh, pi, n, va) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 25;
+        const pts = 12;
+        const step = (w - 2*pad) / (pts - 1);
+        ctx.beginPath();
+        ctx.strokeStyle = '#4f9cf9';
+        ctx.lineWidth = 2;
+        for (let i = 0; i < pts; i++) {
+            let t = i / (pts - 1);
+            let val = vh * Math.pow(1 + pi, t * n);
+            let maxVal = vh * Math.pow(1 + pi, n);
+            let y = h - pad - ((val - vh) / (maxVal - vh || 1)) * (h - 2*pad);
+            let x = pad + i * step;
+            if (i === 0) ctx.moveTo(x, h - pad);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = '9px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText('$' + vh.toLocaleString('es-AR', {maximumFractionDigits:0}), pad, h - pad + 12);
+        ctx.fillText('$' + va.toLocaleString('es-AR', {maximumFractionDigits:0}) + ' (inflado)', w - pad, 15);
+        ctx.fillStyle = '#f9c74f';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText('Inflación: ' + (pi*100).toFixed(1) + '% mensual × ' + n + ' meses', w/2, h - 6);
+    },
+    // =========================================================================
+    // FINANZAS ESCOLARES (6) — Animados
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // F10. INTERÉS SIMPLE — Barra de crecimiento lineal
+    // -------------------------------------------------------------------------
+    interesSimple: function(canvas, capital, interes, tiempo) {
+        if (!canvas.id) canvas.id = 'canvas_int_simple';
+        this.animate(canvas.id, (ease) => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const pad = 20;
+            const total = capital + interes;
+            const barW = w - 2 * pad;
+            const capW = (capital / total) * barW * ease;
+            const intW = (interes / total) * barW * ease;
+            const cy = h / 2 - 10;
+            ctx.fillStyle = '#4f9cf9';
+            ctx.fillRect(pad, cy, capW, 26);
+            ctx.fillStyle = '#f94f4f';
+            ctx.fillRect(pad + capW, cy, intW, 26);
+            ctx.strokeStyle = '#4a5570';
+            ctx.strokeRect(pad, cy, barW * ease, 26);
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = '9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('Capital $' + capital.toLocaleString('es-AR', {maximumFractionDigits:0}), pad + capW / 2, cy + 18);
+            ctx.fillText('Int. $' + interes.toLocaleString('es-AR', {maximumFractionDigits:0}), pad + capW + intW / 2, cy + 18);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '8px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText('Interés Simple — ' + tiempo + ' años', pad, 16);
+        });
+    },
+
+    // -------------------------------------------------------------------------
+    // F11. INTERÉS COMPUESTO — Curva exponencial
+    // -------------------------------------------------------------------------
+    interesCompuesto: function(canvas, capital, monto, tiempo) {
+        if (!canvas.id) canvas.id = 'canvas_int_comp';
+        this.animate(canvas.id, (ease) => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const pad = 25;
+            const cw = w - 2 * pad, ch = h - 40;
+            const maxVal = Math.max(monto, capital * 1.2);
+            const pts = 20;
+            ctx.beginPath();
+            ctx.strokeStyle = '#4ff97b';
+            ctx.lineWidth = 2.5;
+            for (let i = 0; i < pts; i++) {
+                const t = (i / (pts - 1)) * tiempo * ease;
+                const val = capital * Math.pow(monto / capital, t / Math.max(tiempo, 1));
+                const x = pad + (i / (pts - 1)) * cw * ease;
+                const y = h - 15 - (val / maxVal) * ch;
+                if (i === 0) ctx.moveTo(x, h - 15);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = '9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('$' + capital.toLocaleString('es-AR', {maximumFractionDigits:0}), pad, h - 2);
+            ctx.fillText('$' + monto.toLocaleString('es-AR', {maximumFractionDigits:0}) + ' (final)', w - pad, 16);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText('Interés Compuesto — ' + tiempo + ' años', w / 2, h - 2);
+        });
+    },
+
+    // -------------------------------------------------------------------------
+    // F12. DESCUENTO — Barra nominal vs efectivo
+    // -------------------------------------------------------------------------
+    descuento: function(canvas, nominal, descuento, valorEfectivo) {
+        if (!canvas.id) canvas.id = 'canvas_descuento';
+        this.animate(canvas.id, (ease) => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const pad = 20;
+            const barW = w - 2 * pad;
+            const effW = (valorEfectivo / nominal) * barW * ease;
+            const descW = (descuento / nominal) * barW * ease;
+            const cy = h / 2 - 10;
+            ctx.fillStyle = '#4f9cf9';
+            ctx.fillRect(pad, cy, effW, 26);
+            ctx.fillStyle = '#f94f4f';
+            ctx.fillRect(pad + effW, cy, descW, 26);
+            ctx.strokeStyle = '#4a5570';
+            ctx.strokeRect(pad, cy, (effW + descW), 26);
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = '9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('Efectivo $' + valorEfectivo.toLocaleString('es-AR', {maximumFractionDigits:0}), pad + effW / 2, cy + 18);
+            ctx.fillText('Desc. $' + descuento.toLocaleString('es-AR', {maximumFractionDigits:0}), pad + effW + descW / 2, cy + 18);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '8px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText('Descuento — Nominal: $' + nominal.toLocaleString('es-AR', {maximumFractionDigits:0}), pad, 16);
+        });
+    },
+
+    // -------------------------------------------------------------------------
+    // F13. SUELDO NETO — Barra bruto vs descuentos
+    // -------------------------------------------------------------------------
+    sueldoNeto: function(canvas, bruto, neto, descuento) {
+        if (!canvas.id) canvas.id = 'canvas_sueldo';
+        this.animate(canvas.id, (ease) => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const pad = 20;
+            const barW = w - 2 * pad;
+            const netoW = (neto / bruto) * barW * ease;
+            const descW = (descuento / bruto) * barW * ease;
+            const cy = h / 2 - 10;
+            ctx.fillStyle = '#4ff97b';
+            ctx.fillRect(pad, cy, netoW, 26);
+            ctx.fillStyle = '#f94f4f';
+            ctx.fillRect(pad + netoW, cy, descW, 26);
+            ctx.strokeStyle = '#4a5570';
+            ctx.strokeRect(pad, cy, barW * ease, 26);
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = '9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('Neto $' + neto.toLocaleString('es-AR', {maximumFractionDigits:0}), pad + netoW / 2, cy + 18);
+            ctx.fillText('Desc. $' + descuento.toLocaleString('es-AR', {maximumFractionDigits:0}), pad + netoW + descW / 2, cy + 18);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '8px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText('Sueldo Bruto: $' + bruto.toLocaleString('es-AR', {maximumFractionDigits:0}), pad, 16);
+        });
+    },
+
+    // -------------------------------------------------------------------------
+    // F14. MARGEN BRUTO — Gráfico de anillo con porcentaje
+    // -------------------------------------------------------------------------
+    margenBruto: function(canvas, ventas, costo, margen) {
+        if (!canvas.id) canvas.id = 'canvas_margen';
+        this.animate(canvas.id, (ease) => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const cx = w / 2, cy = h / 2 - 5;
+            const radio = Math.min(w, h) * 0.3;
+            const ang = (margen / 100) * Math.PI * 2 * ease;
+            ctx.strokeStyle = '#3f495e';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cx, cy, radio, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.strokeStyle = margen >= 0 ? '#4ff97b' : '#f94f4f';
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.arc(cx, cy, radio, -Math.PI / 2, -Math.PI / 2 + Math.min(ang, Math.PI * 2));
+            ctx.stroke();
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = 'bold 14px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(margen.toFixed(1) + '%', cx, cy + 5);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText('Ventas: $' + ventas.toLocaleString('es-AR', {maximumFractionDigits:0}), cx, cy + radio + 22);
+            ctx.fillText('Costo: $' + costo.toLocaleString('es-AR', {maximumFractionDigits:0}), cx, cy + radio + 36);
+        });
+    },
+
+    // -------------------------------------------------------------------------
+    // F15. TIR — Barra de rentabilidad vs inversión
+    // -------------------------------------------------------------------------
+    tir: function(canvas, inversion, flujo, anios, tirVal) {
+        if (!canvas.id) canvas.id = 'canvas_tir';
+        this.animate(canvas.id, (ease) => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const retorno = flujo * anios;
+            const ganancia = retorno - inversion;
+            const maxVal = Math.max(retorno, inversion) * 1.2;
+            const pad = 20;
+            const barW = 40;
+            const maxH = h - 50;
+            const invH = (inversion / maxVal) * maxH * ease;
+            const retH = (retorno / maxVal) * maxH * ease;
+            const cx = w / 3;
+            ctx.fillStyle = '#f94f4f';
+            ctx.fillRect(cx - barW / 2, h - 20 - invH, barW, invH);
+            ctx.fillStyle = '#4ff97b';
+            ctx.fillRect(cx * 2 - barW / 2, h - 20 - retH, barW, retH);
+            ctx.strokeStyle = '#4a5570';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(cx - barW / 2, h - 20 - invH, barW, invH);
+            ctx.strokeRect(cx * 2 - barW / 2, h - 20 - retH, barW, retH);
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = '9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('Inversión', cx, h - 4);
+            ctx.fillText('Retorno', cx * 2, h - 4);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText('$' + inversion.toLocaleString('es-AR', {maximumFractionDigits:0}), cx, h - 20 - invH - 6);
+            ctx.fillText('$' + retorno.toLocaleString('es-AR', {maximumFractionDigits:0}), cx * 2, h - 20 - retH - 6);
+            ctx.fillStyle = tirVal >= 0 ? '#4ff97b' : '#f94f4f';
+            ctx.font = 'bold 10px JetBrains Mono';
+            ctx.fillText('TIR: ' + tirVal.toFixed(1) + '%', w / 2, 16);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText(anios + ' años  |  Flujo: $' + flujo.toLocaleString('es-AR', {maximumFractionDigits:0}) + '/año', w / 2, 32);
+        });
+    },
+
+    // -------------------------------------------------------------------------
+    // VALOR FUTURO — Curva exponencial
+    // -------------------------------------------------------------------------
+    valorFuturo: function(canvas, vp, vf, n) {
+        if (!canvas.id) canvas.id = 'canvas_vf';
+        this.animate(canvas.id, (ease) => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const pad = 25, cw = w - 2 * pad, ch = h - 40;
+            const maxVal = Math.max(vf, vp * 1.2);
+            const pts = 20;
+            ctx.beginPath();
+            ctx.strokeStyle = '#4ff97b';
+            ctx.lineWidth = 2.5;
+            for (let i = 0; i < pts; i++) {
+                const t = (i / (pts - 1)) * n * ease;
+                const val = vp * Math.pow(vf / vp, t / Math.max(n, 1));
+                const x = pad + (i / (pts - 1)) * cw * ease;
+                const y = h - 15 - (val / maxVal) * ch;
+                if (i === 0) ctx.moveTo(x, h - 15);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = '9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('$' + vp.toLocaleString('es-AR', {maximumFractionDigits:0}), pad, h - 2);
+            ctx.fillText('$' + vf.toLocaleString('es-AR', {maximumFractionDigits:0}) + ' (VF)', w - pad, 16);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText('Valor Futuro — ' + n + ' períodos', w / 2, h - 2);
+        });
+    },
+
+    // -------------------------------------------------------------------------
+    // VPN SIMPLIFICADO — Barra de flujos
+    // -------------------------------------------------------------------------
+    vpnSimple: function(canvas, inv, flujos, van) {
+        if (!canvas.id) canvas.id = 'canvas_vpn_s';
+        this.animate(canvas.id, (ease) => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const pad = 20;
+            const tot = flujos.length + 1;
+            const stepX = (w - 2 * pad) / tot;
+            const barW = Math.min(stepX - 6, 20);
+            const maxF = Math.max(inv, ...flujos) * 1.3;
+            const midY = h / 2 + 10;
+            ctx.strokeStyle = '#3f495e';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(pad, midY);
+            ctx.lineTo(w - pad, midY);
+            ctx.stroke();
+            ctx.fillStyle = '#f94f4f';
+            const invH = (inv / maxF) * (h / 2.8) * ease;
+            ctx.fillRect(pad + 5, midY, barW, invH);
+            ctx.fillStyle = '#4f9cf9';
+            flujos.forEach(function(f, i) {
+                var x = pad + (i + 2) * stepX - barW / 2;
+                var fH = (f / maxF) * (h / 2.8) * ease;
+                ctx.fillRect(x, midY - fH, barW, fH);
+                ctx.fillStyle = '#8a99ad';
+                ctx.font = '6px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.fillText('A' + (i + 1), x + barW / 2, midY + 10);
+                ctx.fillStyle = '#4f9cf9';
+            });
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '7px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('Inv.', pad + 5 + barW / 2, midY + invH + 12);
+            ctx.font = 'bold 9px JetBrains Mono';
+            ctx.fillStyle = van >= 0 ? '#4ff97b' : '#f94f4f';
+            ctx.fillText(van >= 0 ? '✔ VIABLE' : '✘ RECHAZADO', w / 2, 15);
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText('VAN: $' + van.toLocaleString('es-AR', {maximumFractionDigits:0}), w / 2, h - 6);
+        });
+    },
+
+    // -------------------------------------------------------------------------
+    // PAYBACK — Barra de recupero
+    // -------------------------------------------------------------------------
+    payback: function(canvas, inv, flujo, payback) {
+        if (!canvas.id) canvas.id = 'canvas_payback';
+        this.animate(canvas.id, (ease) => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const pad = 20;
+            const barW = w - 2 * pad;
+            const cy = h / 2 - 10;
+            const maxAños = 10;
+            const pct = Math.min(payback / maxAños, 1) * ease;
+            ctx.fillStyle = '#1e232f';
+            ctx.fillRect(pad, cy, barW, 26);
+            ctx.fillStyle = '#4f9cf9';
+            ctx.fillRect(pad, cy, barW * pct, 26);
+            ctx.strokeStyle = '#4a5570';
+            ctx.strokeRect(pad, cy, barW, 26);
+            for (let i = 1; i <= maxAños; i++) {
+                const x = pad + (i / maxAños) * barW;
+                ctx.strokeStyle = '#3f495e';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x, cy - 3);
+                ctx.lineTo(x, cy + 29);
+                ctx.stroke();
+                ctx.fillStyle = '#8a99ad';
+                ctx.font = '6px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.fillText(i + 'a', x, cy + 40);
+            }
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = 'bold 10px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(payback.toFixed(1) + ' años', pad + barW * pct / 2, cy + 19);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '8px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText('Payback Period', pad, 16);
+        });
+    },
+
+    // -------------------------------------------------------------------------
+    // CUOTA ALEMÁN — Barra decreciente
+    // -------------------------------------------------------------------------
+    cuotaAleman: function(canvas, tabla, P) {
+        if (!canvas.id) canvas.id = 'canvas_cuota_al';
+        this.animate(canvas.id, (ease) => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const pad = 25;
+            const count = Math.min(tabla.length, 12);
+            const maxVal = Math.max(...tabla.map(t => t.cuota), 1);
+            const barW = Math.min((w - 2 * pad) / count - 3, 25);
+            const maxH = h - 2 * pad - 15;
+            for (let i = 0; i < count; i++) {
+                const x = pad + i * ((w - 2 * pad) / count);
+                const cuotaH = (tabla[i].cuota / maxVal) * maxH * ease;
+                const intH = (tabla[i].interes / maxVal) * maxH * ease;
+                ctx.fillStyle = '#f94f4f';
+                ctx.fillRect(x, h - pad - cuotaH, barW, intH);
+                ctx.fillStyle = '#4f9cf9';
+                ctx.fillRect(x, h - pad - cuotaH + intH, barW, cuotaH - intH);
+                ctx.strokeStyle = '#4a5570';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(x, h - pad - cuotaH, barW, cuotaH);
+                ctx.fillStyle = '#8a99ad';
+                ctx.font = '6px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.fillText('M' + tabla[i].mes, x + barW / 2, h - pad + 10);
+            }
+            ctx.fillStyle = '#f94f4f';
+            ctx.font = '8px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText('■ Interés', pad, 15);
+            ctx.fillStyle = '#4f9cf9';
+            ctx.fillText('■ Amort.', pad + 80, 15);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText('Sistema Alemán', w / 2, 15);
+        });
+    },
+
+    // -------------------------------------------------------------------------
+    // CUOTA AMERICANO — Barra de intereses
+    // -------------------------------------------------------------------------
+    cuotaAmericano: function(canvas, P, interes, N) {
+        if (!canvas.id) canvas.id = 'canvas_cuota_am';
+        this.animate(canvas.id, (ease) => {
+            const ctx = this.initCanvas(canvas);
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, w, h);
+            const pad = 25;
+            const count = Math.min(N, 12);
+            const maxH = h - 2 * pad - 20;
+            const barW = Math.min((w - 2 * pad) / count - 3, 30);
+            const intH = Math.min((interes / Math.max(P, 1)) * maxH, maxH * 0.4) * ease;
+            const lastH = Math.min((P / Math.max(P, 1)) * maxH, maxH * 0.8) * ease;
+            for (let i = 0; i < count; i++) {
+                const x = pad + i * ((w - 2 * pad) / count);
+                const isLast = i === count - 1;
+                ctx.fillStyle = '#f94f4f';
+                ctx.fillRect(x, h - pad - intH - (isLast ? lastH : 0), barW, intH);
+                if (isLast) {
+                    ctx.fillStyle = '#4f9cf9';
+                    ctx.fillRect(x, h - pad - lastH, barW, lastH);
+                }
+                ctx.strokeStyle = '#4a5570';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(x, h - pad - intH - (isLast ? lastH : 0), barW, intH + (isLast ? lastH : 0));
+                ctx.fillStyle = '#8a99ad';
+                ctx.font = '6px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.fillText('M' + (i + 1), x + barW / 2, h - pad + 10);
+            }
+            ctx.fillStyle = '#f94f4f';
+            ctx.font = '8px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText('■ Interés', pad, 15);
+            ctx.fillStyle = '#4f9cf9';
+            ctx.fillText('■ Capital', pad + 80, 15);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText('Sistema Americano — Capital al final', w / 2, 30);
+        });
+    }
+};
+

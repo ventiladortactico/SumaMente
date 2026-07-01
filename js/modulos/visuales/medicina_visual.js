@@ -1,1 +1,735 @@
-const MedicinaVisual={_loop:{},_startLoop:function(a,s){this._loop[a.id]&&cancelAnimationFrame(this._loop[a.id]);const e=()=>{s(),this._loop[a.id]=requestAnimationFrame(e)};e()},_stopLoop:function(a){this._loop[a.id]&&(cancelAnimationFrame(this._loop[a.id]),delete this._loop[a.id])},initCanvas:function(a){const s=window.devicePixelRatio||1,e=a.getBoundingClientRect();a.width=e.width*s,a.height=e.height*s;const l=a.getContext("2d");return l.scale(s,s),l},goteo:function(a,s,e){const l=this.initCanvas(a),f=a.width/(window.devicePixelRatio||1),t=a.height/(window.devicePixelRatio||1);l.clearRect(0,0,f,t);const i=f/2;l.strokeStyle="#4a5570",l.lineWidth=2,l.strokeRect(i-20,20,40,t-40),l.fillStyle="rgba(79, 156, 249, 0.25)",l.fillRect(i-19,t-55,38,35),l.strokeStyle="#4f9cf9",l.beginPath(),l.moveTo(i-19,t-55),l.lineTo(i+19,t-55),l.stroke(),l.fillStyle="#4f9cf9",l.beginPath(),l.arc(i,45,3.5,0,Math.PI*2),l.fill(),l.fillStyle="#e8edf5",l.font="9px JetBrains Mono",l.textAlign="center",l.fillText(Math.round(s)+" g/min",i,14),l.fillStyle="#8a99ad",l.font="8px JetBrains Mono",l.fillText(e.toFixed(1)+" mL/h",i,t-8)},dosis:function(a,s,e){const l=this.initCanvas(a),f=a.width/(window.devicePixelRatio||1),t=a.height/(window.devicePixelRatio||1);l.clearRect(0,0,f,t);const i=30,n=f-2*i,o=20,c=t/2-o/2,d=Math.min(s/2e3,1);l.fillStyle="#1e232f",l.fillRect(i,c,n,o),l.fillStyle="#f97b4f",l.fillRect(i,c,n*d,o),l.strokeStyle="#4a5570",l.lineWidth=1,l.strokeRect(i,c,n,o),l.fillStyle="#e8edf5",l.font="9px JetBrains Mono",l.textAlign="center",l.fillText(s.toFixed(0)+" mg total ("+e+" kg)",f/2,c-8),l.fillStyle="#8a99ad",l.font="8px JetBrains Mono",l.fillText("Dosis calculada por peso",f/2,c+o+14)},imc:function(a,s){const e=this.initCanvas(a),l=a.width/(window.devicePixelRatio||1),f=a.height/(window.devicePixelRatio||1);e.clearRect(0,0,l,f);const t=20,i=l-2*t,n=14,o=f/2-n/2;[{min:0,max:18.5,color:"#f9c74f",label:"Bajo"},{min:18.5,max:25,color:"#4ff97b",label:"Normal"},{min:25,max:30,color:"#f9c74f",label:"Sobre"},{min:30,max:35,color:"#f97b4f",label:"G1"},{min:35,max:40,color:"#f94f4f",label:"G2"},{min:40,max:50,color:"#991b1b",label:"G3"}].forEach(function(d){var r=t+d.min/50*i,x=t+d.max/50*i;e.fillStyle=d.color+"44",e.fillRect(r,o,x-r,n),e.fillStyle="#8a99ad",e.font="6px JetBrains Mono",e.fillText(d.label,r+2,o-3)});var c=t+Math.min(s,50)/50*i;e.strokeStyle="#e8edf5",e.lineWidth=2,e.beginPath(),e.moveTo(c,o-5),e.lineTo(c,o+n+5),e.stroke(),e.fillStyle="#e8edf5",e.font="bold 10px JetBrains Mono",e.textAlign="center",e.fillText("IMC: "+s.toFixed(1),l/2,o+n+18),e.fillStyle="#8a99ad",e.font="7px JetBrains Mono",e.fillText("18.5       25       30       35       40",l/2,o+n+30)},tmb:function(a,s,e,l,f,t){const i=this.initCanvas(a),n=a.width/(window.devicePixelRatio||1),o=a.height/(window.devicePixelRatio||1);i.clearRect(0,0,n,o);const c=25,d=n-2*c,r=22,x=o/2-r/2,R=Math.min(s/3e3,1);i.fillStyle="#1e232f",i.fillRect(c,x,d,r),i.fillStyle="#4f9cf9",i.fillRect(c,x,d*R,r),i.strokeStyle="#4a5570",i.lineWidth=1,i.strokeRect(c,x,d,r),i.fillStyle="#e8edf5",i.font="9px JetBrains Mono",i.textAlign="center",i.fillText(s.toFixed(0)+" kcal/d\xEDa",n/2,x+16),i.fillStyle="#8a99ad",i.font="8px JetBrains Mono",i.fillText("P:"+e+"kg  A:"+l+"cm  E:"+f+"a  "+(t?"Masc":"Fem"),n/2,x+r+14)},crcl:function(a,s){const e=this.initCanvas(a),l=a.width/(window.devicePixelRatio||1),f=a.height/(window.devicePixelRatio||1);e.clearRect(0,0,l,f);const t=20,i=l-2*t,n=16,o=f/2-n/2,c=120;[{min:0,max:15,color:"#f94f4f",label:"G5"},{min:15,max:30,color:"#f97b4f",label:"G4"},{min:30,max:60,color:"#f9c74f",label:"G3"},{min:60,max:90,color:"#4f9cf9",label:"G2"},{min:90,max:120,color:"#4ff97b",label:"G1"}].forEach(function(r){var x=t+r.min/c*i,R=t+r.max/c*i;e.fillStyle=r.color+"44",e.fillRect(x,o,R-x,n),e.fillStyle="#8a99ad",e.font="6px JetBrains Mono",e.fillText(r.label,x+3,o-3)});var d=t+Math.min(s,c)/c*i;e.strokeStyle="#e8edf5",e.lineWidth=2,e.beginPath(),e.moveTo(d,o-5),e.lineTo(d,o+n+5),e.stroke(),e.fillStyle="#e8edf5",e.font="bold 10px JetBrains Mono",e.textAlign="center",e.fillText(s.toFixed(1)+" mL/min",l/2,o+n+18)},pesoIdeal:function(a,s,e){const l=this.initCanvas(a),f=a.width/(window.devicePixelRatio||1),t=a.height/(window.devicePixelRatio||1);l.clearRect(0,0,f,t);const i=25,n=f-2*i,o=18,c=t/2-o/2,d=Math.min(s/120,1);l.fillStyle="#1e232f",l.fillRect(i,c,n,o),l.fillStyle=e?"#4f9cf9":"#a78bfa",l.fillRect(i,c,n*d,o),l.strokeStyle="#4a5570",l.lineWidth=1,l.strokeRect(i,c,n,o),l.fillStyle="#e8edf5",l.font="9px JetBrains Mono",l.textAlign="center",l.fillText(s.toFixed(1)+" kg",f/2,c+14),l.fillStyle="#8a99ad",l.font="8px JetBrains Mono",l.fillText("Peso Ideal (Devine)",f/2,c+o+14)},asc:function(a,s,e,l){const f=this.initCanvas(a),t=a.width/(window.devicePixelRatio||1),i=a.height/(window.devicePixelRatio||1);f.clearRect(0,0,t,i);const n=t/2,o=i/2,c=35,d=Math.min(s*12,c);f.strokeStyle="#3f495e",f.lineWidth=3,f.beginPath(),f.arc(n,o-8,c,0,Math.PI*2),f.stroke(),f.strokeStyle="#4f9cf9",f.lineWidth=4,f.beginPath(),f.arc(n,o-8,d,-Math.PI/2,-Math.PI/2+s/2*Math.PI),f.stroke(),f.fillStyle="#e8edf5",f.font="bold 12px JetBrains Mono",f.textAlign="center",f.fillText(s.toFixed(2)+" m\xB2",n,o+22),f.fillStyle="#8a99ad",f.font="8px JetBrains Mono",f.fillText(e+"kg  "+l+"cm",n,i-8)},ascvd:function(a,s){const e=this.initCanvas(a),l=a.width/(window.devicePixelRatio||1),f=a.height/(window.devicePixelRatio||1);e.clearRect(0,0,l,f);const t=30,i=l-2*t,n=16,o=f/2-n/2;e.fillStyle="#4ff97b44",e.fillRect(t,o,i*.05,n),e.fillStyle="#f9c74f44",e.fillRect(t+i*.05,o,i*.025,n),e.fillStyle="#f97b4f44",e.fillRect(t+i*.075,o,i*.125,n),e.fillStyle="#f94f4f44",e.fillRect(t+i*.2,o,i*.8,n),e.fillStyle="#8a99ad",e.font="6px JetBrains Mono",e.fillText("<5%",t+2,o-3),e.fillText("7.5%",t+i*.075,o-3),e.fillText("20%",t+i*.2,o-3);var c=t+Math.min(s,50)/50*i;e.strokeStyle="#e8edf5",e.lineWidth=2,e.beginPath(),e.moveTo(c,o-5),e.lineTo(c,o+n+5),e.stroke(),e.fillStyle="#e8edf5",e.font="bold 10px JetBrains Mono",e.textAlign="center",e.fillText(s.toFixed(1)+"% riesgo ASCVD",l/2,o+n+18)},sofa:function(a,s,e,l,f,t,i,n){const o=this.initCanvas(a),c=a.width/(window.devicePixelRatio||1),d=a.height/(window.devicePixelRatio||1);o.clearRect(0,0,c,d);const r=15,x=[{label:"Resp",val:s,color:"#4f9cf9"},{label:"Coag",val:e,color:"#f94f4f"},{label:"Hep",val:l,color:"#f9c74f"},{label:"C-V",val:f,color:"#f97b4f"},{label:"Renal",val:t,color:"#a78bfa"},{label:"Neuro",val:i,color:"#4ff97b"}],R=x.length,h=Math.min((c-2*r)/R-4,35),S=d-50;x.forEach(function(w,y){var v=r+y*((c-2*r)/R)+((c-2*r)/R-h)/2,b=w.val/4*S;o.fillStyle="#22293a",o.fillRect(v,d-30-S,h,S),o.fillStyle=w.color,o.fillRect(v,d-30-b,h,b),o.strokeStyle="#4a5570",o.lineWidth=1,o.strokeRect(v,d-30-S,h,S),o.fillStyle="#8a99ad",o.font="7px JetBrains Mono",o.textAlign="center",o.fillText(w.label,v+h/2,d-10),o.fillStyle="#e8edf5",o.fillText(w.val,v+h/2,d-30-b-4)}),o.fillStyle="#e8edf5",o.font="bold 9px JetBrains Mono",o.textAlign="left",o.fillText("SOFA: "+n+" pts",r,14)},curb65:function(a,s){const e=this.initCanvas(a),l=a.width/(window.devicePixelRatio||1),f=a.height/(window.devicePixelRatio||1);e.clearRect(0,0,l,f);const t=l/2,i=f/2,n=32;[1,2,3,4,5].forEach(function(o){e.strokeStyle=o<=s?"#f94f4f":"#3f495e",e.lineWidth=4,e.lineCap="round",e.beginPath(),e.arc(t,i-5,n,-Math.PI/2+(o-1)/5*Math.PI*2,-Math.PI/2+o/5*Math.PI*2),e.stroke()}),e.fillStyle="#e8edf5",e.font="bold 16px JetBrains Mono",e.textAlign="center",e.fillText(s+"/5",t,i+14)},geneva:function(a,s){const e=this.initCanvas(a),l=a.width/(window.devicePixelRatio||1),f=a.height/(window.devicePixelRatio||1);e.clearRect(0,0,l,f);const t=30,i=l-2*t,n=16,o=f/2-n/2;e.fillStyle="#4ff97b44",e.fillRect(t,o,i*.6,n),e.fillStyle="#f94f4f44",e.fillRect(t+i*.6,o,i*.4,n),e.fillStyle="#8a99ad",e.font="7px JetBrains Mono",e.fillText("Baja",t+5,o-3),e.fillText("Alta",t+i*.6+5,o-3);var c=t+Math.min(s,5)/5*i;e.strokeStyle="#e8edf5",e.lineWidth=2,e.beginPath(),e.moveTo(c,o-5),e.lineTo(c,o+n+5),e.stroke(),e.fillStyle="#e8edf5",e.font="bold 10px JetBrains Mono",e.textAlign="center",e.fillText(s+"/5 puntos",l/2,o+n+18)},gina:function(a,s){const e=this.initCanvas(a),l=a.width/(window.devicePixelRatio||1),f=a.height/(window.devicePixelRatio||1);e.clearRect(0,0,l,f);const t=l/2,i=l-40,n=16,o=f/2-n/2;var c=["#4ff97b","#f9c74f","#f97b4f","#f94f4f"];e.fillStyle="#22293a",e.fillRect(20,o,i,n);for(var d=0;d<s&&d<4;d++)e.fillStyle=c[d],e.fillRect(20+d*(i/4),o,i/4,n);e.strokeStyle="#4a5570",e.lineWidth=1,e.strokeRect(20,o,i,n);var r=["Controlado","Parcial","Mal controlado"],x=s===0?r[0]:s<=2?r[1]:r[2];e.fillStyle="#e8edf5",e.font="9px JetBrains Mono",e.textAlign="center",e.fillText(x+" ("+s+"/4)",t,o+n+16)},anc:function(a,s){const e=this.initCanvas(a),l=a.width/(window.devicePixelRatio||1),f=a.height/(window.devicePixelRatio||1);e.clearRect(0,0,l,f);const t=20,i=l-2*t,n=14,o=f/2-n/2;var c=[{min:0,max:.5,color:"#f94f4f",label:"Severo"},{min:.5,max:1,color:"#f97b4f",label:"Mod."},{min:1,max:1.5,color:"#f9c74f",label:"Leve"},{min:1.5,max:4,color:"#4ff97b",label:"Normal"}],d=4;c.forEach(function(R){var h=t+R.min/d*i,S=t+R.max/d*i;e.fillStyle=R.color+"44",e.fillRect(h,o,S-h,n)});var r=s/1e3,x=t+Math.min(r,d)/d*i;e.strokeStyle="#e8edf5",e.lineWidth=2,e.beginPath(),e.moveTo(x,o-5),e.lineTo(x,o+n+5),e.stroke(),e.fillStyle="#e8edf5",e.font="9px JetBrains Mono",e.textAlign="center",e.fillText("ANC: "+s.toLocaleString("es-AR",{maximumFractionDigits:0})+" /\xB5L",l/2,o+n+16)},shock:function(a,s,e){const l=this.initCanvas(a),f=a.width/(window.devicePixelRatio||1),t=a.height/(window.devicePixelRatio||1);l.clearRect(0,0,f,t);const i=f/2,n=t/2;var o=s<.7?"#4ff97b":s<1?"#f9c74f":"#f94f4f";l.fillStyle=o,l.beginPath(),l.moveTo(i,n-12),l.bezierCurveTo(i-18,n-28,i-32,n-8,i,n+16),l.bezierCurveTo(i+32,n-8,i+18,n-28,i,n-12),l.closePath(),l.fill(),l.fillStyle="#e8edf5",l.font="bold 12px JetBrains Mono",l.textAlign="center",l.fillText("IS: "+s.toFixed(2),i,n+30),l.fillStyle="#8a99ad",l.font="8px JetBrains Mono",l.fillText(e+" lpm",i,t-8)},ganzoni:function(a,s){const e=this.initCanvas(a),l=a.width/(window.devicePixelRatio||1),f=a.height/(window.devicePixelRatio||1);e.clearRect(0,0,l,f);var t=40,i=f-55,n=l/2-t/2,o=30;e.fillStyle="#1e232f",e.fillRect(n,o,t,i);var c=Math.min(s/2200,1),d=c*i;e.fillStyle="#991b1b",e.fillRect(n,o+i-d,t,d),e.fillStyle="#f94f4f",e.fillRect(n,o+i-d,t,Math.min(d,4)),e.strokeStyle="#4a5570",e.lineWidth=2,e.strokeRect(n,o,t,i),e.fillStyle="#e8edf5",e.font="9px JetBrains Mono",e.textAlign="center",e.fillText(s.toFixed(0)+" mg Fe",l/2,o+i+16),e.fillStyle="#8a99ad",e.font="8px JetBrains Mono",e.fillText("D\xE9ficit de Hierro",l/2,o-8)},gcs:function(a,s,e,l,f){this._stopLoop(a);const t=this.initCanvas(a),i=a.width/(window.devicePixelRatio||1),n=a.height/(window.devicePixelRatio||1);let o=0;this._startLoop(a,()=>{t.clearRect(0,0,i,n),t.fillStyle="#0d1117",t.fillRect(0,0,i,n);const c=i/2,d=n/2-5,r=Math.min(i,n)/2.8,x=15;o+=.02;for(let h=0;h<x;h++){const S=-Math.PI/2+h/x*Math.PI*2,w=-Math.PI/2+(h+1)/x*Math.PI*2;t.strokeStyle=h<s?"#4f9cf9":"#1e232f",t.lineWidth=5,t.lineCap="round",t.beginPath(),t.arc(c,d,r,S,w),t.stroke()}const R=.85+.15*Math.sin(o);t.fillStyle="#4f9cf9",t.globalAlpha=R*.15,t.beginPath(),t.arc(c,d,r+6,0,Math.PI*2),t.fill(),t.globalAlpha=1,t.fillStyle="#e8edf5",t.font="bold 16px JetBrains Mono",t.textAlign="center",t.fillText(s+"/15",c,d+6),t.fillStyle="#8a99ad",t.font="8px JetBrains Mono",t.fillText("O:"+e+" V:"+l+" M:"+f,c,n-10)})},apgar:function(a,s,e,l,f,t,i){this._stopLoop(a);const n=this.initCanvas(a),o=a.width/(window.devicePixelRatio||1),c=a.height/(window.devicePixelRatio||1);let d=0;this._startLoop(a,()=>{n.clearRect(0,0,o,c),n.fillStyle="#0d1117",n.fillRect(0,0,o,c);const r=10,x=[{label:"FR",val:e,color:"#4f9cf9"},{label:"FC",val:l,color:"#f94f4f"},{label:"Tono",val:f,color:"#f9c74f"},{label:"Refl.",val:t,color:"#a78bfa"},{label:"Color",val:i,color:"#4ff97b"}],R=x.length,h=Math.min((o-2*r)/R-3,35),S=c-55;d+=.03,x.forEach(function(w,y){const v=r+y*((o-2*r)/R)+((o-2*r)/R-h)/2,b=w.val/2*S;n.fillStyle="#1e232f",n.fillRect(v,c-30-S,h,S),n.fillStyle=w.color,n.fillRect(v,c-30-b,h,b),n.strokeStyle="#2a3040",n.lineWidth=1,n.strokeRect(v,c-30-S,h,S),n.fillStyle="#8a99ad",n.font="7px JetBrains Mono",n.textAlign="center",n.fillText(w.label,v+h/2,c-10),n.fillStyle="#e8edf5",n.fillText(w.val,v+h/2,c-30-b-4)}),n.fillStyle="#e8edf5",n.font="bold 10px JetBrains Mono",n.textAlign="center",n.fillText(s+"/10 APGAR",o/2,16)})},pfRatio:function(a,s){this._stopLoop(a);const e=this.initCanvas(a),l=a.width/(window.devicePixelRatio||1),f=a.height/(window.devicePixelRatio||1);let t=0;this._startLoop(a,()=>{e.clearRect(0,0,l,f),e.fillStyle="#0d1117",e.fillRect(0,0,l,f);const i=20,n=l-2*i,o=16,c=f/2-o/2,d=500;t+=.02,[{min:0,max:100,color:"#f94f4f",label:"Cr\xEDt"},{min:100,max:200,color:"#f97b4f",label:"Sever"},{min:200,max:300,color:"#f9c74f",label:"Mod"},{min:300,max:400,color:"#4f9cf9",label:"Leve"},{min:400,max:500,color:"#4ff97b",label:"Norm"}].forEach(function(h){const S=i+h.min/d*n,w=i+h.max/d*n;e.fillStyle=h.color+"44",e.fillRect(S,c,w-S,o),e.fillStyle="#8a99ad",e.font="6px JetBrains Mono",e.textAlign="center",e.fillText(h.label,S+(w-S)/2,c-3)});const r=Math.min(Math.max(s,0),d),x=i+r/d*n,R=.7+.3*Math.sin(t*2);e.shadowColor=s<200?"#f94f4f":s<300?"#f9c74f":"#4ff97b",e.shadowBlur=10*R,e.strokeStyle="#e8edf5",e.lineWidth=2.5,e.beginPath(),e.moveTo(x,c-6),e.lineTo(x,c+o+6),e.stroke(),e.shadowBlur=0,e.fillStyle="#e8edf5",e.font="bold 11px JetBrains Mono",e.textAlign="center",e.fillText("PF: "+s.toFixed(1),l/2,c+o+20)})},correccionSodio:function(a,s,e,l){this._stopLoop(a);const f=this.initCanvas(a),t=a.width/(window.devicePixelRatio||1),i=a.height/(window.devicePixelRatio||1);let n=0;this._startLoop(a,()=>{f.clearRect(0,0,t,i),f.fillStyle="#0d1117",f.fillRect(0,0,t,i);const o=25,c=45,d=i-60,r=160;n+=.025;const x=Math.min(s,r)/r*d,R=Math.min(e,r)/r*d,h=t/2-c-10,S=t/2+10,w=i-25;f.fillStyle="#1e232f",f.fillRect(h,w-d,c,d),f.fillRect(S,w-d,c,d),f.fillStyle="#4f9cf9",f.fillRect(h,w-x,c,x),f.fillStyle="#f9c74f",f.fillRect(S,w-R,c,R),f.strokeStyle="#2a3040",f.lineWidth=1,f.strokeRect(h,w-d,c,d),f.strokeRect(S,w-d,c,d);const y=.85+.15*Math.sin(n);f.fillStyle="#4f9cf9",f.globalAlpha=y*.2,f.fillRect(h,w-x,c,x),f.globalAlpha=1,f.fillStyle="#e8edf5",f.font="9px JetBrains Mono",f.textAlign="center",f.fillText("Na medido",h+c/2,w+12),f.fillText("Na corregido",S+c/2,w+12),f.fillStyle="#4f9cf9",f.fillText(s.toFixed(1),h+c/2,w-x-6),f.fillStyle="#f9c74f",f.fillText(e.toFixed(1),S+c/2,w-R-6),f.fillStyle="#8a99ad",f.font="8px JetBrains Mono",f.fillText("Glu: "+l+" mg/dL",t/2,16)})},anionGap:function(a,s,e,l,f){this._stopLoop(a);const t=this.initCanvas(a),i=a.width/(window.devicePixelRatio||1),n=a.height/(window.devicePixelRatio||1);let o=0;this._startLoop(a,()=>{t.clearRect(0,0,i,n),t.fillStyle="#0d1117",t.fillRect(0,0,i,n);const c=20,d=i-2*c,r=18,x=n/2-r/2,R=30;o+=.02,t.fillStyle="#4ff97b44",t.fillRect(c,x,d*(8/R),r),t.fillStyle="#f9c74f44",t.fillRect(c+d*(8/R),x,d*(4/R),r),t.fillStyle="#f94f4f44",t.fillRect(c+d*(12/R),x,d*(18/R),r),t.fillStyle="#8a99ad",t.font="6px JetBrains Mono",t.textAlign="center",t.fillText("Normal <8",c+d*(4/R),x-3),t.fillText("L\xEDmite 8-11",c+d*(10/R),x-3),t.fillText("Elevado \u226512",c+d*(21/R),x-3);const h=Math.min(Math.max(s,0),R),S=c+h/R*d,w=.7+.3*Math.sin(o*2);t.shadowColor=s>=12?"#f94f4f":s>=8?"#f9c74f":"#4ff97b",t.shadowBlur=10*w,t.strokeStyle="#e8edf5",t.lineWidth=2.5,t.beginPath(),t.moveTo(S,x-6),t.lineTo(S,x+r+6),t.stroke(),t.shadowBlur=0,t.fillStyle="#e8edf5",t.font="bold 11px JetBrains Mono",t.textAlign="center",t.fillText("AG: "+s.toFixed(1)+" mEq/L",i/2,x+r+20)})}};
+﻿const MedicinaVisual = {
+    _loop: {},
+
+    _startLoop: function(canvas, fn) {
+        if (this._loop[canvas.id]) cancelAnimationFrame(this._loop[canvas.id]);
+        const animate = () => {
+            fn();
+            this._loop[canvas.id] = requestAnimationFrame(animate);
+        };
+        animate();
+    },
+
+    _stopLoop: function(canvas) {
+        if (this._loop[canvas.id]) {
+            cancelAnimationFrame(this._loop[canvas.id]);
+            delete this._loop[canvas.id];
+        }
+    },
+
+    initCanvas: function(canvas) {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return ctx;
+    },
+
+    goteo: function(canvas, gotasMin, mlh) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2;
+        ctx.strokeStyle = '#4a5570';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(cx - 20, 20, 40, h - 40);
+        ctx.fillStyle = 'rgba(79, 156, 249, 0.25)';
+        ctx.fillRect(cx - 19, h - 55, 38, 35);
+        ctx.strokeStyle = '#4f9cf9';
+        ctx.beginPath();
+        ctx.moveTo(cx - 19, h - 55);
+        ctx.lineTo(cx + 19, h - 55);
+        ctx.stroke();
+        ctx.fillStyle = '#4f9cf9';
+        ctx.beginPath();
+        ctx.arc(cx, 45, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = '9px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(Math.round(gotasMin) + ' g/min', cx, 14);
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText(mlh.toFixed(1) + ' mL/h', cx, h - 8);
+    },
+
+    dosis: function(canvas, dosis, peso) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 30, barW = w - 2 * pad, barH = 20;
+        const cy = h / 2 - barH / 2;
+        const maxD = 2000;
+        const pct = Math.min(dosis / maxD, 1);
+        ctx.fillStyle = '#1e232f';
+        ctx.fillRect(pad, cy, barW, barH);
+        ctx.fillStyle = '#f97b4f';
+        ctx.fillRect(pad, cy, barW * pct, barH);
+        ctx.strokeStyle = '#4a5570';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(pad, cy, barW, barH);
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = '9px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(dosis.toFixed(0) + ' mg total (' + peso + ' kg)', w / 2, cy - 8);
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText('Dosis calculada por peso', w / 2, cy + barH + 14);
+    },
+
+    imc: function(canvas, imc) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 20, barW = w - 2 * pad, barH = 14;
+        const cy = h / 2 - barH / 2;
+        const rangos = [
+            { min: 0, max: 18.5, color: '#f9c74f', label: 'Bajo' },
+            { min: 18.5, max: 25, color: '#4ff97b', label: 'Normal' },
+            { min: 25, max: 30, color: '#f9c74f', label: 'Sobre' },
+            { min: 30, max: 35, color: '#f97b4f', label: 'G1' },
+            { min: 35, max: 40, color: '#f94f4f', label: 'G2' },
+            { min: 40, max: 50, color: '#991b1b', label: 'G3' },
+        ];
+        rangos.forEach(function(r) {
+            var x1 = pad + (r.min / 50) * barW;
+            var x2 = pad + (r.max / 50) * barW;
+            ctx.fillStyle = r.color + '44';
+            ctx.fillRect(x1, cy, x2 - x1, barH);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '6px JetBrains Mono';
+            ctx.fillText(r.label, x1 + 2, cy - 3);
+        });
+        var markerX = pad + (Math.min(imc, 50) / 50) * barW;
+        ctx.strokeStyle = '#e8edf5';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(markerX, cy - 5);
+        ctx.lineTo(markerX, cy + barH + 5);
+        ctx.stroke();
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = 'bold 10px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText('IMC: ' + imc.toFixed(1), w / 2, cy + barH + 18);
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '7px JetBrains Mono';
+        ctx.fillText('18.5       25       30       35       40', w / 2, cy + barH + 30);
+    },
+
+    tmb: function(canvas, tmb, peso, altura, edad, masculino) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 25, barW = w - 2 * pad, barH = 22;
+        const cy = h / 2 - barH / 2;
+        const maxTMB = 3000;
+        const pct = Math.min(tmb / maxTMB, 1);
+        ctx.fillStyle = '#1e232f';
+        ctx.fillRect(pad, cy, barW, barH);
+        ctx.fillStyle = '#4f9cf9';
+        ctx.fillRect(pad, cy, barW * pct, barH);
+        ctx.strokeStyle = '#4a5570';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(pad, cy, barW, barH);
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = '9px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(tmb.toFixed(0) + ' kcal/d\u00eda', w / 2, cy + 16);
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText('P:' + peso + 'kg  A:' + altura + 'cm  E:' + edad + 'a  ' + (masculino ? 'Masc' : 'Fem'), w / 2, cy + barH + 14);
+    },
+
+    crcl: function(canvas, clcr) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 20, barW = w - 2 * pad, barH = 16;
+        const cy = h / 2 - barH / 2;
+        const maxCr = 120;
+        const etapas = [
+            { min: 0, max: 15, color: '#f94f4f', label: 'G5' },
+            { min: 15, max: 30, color: '#f97b4f', label: 'G4' },
+            { min: 30, max: 60, color: '#f9c74f', label: 'G3' },
+            { min: 60, max: 90, color: '#4f9cf9', label: 'G2' },
+            { min: 90, max: 120, color: '#4ff97b', label: 'G1' },
+        ];
+        etapas.forEach(function(e) {
+            var x1 = pad + (e.min / maxCr) * barW;
+            var x2 = pad + (e.max / maxCr) * barW;
+            ctx.fillStyle = e.color + '44';
+            ctx.fillRect(x1, cy, x2 - x1, barH);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '6px JetBrains Mono';
+            ctx.fillText(e.label, x1 + 3, cy - 3);
+        });
+        var mx = pad + (Math.min(clcr, maxCr) / maxCr) * barW;
+        ctx.strokeStyle = '#e8edf5';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(mx, cy - 5);
+        ctx.lineTo(mx, cy + barH + 5);
+        ctx.stroke();
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = 'bold 10px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(clcr.toFixed(1) + ' mL/min', w / 2, cy + barH + 18);
+    },
+
+    pesoIdeal: function(canvas, pi, masculino) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 25, barW = w - 2 * pad, barH = 18;
+        const cy = h / 2 - barH / 2;
+        const maxPI = 120;
+        const pct = Math.min(pi / maxPI, 1);
+        ctx.fillStyle = '#1e232f';
+        ctx.fillRect(pad, cy, barW, barH);
+        ctx.fillStyle = masculino ? '#4f9cf9' : '#a78bfa';
+        ctx.fillRect(pad, cy, barW * pct, barH);
+        ctx.strokeStyle = '#4a5570';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(pad, cy, barW, barH);
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = '9px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(pi.toFixed(1) + ' kg', w / 2, cy + 14);
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText('Peso Ideal (Devine)', w / 2, cy + barH + 14);
+    },
+
+    asc: function(canvas, asc, peso, altura) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2, cy = h / 2;
+        const maxR = 35;
+        const r = Math.min(asc * 12, maxR);
+        ctx.strokeStyle = '#3f495e';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(cx, cy - 8, maxR, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.strokeStyle = '#4f9cf9';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(cx, cy - 8, r, -Math.PI / 2, -Math.PI / 2 + (asc / 2) * Math.PI);
+        ctx.stroke();
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = 'bold 12px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(asc.toFixed(2) + ' m\u00b2', cx, cy + 22);
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText(peso + 'kg  ' + altura + 'cm', cx, h - 8);
+    },
+
+    ascvd: function(canvas, riesgo) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 30, barW = w - 2 * pad, barH = 16;
+        const cy = h / 2 - barH / 2;
+        ctx.fillStyle = '#4ff97b44';
+        ctx.fillRect(pad, cy, barW * 0.05, barH);
+        ctx.fillStyle = '#f9c74f44';
+        ctx.fillRect(pad + barW * 0.05, cy, barW * 0.025, barH);
+        ctx.fillStyle = '#f97b4f44';
+        ctx.fillRect(pad + barW * 0.075, cy, barW * 0.125, barH);
+        ctx.fillStyle = '#f94f4f44';
+        ctx.fillRect(pad + barW * 0.2, cy, barW * 0.8, barH);
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '6px JetBrains Mono';
+        ctx.fillText('<5%', pad + 2, cy - 3);
+        ctx.fillText('7.5%', pad + barW * 0.075, cy - 3);
+        ctx.fillText('20%', pad + barW * 0.2, cy - 3);
+        var mx = pad + (Math.min(riesgo, 50) / 50) * barW;
+        ctx.strokeStyle = '#e8edf5';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(mx, cy - 5);
+        ctx.lineTo(mx, cy + barH + 5);
+        ctx.stroke();
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = 'bold 10px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(riesgo.toFixed(1) + '% riesgo ASCVD', w / 2, cy + barH + 18);
+    },
+
+    sofa: function(canvas, resp, coag, hep, cv, renal, neuro, total) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 15;
+        const comps = [
+            { label: 'Resp', val: resp, color: '#4f9cf9' },
+            { label: 'Coag', val: coag, color: '#f94f4f' },
+            { label: 'Hep', val: hep, color: '#f9c74f' },
+            { label: 'C-V', val: cv, color: '#f97b4f' },
+            { label: 'Renal', val: renal, color: '#a78bfa' },
+            { label: 'Neuro', val: neuro, color: '#4ff97b' },
+        ];
+        const n = comps.length;
+        const barW = Math.min((w - 2 * pad) / n - 4, 35);
+        const maxBarH = h - 50;
+        comps.forEach(function(c, i) {
+            var x = pad + i * ((w - 2 * pad) / n) + ((w - 2 * pad) / n - barW) / 2;
+            var bh = (c.val / 4) * maxBarH;
+            ctx.fillStyle = '#22293a';
+            ctx.fillRect(x, h - 30 - maxBarH, barW, maxBarH);
+            ctx.fillStyle = c.color;
+            ctx.fillRect(x, h - 30 - bh, barW, bh);
+            ctx.strokeStyle = '#4a5570';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x, h - 30 - maxBarH, barW, maxBarH);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '7px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(c.label, x + barW / 2, h - 10);
+            ctx.fillStyle = '#e8edf5';
+            ctx.fillText(c.val, x + barW / 2, h - 30 - bh - 4);
+        });
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = 'bold 9px JetBrains Mono';
+        ctx.textAlign = 'left';
+        ctx.fillText('SOFA: ' + total + ' pts', pad, 14);
+    },
+
+    curb65: function(canvas, score) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2, cy = h / 2;
+        const r = 32;
+        [1, 2, 3, 4, 5].forEach(function(i) {
+            ctx.strokeStyle = i <= score ? '#f94f4f' : '#3f495e';
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.arc(cx, cy - 5, r, -Math.PI / 2 + ((i - 1) / 5) * Math.PI * 2, -Math.PI / 2 + (i / 5) * Math.PI * 2);
+            ctx.stroke();
+        });
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = 'bold 16px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(score + '/5', cx, cy + 14);
+    },
+
+    geneva: function(canvas, score) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 30, barW = w - 2 * pad, barH = 16;
+        const cy = h / 2 - barH / 2;
+        ctx.fillStyle = '#4ff97b44';
+        ctx.fillRect(pad, cy, barW * 0.6, barH);
+        ctx.fillStyle = '#f94f4f44';
+        ctx.fillRect(pad + barW * 0.6, cy, barW * 0.4, barH);
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '7px JetBrains Mono';
+        ctx.fillText('Baja', pad + 5, cy - 3);
+        ctx.fillText('Alta', pad + barW * 0.6 + 5, cy - 3);
+        var mx = pad + (Math.min(score, 5) / 5) * barW;
+        ctx.strokeStyle = '#e8edf5';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(mx, cy - 5);
+        ctx.lineTo(mx, cy + barH + 5);
+        ctx.stroke();
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = 'bold 10px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(score + '/5 puntos', w / 2, cy + barH + 18);
+    },
+
+    gina: function(canvas, total) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2;
+        const barW = w - 40, barH = 16;
+        const cy = h / 2 - barH / 2;
+        var colores = ['#4ff97b', '#f9c74f', '#f97b4f', '#f94f4f'];
+        ctx.fillStyle = '#22293a';
+        ctx.fillRect(20, cy, barW, barH);
+        for (var i = 0; i < total && i < 4; i++) {
+            ctx.fillStyle = colores[i];
+            ctx.fillRect(20 + i * (barW / 4), cy, barW / 4, barH);
+        }
+        ctx.strokeStyle = '#4a5570';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(20, cy, barW, barH);
+        var labels = ['Controlado', 'Parcial', 'Mal controlado'];
+        var label = total === 0 ? labels[0] : total <= 2 ? labels[1] : labels[2];
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = '9px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(label + ' (' + total + '/4)', cx, cy + barH + 16);
+    },
+
+    anc: function(canvas, anc) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const pad = 20, barW = w - 2 * pad, barH = 14;
+        const cy = h / 2 - barH / 2;
+        var categorias = [
+            { min: 0, max: 0.5, color: '#f94f4f', label: 'Severo' },
+            { min: 0.5, max: 1.0, color: '#f97b4f', label: 'Mod.' },
+            { min: 1.0, max: 1.5, color: '#f9c74f', label: 'Leve' },
+            { min: 1.5, max: 4.0, color: '#4ff97b', label: 'Normal' },
+        ];
+        var maxV = 4;
+        categorias.forEach(function(c) {
+            var x1 = pad + (c.min / maxV) * barW;
+            var x2 = pad + (c.max / maxV) * barW;
+            ctx.fillStyle = c.color + '44';
+            ctx.fillRect(x1, cy, x2 - x1, barH);
+        });
+        var val = anc / 1000;
+        var mx = pad + (Math.min(val, maxV) / maxV) * barW;
+        ctx.strokeStyle = '#e8edf5';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(mx, cy - 5);
+        ctx.lineTo(mx, cy + barH + 5);
+        ctx.stroke();
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = '9px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText('ANC: ' + anc.toLocaleString('es-AR', {maximumFractionDigits:0}) + ' /\u00b5L', w / 2, cy + barH + 16);
+    },
+
+    shock: function(canvas, is, fc) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2, cy = h / 2;
+        var color = is < 0.7 ? '#4ff97b' : is < 1.0 ? '#f9c74f' : '#f94f4f';
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 12);
+        ctx.bezierCurveTo(cx - 18, cy - 28, cx - 32, cy - 8, cx, cy + 16);
+        ctx.bezierCurveTo(cx + 32, cy - 8, cx + 18, cy - 28, cx, cy - 12);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = 'bold 12px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText('IS: ' + is.toFixed(2), cx, cy + 30);
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText(fc + ' lpm', cx, h - 8);
+    },
+
+    ganzoni: function(canvas, deficit) {
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        ctx.clearRect(0, 0, w, h);
+        var barW = 40, barH = h - 55;
+        var bx = w / 2 - barW / 2, by = 30;
+        ctx.fillStyle = '#1e232f';
+        ctx.fillRect(bx, by, barW, barH);
+        var pct = Math.min(deficit / 2200, 1);
+        var fillH = pct * barH;
+        ctx.fillStyle = '#991b1b';
+        ctx.fillRect(bx, by + barH - fillH, barW, fillH);
+        ctx.fillStyle = '#f94f4f';
+        ctx.fillRect(bx, by + barH - fillH, barW, Math.min(fillH, 4));
+        ctx.strokeStyle = '#4a5570';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(bx, by, barW, barH);
+        ctx.fillStyle = '#e8edf5';
+        ctx.font = '9px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(deficit.toFixed(0) + ' mg Fe', w / 2, by + barH + 16);
+        ctx.fillStyle = '#8a99ad';
+        ctx.font = '8px JetBrains Mono';
+        ctx.fillText('D\u00e9ficit de Hierro', w / 2, by - 8);
+    },
+
+    gcs: function(canvas, total, eyes, verbal, motor) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, w, h);
+
+            const cx = w / 2, cy = h / 2 - 5;
+            const r = Math.min(w, h) / 2.8;
+            const maxSeg = 15;
+            t += 0.02;
+
+            for (let i = 0; i < maxSeg; i++) {
+                const startA = -Math.PI / 2 + (i / maxSeg) * Math.PI * 2;
+                const endA = -Math.PI / 2 + ((i + 1) / maxSeg) * Math.PI * 2;
+                ctx.strokeStyle = i < total ? '#4f9cf9' : '#1e232f';
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.arc(cx, cy, r, startA, endA);
+                ctx.stroke();
+            }
+
+            const pulse = 0.85 + 0.15 * Math.sin(t);
+            ctx.fillStyle = '#4f9cf9';
+            ctx.globalAlpha = pulse * 0.15;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r + 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = 'bold 16px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(total + '/15', cx, cy + 6);
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText('O:' + eyes + ' V:' + verbal + ' M:' + motor, cx, h - 10);
+        });
+    },
+
+    apgar: function(canvas, total, fr, fc, tono, reflejo, color) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, w, h);
+
+            const pad = 10;
+            const comps = [
+                { label: 'FR', val: fr, color: '#4f9cf9' },
+                { label: 'FC', val: fc, color: '#f94f4f' },
+                { label: 'Tono', val: tono, color: '#f9c74f' },
+                { label: 'Refl.', val: reflejo, color: '#a78bfa' },
+                { label: 'Color', val: color, color: '#4ff97b' },
+            ];
+            const n = comps.length;
+            const barW = Math.min((w - 2 * pad) / n - 3, 35);
+            const maxH = h - 55;
+            t += 0.03;
+
+            comps.forEach(function(c, i) {
+                const x = pad + i * ((w - 2 * pad) / n) + ((w - 2 * pad) / n - barW) / 2;
+                const bh = (c.val / 2) * maxH;
+                ctx.fillStyle = '#1e232f';
+                ctx.fillRect(x, h - 30 - maxH, barW, maxH);
+                ctx.fillStyle = c.color;
+                ctx.fillRect(x, h - 30 - bh, barW, bh);
+                ctx.strokeStyle = '#2a3040';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(x, h - 30 - maxH, barW, maxH);
+                ctx.fillStyle = '#8a99ad';
+                ctx.font = '7px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.fillText(c.label, x + barW / 2, h - 10);
+                ctx.fillStyle = '#e8edf5';
+                ctx.fillText(c.val, x + barW / 2, h - 30 - bh - 4);
+            });
+
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = 'bold 10px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText(total + '/10 APGAR', w / 2, 16);
+        });
+    },
+
+    pfRatio: function(canvas, pf) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, w, h);
+
+            const pad = 20, barW = w - 2 * pad, barH = 16;
+            const cy = h / 2 - barH / 2;
+            const maxPF = 500;
+            t += 0.02;
+
+            const zonas = [
+                { min: 0, max: 100, color: '#f94f4f', label: 'Crít' },
+                { min: 100, max: 200, color: '#f97b4f', label: 'Sever' },
+                { min: 200, max: 300, color: '#f9c74f', label: 'Mod' },
+                { min: 300, max: 400, color: '#4f9cf9', label: 'Leve' },
+                { min: 400, max: 500, color: '#4ff97b', label: 'Norm' },
+            ];
+
+            zonas.forEach(function(z) {
+                const x1 = pad + (z.min / maxPF) * barW;
+                const x2 = pad + (z.max / maxPF) * barW;
+                ctx.fillStyle = z.color + '44';
+                ctx.fillRect(x1, cy, x2 - x1, barH);
+                ctx.fillStyle = '#8a99ad';
+                ctx.font = '6px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.fillText(z.label, x1 + (x2 - x1) / 2, cy - 3);
+            });
+
+            const clamped = Math.min(Math.max(pf, 0), maxPF);
+            const mx = pad + (clamped / maxPF) * barW;
+            const pulse = 0.7 + 0.3 * Math.sin(t * 2);
+
+            ctx.shadowColor = pf < 200 ? '#f94f4f' : pf < 300 ? '#f9c74f' : '#4ff97b';
+            ctx.shadowBlur = 10 * pulse;
+            ctx.strokeStyle = '#e8edf5';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(mx, cy - 6);
+            ctx.lineTo(mx, cy + barH + 6);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = 'bold 11px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('PF: ' + pf.toFixed(1), w / 2, cy + barH + 20);
+        });
+    },
+
+    correccionSodio: function(canvas, na, naCorr, glu) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, w, h);
+
+            const pad = 25;
+            const barW = 45;
+            const maxH = h - 60;
+            const maxNa = 160;
+            t += 0.025;
+
+            const naH = (Math.min(na, maxNa) / maxNa) * maxH;
+            const naCorrH = (Math.min(naCorr, maxNa) / maxNa) * maxH;
+
+            const x1 = w / 2 - barW - 10;
+            const x2 = w / 2 + 10;
+            const base = h - 25;
+
+            ctx.fillStyle = '#1e232f';
+            ctx.fillRect(x1, base - maxH, barW, maxH);
+            ctx.fillRect(x2, base - maxH, barW, maxH);
+
+            ctx.fillStyle = '#4f9cf9';
+            ctx.fillRect(x1, base - naH, barW, naH);
+            ctx.fillStyle = '#f9c74f';
+            ctx.fillRect(x2, base - naCorrH, barW, naCorrH);
+
+            ctx.strokeStyle = '#2a3040';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x1, base - maxH, barW, maxH);
+            ctx.strokeRect(x2, base - maxH, barW, maxH);
+
+            const pulse = 0.85 + 0.15 * Math.sin(t);
+            ctx.fillStyle = '#4f9cf9';
+            ctx.globalAlpha = pulse * 0.2;
+            ctx.fillRect(x1, base - naH, barW, naH);
+            ctx.globalAlpha = 1;
+
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = '9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('Na medido', x1 + barW / 2, base + 12);
+            ctx.fillText('Na corregido', x2 + barW / 2, base + 12);
+            ctx.fillStyle = '#4f9cf9';
+            ctx.fillText(na.toFixed(1), x1 + barW / 2, base - naH - 6);
+            ctx.fillStyle = '#f9c74f';
+            ctx.fillText(naCorr.toFixed(1), x2 + barW / 2, base - naCorrH - 6);
+
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '8px JetBrains Mono';
+            ctx.fillText('Glu: ' + glu + ' mg/dL', w / 2, 16);
+        });
+    },
+
+    anionGap: function(canvas, ag, na, cl, hco3) {
+        this._stopLoop(canvas);
+        const ctx = this.initCanvas(canvas);
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        let t = 0;
+
+        this._startLoop(canvas, () => {
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, w, h);
+
+            const pad = 20, barW = w - 2 * pad, barH = 18;
+            const cy = h / 2 - barH / 2;
+            const maxAG = 30;
+            t += 0.02;
+
+            ctx.fillStyle = '#4ff97b44';
+            ctx.fillRect(pad, cy, barW * (8 / maxAG), barH);
+            ctx.fillStyle = '#f9c74f44';
+            ctx.fillRect(pad + barW * (8 / maxAG), cy, barW * (4 / maxAG), barH);
+            ctx.fillStyle = '#f94f4f44';
+            ctx.fillRect(pad + barW * (12 / maxAG), cy, barW * (18 / maxAG), barH);
+
+            ctx.fillStyle = '#8a99ad';
+            ctx.font = '6px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('Normal <8', pad + barW * (4 / maxAG), cy - 3);
+            ctx.fillText('Límite 8-11', pad + barW * (10 / maxAG), cy - 3);
+            ctx.fillText('Elevado ≥12', pad + barW * (21 / maxAG), cy - 3);
+
+            const clamped = Math.min(Math.max(ag, 0), maxAG);
+            const mx = pad + (clamped / maxAG) * barW;
+            const pulse = 0.7 + 0.3 * Math.sin(t * 2);
+
+            ctx.shadowColor = ag >= 12 ? '#f94f4f' : ag >= 8 ? '#f9c74f' : '#4ff97b';
+            ctx.shadowBlur = 10 * pulse;
+            ctx.strokeStyle = '#e8edf5';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(mx, cy - 6);
+            ctx.lineTo(mx, cy + barH + 6);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#e8edf5';
+            ctx.font = 'bold 11px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('AG: ' + ag.toFixed(1) + ' mEq/L', w / 2, cy + barH + 20);
+        });
+    }
+};

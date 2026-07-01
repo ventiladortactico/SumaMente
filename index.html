@@ -1391,8 +1391,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 
 
 
-<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
-<script defer src="https://va.vercel-scripts.com/v1/script.js"></script>
+<script>
+try {
+  window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};
+  var script = document.createElement('script');
+  script.defer = true;
+  script.src = 'https://va.vercel-scripts.com/v1/script.js';
+  script.onerror = function() { console.warn('Vercel Analytics failed to load'); };
+  document.head.appendChild(script);
+} catch(e) {
+  console.warn('Vercel Analytics initialization error:', e);
+}
+</script>
 
 <script>
 // Cargar anuncios despu&eacute;s del LCP para no bloquear rendimiento

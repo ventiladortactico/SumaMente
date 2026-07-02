@@ -3,6 +3,10 @@
   "outputDirectory": "www",
   "routes": [
     {
+      "src": "/sitemap.xml",
+      "headers": { "Content-Type": "application/xml; charset=utf-8" }
+    },
+    {
       "src": "/about",
       "dest": "/about.html"
     },

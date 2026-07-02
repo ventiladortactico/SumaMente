@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-AR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +15,7 @@ img { max-width: 100%; height: auto; display: block; }
 </style>
 <title>SumaMente - Calculadora Científica con Fórmulas</title>
 <meta name="description" content="Calculadora científica online con módulos de matemática, física, química, medicina, finanzas y más. Resuelve ecuaciones, conversiones y fórmulas al instante.">
+<meta name="keywords" content="calculadora científica, fórmulas, matemáticas, física, química, medicina, finanzas, ingeniería, conversor unidades">
 <meta property="og:title" content="SumaMente - Calculadora Científica con Fórmulas">
 <meta property="og:description" content="Calculadora científica online con módulos de matemática, física, química, medicina, finanzas y más. Resuelve ecuaciones, conversiones y fórmulas al instante.">
 <meta property="og:type" content="website">
@@ -80,6 +81,54 @@ img { max-width: 100%; height: auto; display: block; }
     },
     "query-input": "required name=search_term_string"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Cómo usar la calculadora científica de SumaMente?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Seleccioná un módulo desde el menú (General, Electrónica, Medicina, Finanzas, etc.), ingresá los valores en los campos correspondientes y presioná Calcular. También podés usar la calculadora científica General con el teclado numérico y funciones avanzadas."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué módulos incluye SumaMente?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "SumaMente incluye módulos de calculadora científica General, Electrónica, Medicina, Finanzas, Química, Arquitectura, Mecánica, Geometría, Física, Conversor de Unidades, Nutrición, Acústica, Programación, Estadística, Redes, Álgebra y Diseño."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿SumaMente guarda mis datos o resultados?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Todos los cálculos se realizan localmente en tu navegador. No almacenamos datos personales ni resultados de cálculos en nuestros servidores."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo convertir unidades en SumaMente?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Seleccioná el módulo Conversor de Unidades desde el menú principal. Elegí el tipo de conversión (longitud, masa, temperatura, presión, etc.), ingresá el valor y obtené el resultado al instante."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué es SumaMente PRO y cuánto cuesta?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "SumaMente PRO es la versión premium sin publicidad con exportación PDF, historial ilimitado, temas visuales y favoritos ilimitados. Cuesta USD 3.50, pago único."
+      }
+    }
+  ]
 }
 </script>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -411,7 +460,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 <div class="modal" id="modal-modules" onclick="toggleModal(false)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="toggleModal(false)">✕</button>
-    <h1 style="font-size:22px;font-weight:700;color:var(--text);margin:0 0 10px 0">Calculadora Científica Modular</h1>
+    <h2 style="font-size:22px;font-weight:700;color:var(--text);margin:0 0 10px 0">Calculadora Científica Modular</h2>
     <p style="font-size:13px;color:var(--text2);margin:0 0 20px 0">Selecciona un módulo para comenzar</p>
     <div class="modal-grid">
 
@@ -637,7 +686,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== GENERAL ===== -->
     <div class="mode-section active" id="mode-general">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Calculadora científica</span></div>
+        <div class="panel-header"><h2 class="panel-title">Calculadora científica</h2></div>
         <div class="panel-body">
           <div class="gen-display">
             <div class="gen-expr" id="gen-expr"></div>
@@ -703,7 +752,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== ELECTRÓNICA ===== -->
     <div class="mode-section" id="mode-electro">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Electrónica</span></div>
+        <div class="panel-header"><h2 class="panel-title">Electrónica</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">⚡ Electricidad</div>
           <div class="formula-chips">
@@ -747,7 +796,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== MEDICINA ===== -->
     <div class="mode-section" id="mode-med">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Medicina</span></div>
+        <div class="panel-header"><h2 class="panel-title">Medicina</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">💊 Fórmulas Clínicas</div>
           <div class="formula-chips">
@@ -792,7 +841,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <div class="mode-section" id="mode-fin">
       <div class="panel">
         <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center">
-          <span class="panel-title">Finanzas</span>
+          <h2 class="panel-title">Finanzas</h2>
           <label for="modo-ar" style="font-size:9px;display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text3)">MODO ARGENTINA</label>
             <input type="checkbox" id="modo-ar" onchange="renderForm('fin', activeFormula['fin'])">
         </div>
@@ -836,7 +885,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== QUÍMICA ===== -->
     <div class="mode-section" id="mode-quim">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Química</span></div>
+        <div class="panel-header"><h2 class="panel-title">Química</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🧪 Soluciones</div>
           <div class="formula-chips">
@@ -880,7 +929,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== CONSTRUCCIÓN ===== -->
     <div class="mode-section" id="mode-civil">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Arquitectura y Construcción</span></div>
+        <div class="panel-header"><h2 class="panel-title">Arquitectura y Construcción</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🏗️ Estructural / Hormigón</div>
           <div class="formula-chips">
@@ -923,7 +972,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== MECÁNICA ===== -->
     <div class="mode-section" id="mode-mec">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Mecánica</span></div>
+        <div class="panel-header"><h2 class="panel-title">Mecánica</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">⚙️ Máquinas Simples</div>
           <div class="formula-chips">
@@ -964,7 +1013,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== GEOMETRÍA ===== -->
     <div class="mode-section" id="mode-geom">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Geometría</span></div>
+        <div class="panel-header"><h2 class="panel-title">Geometría</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📐 Figuras Planas</div>
           <div class="formula-chips">
@@ -1002,7 +1051,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== UNIDADES ===== -->
     <div class="mode-section" id="mode-unit">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Conversor de Unidades</span></div>
+        <div class="panel-header"><h2 class="panel-title">Conversor de Unidades</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📏 Longitud y Masa</div>
           <div class="formula-chips">
@@ -1046,7 +1095,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== FÍSICA ===== -->
     <div class="mode-section" id="mode-fis">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Física</span></div>
+        <div class="panel-header"><h2 class="panel-title">Física</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📐 Cinemática</div>
           <div class="formula-chips">
@@ -1090,7 +1139,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== DISEÑO GRÁFICO ===== -->
     <div class="mode-section" id="mode-diseno">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Diseño y Multimedia</span></div>
+        <div class="panel-header"><h2 class="panel-title">Diseño y Multimedia</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📐 Proporciones y Escalas</div>
           <div class="formula-chips">
@@ -1134,7 +1183,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== NUTRICIÓN ===== -->
     <div class="mode-section" id="mode-nutri">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Nutrición y Dietética</span></div>
+        <div class="panel-header"><h2 class="panel-title">Nutrición y Dietética</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🔥 Calorías y Macros</div>
           <div class="formula-chips">
@@ -1175,7 +1224,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== ACÚSTICA ===== -->
     <div class="mode-section" id="mode-acust">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Sonido y Acústica</span></div>
+        <div class="panel-header"><h2 class="panel-title">Sonido y Acústica</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">👋 Ondas y Frecuencia</div>
           <div class="formula-chips">
@@ -1211,7 +1260,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== PROGRAMACIÓN ===== -->
     <div class="mode-section" id="mode-prog">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Informática / Programación</span></div>
+        <div class="panel-header"><h2 class="panel-title">Informática / Programación</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🔢 Números y Algoritmos</div>
           <div class="formula-chips">
@@ -1253,7 +1302,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== ESTADÍSTICA ===== -->
     <div class="mode-section" id="mode-estad">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Estadística Aplicada</span></div>
+        <div class="panel-header"><h2 class="panel-title">Estadística Aplicada</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📊 Descriptiva</div>
           <div class="formula-chips">
@@ -1289,7 +1338,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== REDES ===== -->
     <div class="mode-section" id="mode-redes">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Redes y Conectividad</span></div>
+        <div class="panel-header"><h2 class="panel-title">Redes y Conectividad</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">🌐 Subneteo</div>
           <div class="formula-chips">
@@ -1333,7 +1382,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- ===== ÁLGEBRA ===== -->
     <div class="mode-section" id="mode-alg">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Álgebra</span></div>
+        <div class="panel-header"><h2 class="panel-title">Álgebra</h2></div>
         <div class="panel-body">
           <div style="margin:6px 0 3px;color:var(--accent);font-weight:700;font-size:0.8rem">📐 Ecuaciones</div>
           <div class="formula-chips">
@@ -1388,7 +1437,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <!-- Base de datos unificada -->
     <div class="panel">
       <div class="panel-header" style="cursor:pointer;user-select:none" onclick="toggleDBPanel()">
-        <span class="panel-title">Base de datos</span>
+        <h2 class="panel-title">Base de datos</h2>
         <span id="db-toggle-arrow" style="margin-left:auto;font-size:10px;transition:transform 0.2s">▶</span>
       </div>
       <div class="panel-body" id="unified-db-panel" style="display:none">
@@ -1401,7 +1450,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 
     <!-- Historial -->
     <div class="panel">
-      <div class="panel-header"><span class="panel-title">Historial</span><button onclick="exportGenPDF()" aria-label="Exportar PDF" style="margin-left:auto;background:none;border:1px solid var(--border2);color:var(--text3);border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='var(--accent2)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'"><span aria-hidden="true">📄</span> PDF</button></div>
+      <div class="panel-header"><h2 class="panel-title">Historial</h2><button onclick="exportGenPDF()" aria-label="Exportar PDF" style="margin-left:auto;background:none;border:1px solid var(--border2);color:var(--text3);border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='var(--accent2)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'"><span aria-hidden="true">📄</span> PDF</button></div>
       <div class="panel-body">
         <div class="history-list" id="history-list">
           <div style="font-size:11px;color:var(--text3);padding:10px 0">Sin cálculos aún</div>

@@ -8,6 +8,22 @@
         "Content-Type": "application/xml; charset=utf-8"
       },
       "dest": "/sitemap.xml"
+    },
+    {
+      "src": "/about",
+      "dest": "/about.html"
+    },
+    {
+      "src": "/contact",
+      "dest": "/contact.html"
+    },
+    {
+      "src": "/privacy",
+      "dest": "/privacy.html"
+    },
+    {
+      "src": "/terms",
+      "dest": "/terms.html"
     }
   ]
 }

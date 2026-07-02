@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://suma-mente.vercel.app/sitemap.xml
+Sitemap: https://suma-mente.vercel.app/sitemap-index.xml

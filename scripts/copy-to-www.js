@@ -20,6 +20,8 @@ const copyDir = (from, to) => {
     }
 };
 
+require('./generate-og-image');
+
 fs.mkdirSync(dest, { recursive: true });
 copyDir(src, dest);
 console.log('\u2713 www/ actualizada');

@@ -2,8 +2,10 @@ const { createCanvas, registerFont } = require('canvas');
 const fs = require('fs');
 const path = require('path');
 
-registerFont('C:\\Windows\\Fonts\\arialbd.ttf', { family: 'Arial Bold' });
-registerFont('C:\\Windows\\Fonts\\arial.ttf', { family: 'Arial' });
+if (process.platform === 'win32') {
+  try { registerFont('C:\\Windows\\Fonts\\arialbd.ttf', { family: 'Arial Bold' }); } catch {}
+  try { registerFont('C:\\Windows\\Fonts\\arial.ttf', { family: 'Arial' }); } catch {}
+}
 
 const W = 1200;
 const H = 630;
@@ -45,7 +47,7 @@ const symbols = [
 ctx.textAlign = 'center';
 ctx.textBaseline = 'middle';
 for (const sym of symbols) {
-  ctx.font = `bold ${sym.size}px 'Arial'`;
+  ctx.font = `bold ${sym.size}px sans-serif`;
   ctx.fillStyle = 'rgba(79, 156, 249, 0.07)';
   ctx.fillText(sym.char, sym.x, sym.y);
 }
@@ -61,22 +63,22 @@ ctx.fill();
 
 ctx.textAlign = 'left';
 ctx.textBaseline = 'bottom';
-ctx.font = "72px 'Arial Bold'";
+ctx.font = "bold 72px sans-serif";
 ctx.fillStyle = '#e8edf5';
 ctx.fillText('SumaMente', 40, 280);
 
 ctx.textBaseline = 'top';
-ctx.font = "28px 'Arial'";
+ctx.font = "28px sans-serif";
 ctx.fillStyle = '#4f9cf9';
 ctx.fillText('Calculadora Cient\u00EDfica', 40, 290);
 
 ctx.textBaseline = 'top';
-ctx.font = "16px 'Arial'";
+ctx.font = "16px sans-serif";
 ctx.fillStyle = '#4a5570';
 ctx.fillText('Herramienta de c\u00E1lculos matem\u00E1ticos y conversiones', 40, 330);
 
 ctx.textBaseline = 'bottom';
-ctx.font = "14px 'Arial'";
+ctx.font = "14px sans-serif";
 ctx.fillStyle = '#3a4155';
 ctx.fillText('suma-mente.vercel.app', 40, H - 30);
 

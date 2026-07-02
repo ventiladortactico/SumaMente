@@ -10,3 +10,6 @@ www/
 sumamente-keystore.jks
 android/keystore.properties
 android/app/google-services.json
+
+.vercel
+.env*

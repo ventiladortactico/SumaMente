@@ -1,0 +1,44 @@
+diff --git a/node_modules/@browserbasehq/stagehand/dist/cjs/lib/v3/llm/aisdk.js b/node_modules/@browserbasehq/stagehand/dist/cjs/lib/v3/llm/aisdk.js
+index 1c2d47b..79365ca 100644
+--- a/node_modules/@browserbasehq/stagehand/dist/cjs/lib/v3/llm/aisdk.js
++++ b/node_modules/@browserbasehq/stagehand/dist/cjs/lib/v3/llm/aisdk.js
+@@ -119,7 +119,7 @@ class AISdkClient extends LLMClient_js_1.LLMClient {
+         const providerName = inferProviderName(this.model.modelId);
+         // Models that lack native structured-output support need a prompt-based
+         // JSON fallback instead of response_format: { type: "json_schema" }.
+-        const PROMPT_JSON_FALLBACK_PATTERNS = ["deepseek", "kimi", "glm"];
++        const PROMPT_JSON_FALLBACK_PATTERNS = ["deepseek", "kimi", "glm", "llama", "mixtral", "gemma"];
+         const needsPromptJsonFallback = PROMPT_JSON_FALLBACK_PATTERNS.some((p) => this.model.modelId.includes(p));
+         const providerOptions = {};
+         switch (providerName) {
+@@ -157,7 +157,7 @@ class AISdkClient extends LLMClient_js_1.LLMClient {
+                 break;
+             case "groq":
+                 providerOptions.groq = {
+-                    structuredOutputs: true,
++                    structuredOutputs: false,
+                 };
+                 break;
+             case "cerebras":
+diff --git a/node_modules/@browserbasehq/stagehand/dist/esm/lib/v3/llm/aisdk.js b/node_modules/@browserbasehq/stagehand/dist/esm/lib/v3/llm/aisdk.js
+index 522a0cc..037dc34 100644
+--- a/node_modules/@browserbasehq/stagehand/dist/esm/lib/v3/llm/aisdk.js
++++ b/node_modules/@browserbasehq/stagehand/dist/esm/lib/v3/llm/aisdk.js
+@@ -116,7 +116,7 @@ export class AISdkClient extends LLMClient {
+         const providerName = inferProviderName(this.model.modelId);
+         // Models that lack native structured-output support need a prompt-based
+         // JSON fallback instead of response_format: { type: "json_schema" }.
+-        const PROMPT_JSON_FALLBACK_PATTERNS = ["deepseek", "kimi", "glm"];
++        const PROMPT_JSON_FALLBACK_PATTERNS = ["deepseek", "kimi", "glm", "llama", "mixtral", "gemma"];
+         const needsPromptJsonFallback = PROMPT_JSON_FALLBACK_PATTERNS.some((p) => this.model.modelId.includes(p));
+         const providerOptions = {};
+         switch (providerName) {
+@@ -154,7 +154,7 @@ export class AISdkClient extends LLMClient {
+                 break;
+             case "groq":
+                 providerOptions.groq = {
+-                    structuredOutputs: true,
++                    structuredOutputs: false,
+                 };
+                 break;
+             case "cerebras":

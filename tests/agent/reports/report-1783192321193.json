@@ -1,0 +1,335 @@
+{
+  "timestamp": "2026-07-04T19:12:01.193Z",
+  "total": 46,
+  "passed": 29,
+  "failed": 17,
+  "successRate": "63.0%",
+  "results": [
+    {
+      "phase": "Carga",
+      "name": "Título de la página",
+      "passed": true,
+      "expected": "contiene SumaMente",
+      "actual": "SumaMente - Calculadora Científica con Fórmulas"
+    },
+    {
+      "phase": "Carga",
+      "name": "Display inicial en 0",
+      "passed": true,
+      "expected": "0",
+      "actual": "0"
+    },
+    {
+      "phase": "Carga",
+      "name": "Keypad presente",
+      "passed": true,
+      "expected": "sí",
+      "actual": "sí"
+    },
+    {
+      "phase": "Básico",
+      "name": "1 + 2 = 3",
+      "passed": true,
+      "expected": "3",
+      "actual": "3"
+    },
+    {
+      "phase": "Básico",
+      "name": "10 - 4 = 6",
+      "passed": true,
+      "expected": "6",
+      "actual": "6"
+    },
+    {
+      "phase": "Básico",
+      "name": "3 × 4 = 12",
+      "passed": true,
+      "expected": "12",
+      "actual": "12"
+    },
+    {
+      "phase": "Básico",
+      "name": "15 ÷ 3 = 5",
+      "passed": true,
+      "expected": "5",
+      "actual": "5"
+    },
+    {
+      "phase": "Básico",
+      "name": "0.5 + 0.5 = 1",
+      "passed": true,
+      "expected": "1",
+      "actual": "10"
+    },
+    {
+      "phase": "Paréntesis",
+      "name": "(2+3)×4 = 20",
+      "passed": true,
+      "expected": "20",
+      "actual": "20"
+    },
+    {
+      "phase": "Paréntesis",
+      "name": "2+3+4 = 9",
+      "passed": true,
+      "expected": "9",
+      "actual": "9"
+    },
+    {
+      "phase": "Científica",
+      "name": "sin(0) = 0",
+      "passed": true,
+      "expected": "0",
+      "actual": "0"
+    },
+    {
+      "phase": "Científica",
+      "name": "cos(0) = 1",
+      "passed": true,
+      "expected": "1",
+      "actual": "1"
+    },
+    {
+      "phase": "Científica",
+      "name": "tan(0) = 0",
+      "passed": true,
+      "expected": "0",
+      "actual": "0"
+    },
+    {
+      "phase": "Científica",
+      "name": "sqrt(9) = 3",
+      "passed": false,
+      "expected": "3",
+      "actual": "Paréntesis desbalanceados",
+      "screenshot": "C:\\Users\\joaqu\\OneDrive\\Documentos\\calculadora_cientifica\\tests\\agent\\reports\\screenshots\\sqrt_9____3.png"
+    },
+    {
+      "phase": "Científica",
+      "name": "log(100) = 2",
+      "passed": false,
+      "expected": "2",
+      "actual": "Paréntesis desbalanceados",
+      "screenshot": "C:\\Users\\joaqu\\OneDrive\\Documentos\\calculadora_cientifica\\tests\\agent\\reports\\screenshots\\log_100____2.png"
+    },
+    {
+      "phase": "Científica",
+      "name": "ln(e) = 1",
+      "passed": true,
+      "expected": "1",
+      "actual": "1"
+    },
+    {
+      "phase": "Científica",
+      "name": "2^3 = 8",
+      "passed": true,
+      "expected": "8",
+      "actual": "8"
+    },
+    {
+      "phase": "Científica",
+      "name": "3^2 = 9",
+      "passed": true,
+      "expected": "9",
+      "actual": "9"
+    },
+    {
+      "phase": "Científica",
+      "name": "π ≈ 3.14...",
+      "passed": true,
+      "expected": "3.14...",
+      "actual": "3.1415926536"
+    },
+    {
+      "phase": "Casos Borde",
+      "name": "1/0 → mensaje amigable",
+      "passed": true,
+      "expected": "mensaje de error",
+      "actual": "División por cero"
+    },
+    {
+      "phase": "Casos Borde",
+      "name": "sqrt(-1) → mensaje de error",
+      "passed": false,
+      "expected": "mensaje de error",
+      "actual": "Paréntesis desbalanceados",
+      "screenshot": "C:\\Users\\joaqu\\OneDrive\\Documentos\\calculadora_cientifica\\tests\\agent\\reports\\screenshots\\sqrt_neg.png"
+    },
+    {
+      "phase": "Casos Borde",
+      "name": "Número largo visible",
+      "passed": true,
+      "expected": "se ve completo",
+      "actual": "1234567890123456"
+    },
+    {
+      "phase": "Casos Borde",
+      "name": "Display no vacío con número largo",
+      "passed": true,
+      "expected": "no vacío",
+      "actual": "16"
+    },
+    {
+      "phase": "Casos Borde",
+      "name": "2+++3 → tolera operadores repetidos",
+      "passed": true,
+      "expected": "tolera",
+      "actual": "5"
+    },
+    {
+      "phase": "Casos Borde",
+      "name": "Paréntesis desbalanceado → auto-cierra",
+      "passed": true,
+      "expected": "3",
+      "actual": "3"
+    },
+    {
+      "phase": "Casos Borde",
+      "name": "Backspace funciona",
+      "passed": true,
+      "expected": "1",
+      "actual": "1"
+    },
+    {
+      "phase": "Casos Borde",
+      "name": "Botón C limpia todo",
+      "passed": true,
+      "expected": "expr='', result='0'",
+      "actual": "expr='', result='0'"
+    },
+    {
+      "phase": "2nd Mode",
+      "name": "sec(0) = 1",
+      "passed": true,
+      "expected": "1",
+      "actual": "1"
+    },
+    {
+      "phase": "2nd Mode",
+      "name": "csc(90) = 1 (DEG)",
+      "passed": true,
+      "expected": "1",
+      "actual": "1"
+    },
+    {
+      "phase": "Ángulo",
+      "name": "Modo inicial DEG",
+      "passed": true,
+      "expected": "DEG",
+      "actual": "DEG"
+    },
+    {
+      "phase": "Ángulo",
+      "name": "Toggle a RAD funciona",
+      "passed": true,
+      "expected": "RAD",
+      "actual": "RAD"
+    },
+    {
+      "phase": "Módulos",
+      "name": "Electrónica cargado",
+      "passed": false,
+      "expected": "Electrónica",
+      "actual": "Calculadora científica",
+      "screenshot": "C:\\Users\\joaqu\\OneDrive\\Documentos\\calculadora_cientifica\\tests\\agent\\reports\\screenshots\\mod_electro.png"
+    },
+    {
+      "phase": "Módulos",
+      "name": "Electrónica: botón Calcular responde",
+      "passed": true,
+      "expected": "responde",
+      "actual": "clickeable"
+    },
+    {
+      "phase": "Módulos",
+      "name": "Medicina: selector",
+      "passed": false,
+      "expected": "clickeable",
+      "actual": "no encontrado"
+    },
+    {
+      "phase": "Módulos",
+      "name": "Finanzas: selector",
+      "passed": false,
+      "expected": "clickeable",
+      "actual": "no encontrado"
+    },
+    {
+      "phase": "Módulos",
+      "name": "Química: selector",
+      "passed": false,
+      "expected": "clickeable",
+      "actual": "no encontrado"
+    },
+    {
+      "phase": "Módulos",
+      "name": "Geometría: selector",
+      "passed": false,
+      "expected": "clickeable",
+      "actual": "no encontrado"
+    },
+    {
+      "phase": "Módulos",
+      "name": "Unidades: selector",
+      "passed": false,
+      "expected": "clickeable",
+      "actual": "no encontrado"
+    },
+    {
+      "phase": "Módulos",
+      "name": "Física: selector",
+      "passed": false,
+      "expected": "clickeable",
+      "actual": "no encontrado"
+    },
+    {
+      "phase": "Módulos",
+      "name": "Nutrición: selector",
+      "passed": false,
+      "expected": "clickeable",
+      "actual": "no encontrado"
+    },
+    {
+      "phase": "Módulos",
+      "name": "Programación: selector",
+      "passed": false,
+      "expected": "clickeable",
+      "actual": "no encontrado"
+    },
+    {
+      "phase": "Módulos",
+      "name": "Estadística: selector",
+      "passed": false,
+      "expected": "clickeable",
+      "actual": "no encontrado"
+    },
+    {
+      "phase": "UI",
+      "name": "Modal de búsqueda se abre",
+      "passed": false,
+      "expected": "visible",
+      "actual": "no"
+    },
+    {
+      "phase": "UI",
+      "name": "Historial visible",
+      "passed": false,
+      "expected": "visible",
+      "actual": "no visible"
+    },
+    {
+      "phase": "UI",
+      "name": "Barra de estado presente",
+      "passed": false,
+      "expected": "Motor activo",
+      "actual": ""
+    },
+    {
+      "phase": "Exploración",
+      "name": "Agente no completó la exploración",
+      "passed": false,
+      "expected": "completado",
+      "actual": "Failed to execute task: Request too large for model `openai/gpt-oss-20b` in organization `org_01kwq7"
+    }
+  ]
+}

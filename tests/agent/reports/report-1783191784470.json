@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-07-04T19:03:04.470Z",
+  "total": 1,
+  "passed": 0,
+  "failed": 1,
+  "successRate": "0.0%",
+  "results": [
+    {
+      "phase": "Exploración",
+      "name": "Agente no completó la exploración",
+      "passed": false,
+      "expected": "completado",
+      "actual": "Failed to execute task: Failed to call a function. Please adjust your prompt. See 'failed_generation"
+    }
+  ]
+}

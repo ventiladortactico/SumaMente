@@ -1,0 +1,26 @@
+diff --git a/node_modules/@ai-sdk/groq/dist/index.js b/node_modules/@ai-sdk/groq/dist/index.js
+index 2368ebd..ec01a1d 100644
+--- a/node_modules/@ai-sdk/groq/dist/index.js
++++ b/node_modules/@ai-sdk/groq/dist/index.js
+@@ -381,7 +381,7 @@ var GroqChatLanguageModel = class {
+         stop: stopSequences,
+         seed,
+         // response format:
+-        response_format: (responseFormat == null ? void 0 : responseFormat.type) === "json" ? structuredOutputs && responseFormat.schema != null ? {
++        response_format: (responseFormat == null ? void 0 : responseFormat.type) === "json" ? this.modelId.includes("llama") || this.modelId.includes("mixtral") || this.modelId.includes("gemma") || this.modelId.includes("deepseek") ? { type: "json_object" } : structuredOutputs && responseFormat.schema != null ? {
+           type: "json_schema",
+           json_schema: {
+             schema: responseFormat.schema,
+diff --git a/node_modules/@ai-sdk/groq/dist/index.mjs b/node_modules/@ai-sdk/groq/dist/index.mjs
+index c25d460..8a51612 100644
+--- a/node_modules/@ai-sdk/groq/dist/index.mjs
++++ b/node_modules/@ai-sdk/groq/dist/index.mjs
+@@ -372,7 +372,7 @@ var GroqChatLanguageModel = class {
+         stop: stopSequences,
+         seed,
+         // response format:
+-        response_format: (responseFormat == null ? void 0 : responseFormat.type) === "json" ? structuredOutputs && responseFormat.schema != null ? {
++        response_format: (responseFormat == null ? void 0 : responseFormat.type) === "json" ? this.modelId.includes("llama") || this.modelId.includes("mixtral") || this.modelId.includes("gemma") || this.modelId.includes("deepseek") ? { type: "json_object" } : structuredOutputs && responseFormat.schema != null ? {
+           type: "json_schema",
+           json_schema: {
+             schema: responseFormat.schema,

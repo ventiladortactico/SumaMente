@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-07-04T19:13:34.504Z",
+  "total": 1,
+  "passed": 0,
+  "failed": 1,
+  "successRate": "0.0%",
+  "results": [
+    {
+      "phase": "Exploración",
+      "name": "Agente no completó la exploración",
+      "passed": false,
+      "expected": "completado",
+      "actual": "Failed to execute task: No LLM API key or LLM Client configured. An LLM API key or a custom LLM Clie"
+    }
+  ]
+}

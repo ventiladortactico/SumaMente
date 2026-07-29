@@ -1,0 +1,22 @@
+{
+  "name": "sumamente-ai-test-agent",
+  "version": "1.0.0",
+  "description": "AI-powered testing agent for SumaMente calculator using Stagehand",
+  "type": "module",
+  "scripts": {
+    "postinstall": "patch-package",
+    "test": "npx tsx src/index.ts",
+    "test:quick": "npx tsx src/index.ts --quick",
+    "test:explore": "npx tsx src/index.ts --explore-only"
+  },
+  "dependencies": {
+    "@browserbasehq/stagehand": "^3.0.0",
+    "dotenv": "^16.4.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "patch-package": "^8.0.1"
+  }
+}

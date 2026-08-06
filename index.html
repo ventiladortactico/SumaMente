@@ -1574,6 +1574,32 @@ window.addEventListener('load', function(){
   });
 })();
 </script>
+<script>
+// A11Y: nombre accesible para iframes de publicidad inyectados (error axe "frame-title")
+(function () {
+  function nameIframe(el) {
+    if (el && el.tagName === 'IFRAME' && !el.getAttribute('title') && el.id.indexOf('bdvifrmloc') === 0) {
+      el.setAttribute('title', 'Publicidad');
+    }
+  }
+  function run(root) {
+    if (!root || !root.querySelectorAll) return;
+    var all = root.querySelectorAll('iframe');
+    for (var i = 0; i < all.length; i++) nameIframe(all[i]);
+    nameIframe(root);
+  }
+  run(document);
+  var mo = new MutationObserver(function (muts) {
+    for (var i = 0; i < muts.length; i++) {
+      var m = muts[i];
+      if (m.type === 'childList') {
+        for (var j = 0; j < m.addedNodes.length; j++) run(m.addedNodes[j]);
+      }
+    }
+  });
+  mo.observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>
 </body>
 </html>
 

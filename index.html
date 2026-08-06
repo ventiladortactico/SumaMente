@@ -438,7 +438,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 <body>
 <div class="app">
 
-<div class="header">
+<header class="header">
   <div>
     <h1 class="logo" style="font-size:inherit;font-weight:inherit;margin:0">SUMA<span>MENTE</span></h1>
     <div class="version" id="version-tap" style="cursor:pointer">v1.2 © Pro Dynamic</div>
@@ -447,9 +447,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     <button class="btn-secondary" onclick="toggleSteps()">◀ Pasos</button>
     <button class="btn-secondary" onclick="clearHistory()">Limpiar</button>
   </div>
-</div>
+</header>
 
-<div class="nav-bar">
+<nav class="nav-bar">
   <div class="current-mode-display">
     <span class="dot" id="current-dot" style="background:#4f9cf9"></span>
     <span class="current-mode-name" id="current-name">General</span>
@@ -462,7 +462,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
       MÓDULOS
     </button>
   </div>
-</div>
+</nav>
 
 <!-- Modal Selector de Módulos -->
 <div class="modal" id="modal-modules" onclick="toggleModal(false)">
@@ -688,7 +688,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
   </div>
 </div>
 
-<div class="layout">
+<main class="layout">
   <div>
 
     <!-- ===== GENERAL ===== -->
@@ -1467,7 +1467,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
     </div>
 
   </div>
-</div>
+</main>
 
 <div id="notif-bar">
   <span class="nb-text">🔔 Recibí novedades de SumaMente</span>
@@ -1552,6 +1552,44 @@ window.addEventListener('load', function(){
     document.body.appendChild(sp);
   }, 1500);
 });
+</script>
+<script>
+// A11Y: evitar que elementos con aria-hidden contengan contenido enfocable (error axe "aria-hidden-focus")
+(function () {
+  var FOCUS = 'a[href],button,input,select,textarea,iframe,audio[controls],video[controls],[tabindex]';
+  function hasFocusable(el) {
+    if (!el.querySelectorAll) return false;
+    return el.querySelector(FOCUS) !== null;
+  }
+  function fix(el) {
+    if (!el || el.nodeType !== 1) return;
+    if (el.getAttribute('aria-hidden') !== 'true') return;
+    var tag = (el.tagName || '').toLowerCase();
+    if (tag === 'body' || tag === 'html' || (el.classList && el.classList.contains('app')) || hasFocusable(el)) {
+      el.removeAttribute('aria-hidden');
+    }
+  }
+  function run(root) {
+    if (!root || !root.querySelectorAll) return;
+    var all = root.querySelectorAll('[aria-hidden="true"]');
+    for (var i = 0; i < all.length; i++) fix(all[i]);
+    fix(root);
+  }
+  run(document);
+  var mo = new MutationObserver(function (muts) {
+    for (var i = 0; i < muts.length; i++) {
+      var m = muts[i];
+      if (m.type === 'attributes' && m.attributeName === 'aria-hidden') fix(m.target);
+      else if (m.type === 'childList') {
+        for (var j = 0; j < m.addedNodes.length; j++) run(m.addedNodes[j]);
+      }
+    }
+  });
+  mo.observe(document.documentElement, {
+    childList: true, subtree: true,
+    attributes: true, attributeFilter: ['aria-hidden']
+  });
+})();
 </script>
 </body>
 </html>
